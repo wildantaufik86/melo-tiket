@@ -1,0 +1,68 @@
+import jwt, { SignOptions, VerifyOptions } from "jsonwebtoken";
+import { SessionDocument } from "../models/SessionModel";
+import { UserDocument } from "../models/UserModel";
+import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
+
+export type RefreshTokenPayload = {
+  sessionId: SessionDocument['_id'];
+};
+
+export type AccessTokenPayload = {
+  userId: UserDocument['_id'];
+  sessionId: SessionDocument['_id'];
+};
+
+type SignOptionsAndSecret = SignOptions & {
+  secret: string;
+};
+
+const defaultSignOptions: SignOptions = {
+  audience: 'user',
+}
+
+const defaultVerifyOptions: VerifyOptions = {
+  audience: ['user'] as [string],
+}
+
+const accessTokenSignOptions: SignOptionsAndSecret = {
+  expiresIn: '60m',
+  secret: JWT_SECRET,
+};
+
+export const refreshTokenSignOptions: SignOptionsAndSecret = {
+  expiresIn: '30d',
+  secret: JWT_REFRESH_SECRET,
+};
+
+export const signToken = (
+  payload: AccessTokenPayload | RefreshTokenPayload,
+  option?: SignOptionsAndSecret
+) => {
+  const { secret, ...signOpts } = option || accessTokenSignOptions;
+  return jwt.sign(payload, secret, {
+    ...defaultSignOptions,
+    ...signOpts,
+  });
+};
+
+export const verifyToken = <TPayload extends object = AccessTokenPayload>(
+  token: string,
+  options?: VerifyOptions & {
+    secret?: string;
+  }
+) => {
+  const { secret = JWT_SECRET, ...verifyOpts } = options || {};
+  try {
+    const payload = jwt.verify(token, secret, {
+      ...defaultVerifyOptions,
+      ...verifyOpts,
+    }) as unknown as TPayload;
+    return {
+      payload,
+    };
+  } catch (error: any) {
+    return {
+      error: error.message,
+    };
+  }
+};
