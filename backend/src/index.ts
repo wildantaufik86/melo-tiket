@@ -14,6 +14,7 @@ import adminRoutes from "./routes/admin.routes";
 import { createServer } from "http";
 import { generateTicketImage, getAllTicketDetail, getAllTickets } from "./controllers/transaction.controller";
 import operatorRoutes from "./routes/operator.routes";
+import ticketRoutes from "./routes/ticket.routes";
 
 const allowedOrigins = [
   // Local development
@@ -59,7 +60,8 @@ app.get("/", ({ req, res }: any) => {
     status: "Perfectly Connected",
   });
 });
-app.get("/tickets", getAllTickets);
+
+app.use("/ticket", ticketRoutes);
 app.get("/tickets/:id", getAllTicketDetail);
 app.use("/admin", adminRoutes);
 app.use("/operator", operatorRoutes);

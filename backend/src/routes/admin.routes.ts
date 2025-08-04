@@ -22,8 +22,8 @@ adminRoutes.get("/tickets/print/:transactionId", authenticate, validateRole("sup
 adminRoutes.get("/users", authenticate, validateRole("superadmin", "operator"), getAllUsers);
 adminRoutes.post("/users/:id/edit", authenticate, validateRole('superadmin'), updateUserProfile);
 adminRoutes.post("/users/:id/change-password", authenticate, validateRole('superadmin'), changeUserPassword);
-adminRoutes.post("/tickets", authenticate, validateRole('superadmin'), createTicketHandler);
-adminRoutes.get("/tickets/all", authenticate, validateRole('superadmin'), getAllTickets);
+// adminRoutes.post("/tickets", authenticate, validateRole('superadmin'), createTicketHandler);
+// adminRoutes.get("/tickets/all", authenticate, validateRole('superadmin'), getAllTickets);
 adminRoutes.put("/tickets/:ticketId", authenticate, validateRole("superadmin"), upload.array("images", 5), updateTicketHandler);
 
 adminRoutes.post("/transactions/create", authenticate, validateRole("superadmin", "operator"),  createAdminTransactionHandler);
