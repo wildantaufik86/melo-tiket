@@ -255,42 +255,6 @@ export const printTicketHandler: RequestHandler = async (req, res, next) => {
   // }
 };
 
-export const getAllUsers = async (req: Request, res: Response) => {
-  try {
-    const users = await UserModel.find(
-      {},
-      "_id email profile role historyTransaction"
-    );
-    const formattedUsers = await Promise.all(
-      users.map(async (user) => {
-        const validTransactions = await TransactionModel.find({
-          _id: { $in: user.historyTransaction },
-        });
-
-        const validTransactionIds = validTransactions.map((t) => t._id as mongoose.Types.ObjectId);
-        if (validTransactionIds.length !== user.historyTransaction?.length) {
-          user.historyTransaction = validTransactionIds;
-          await user.save();
-        }
-        return {
-          id: user._id,
-          profile: user.profile,
-          email: user.email,
-          role: user.role,
-          historyTransaction: validTransactionIds,
-        };
-      })
-    );
-
-    res.status(OK).json({
-      message: "Data Successfully Retrieved",
-      data: formattedUsers,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error });
-  }
-};
-
 export const updateUserProfile: RequestHandler = async (req: any, res: any) => {
   try {
     const userId = req.params.id;

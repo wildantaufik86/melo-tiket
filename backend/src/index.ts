@@ -12,9 +12,9 @@ import authenticate from "./middleware/authenticate";
 import path from "path";
 import adminRoutes from "./routes/admin.routes";
 import { createServer } from "http";
-import { generateTicketImage, getAllTicketDetail, getAllTickets } from "./controllers/transaction.controller";
 import operatorRoutes from "./routes/operator.routes";
 import ticketRoutes from "./routes/ticket.routes";
+import profileRoutes from "./routes/profile.routes";
 
 const allowedOrigins = [
   // Local development
@@ -62,14 +62,13 @@ app.get("/", ({ req, res }: any) => {
 });
 
 app.use("/ticket", ticketRoutes);
-app.get("/tickets/:id", getAllTicketDetail);
+app.use("/profile", profileRoutes);
 app.use("/admin", adminRoutes);
 app.use("/operator", operatorRoutes);
 
 app.use("/auth", authRoutes);
 
-
-app.use("/user", authenticate, userRoutes);
+app.use("/user", userRoutes);
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 

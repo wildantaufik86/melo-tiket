@@ -4,8 +4,9 @@ import AppErrorCode from "../constants/appErrorCode";
 import { UNAUTHORIZED } from "../constants/http";
 import { verifyToken } from "../utils/jwt";
 import mongoose from "mongoose";
+import UserModel from "../models/UserModel";
 
-const authenticate: RequestHandler = (req, res, next) => {
+const authenticate: RequestHandler = async (req, res, next) => {
   try {
     // Ambil token dari Cookie atau Header Authorization
     const cookieToken = req.cookies?.accessToken as string | undefined;
@@ -31,6 +32,17 @@ const authenticate: RequestHandler = (req, res, next) => {
 
     // Validasi payload userId dan sessionId
     const { userId, sessionId } = payload;
+    const userFromDb = await UserModel.findById(userId).select('_id role');
+
+    if (!userFromDb) {
+      return res.status(UNAUTHORIZED).json({ message: "User for this token not found" });
+    }
+
+    req.user = {
+      _id: userFromDb._id as mongoose.Types.ObjectId,
+      role: userFromDb.role!
+    };
+
     if (typeof userId === "string" && typeof sessionId === "string") {
       try {
         req.userId = new mongoose.Types.ObjectId(userId);

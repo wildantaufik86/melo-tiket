@@ -6,7 +6,6 @@ import {
   getAllTickets,
   getAllTransactions,
   getAllTransactionsByUser,
-  getAllUsers,
   printTicketHandler,
   updateUserProfile,
 } from "../controllers/admin.controller";
@@ -19,7 +18,6 @@ const adminRoutes = Router();
 // adminRoutes.get("/transactions", authenticate, validateRole("superadmin"), getAllTransactions);
 adminRoutes.get("/transactions/user/:id", authenticate, validateRole("superadmin"), getAllTransactionsByUser);
 adminRoutes.get("/tickets/print/:transactionId", authenticate, validateRole("superadmin"), printTicketHandler);
-adminRoutes.get("/users", authenticate, validateRole("superadmin", "operator"), getAllUsers);
 adminRoutes.post("/users/:id/edit", authenticate, validateRole('superadmin'), updateUserProfile);
 adminRoutes.post("/users/:id/change-password", authenticate, validateRole('superadmin'), changeUserPassword);
 // adminRoutes.post("/tickets", authenticate, validateRole('superadmin'), createTicketHandler);

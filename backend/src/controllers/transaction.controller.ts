@@ -252,7 +252,7 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       session.startTransaction();
 
       try {
-          const userId = req.userId;
+          const userId = req.user?._id;
           const validatedData = transactionSchema.parse(req.body);
           const ticketIds = validatedData.tickets.map((t) => t.ticketId);
 
@@ -405,7 +405,7 @@ export const createTransactionPresale2Handler: RequestHandler = async (req, res,
       session.startTransaction();
 
       try {
-          const userId = req.userId;
+          const userId = req.user?._id;
           const validatedData = transactionSchema.parse(req.body);
           const ticketIds = validatedData.tickets.map((t) => t.ticketId);
 
@@ -558,7 +558,7 @@ export const createTransactionPresale3Handler: RequestHandler = async (req, res,
       session.startTransaction();
 
       try {
-          const userId = req.userId;
+          const userId = req.user?._id;
           const validatedData = transactionSchema.parse(req.body);
           const ticketIds = validatedData.tickets.map((t) => t.ticketId);
 
@@ -711,7 +711,7 @@ export const createTransactionPresale4Handler: RequestHandler = async (req, res,
       session.startTransaction();
 
       try {
-          const userId = req.userId;
+          const userId = req.user?._id;
           const validatedData = transactionSchema.parse(req.body);
           const ticketIds = validatedData.tickets.map((t) => t.ticketId);
 
@@ -865,7 +865,7 @@ export const createAdminTransactionHandler: RequestHandler = async (req, res, ne
       session.startTransaction();
 
       try {
-          const adminUserId = req.userId;
+          const adminUserId = req.user?._id;
           const validatedData = adminTransactionSchema.parse(req.body);
           const userId = validatedData.userId;
 
@@ -1011,7 +1011,7 @@ export const createAdminTransactionHandler2: RequestHandler = async (req, res, n
       session.startTransaction();
 
       try {
-          const adminUserId = req.userId;
+          const adminUserId = req.user?._id;
           const validatedData = adminTransactionSchema.parse(req.body);
           const userId = validatedData.userId;
 
@@ -1157,7 +1157,7 @@ export const createAdminTransactionHandler3: RequestHandler = async (req, res, n
       session.startTransaction();
 
       try {
-          const adminUserId = req.userId;
+          const adminUserId = req.user?._id;
           const validatedData = adminTransactionSchema.parse(req.body);
           const userId = validatedData.userId;
 
@@ -1303,7 +1303,7 @@ export const createAdminTransactionHandler4: RequestHandler = async (req, res, n
       session.startTransaction();
 
       try {
-          const adminUserId = req.userId;
+          const adminUserId = req.user?._id;
           const validatedData = adminTransactionSchema.parse(req.body);
           const userId = validatedData.userId;
 
@@ -1553,7 +1553,7 @@ export const getAllTicketDetail: RequestHandler = async (req, res, next) => {
 
 export const getUserTransactions: RequestHandler = async (req, res) => {
   try {
-    const userId = req.userId;
+    const userId = req.user?._id;
 
     const transactions = await TransactionModel.find({
       userId: userId,
