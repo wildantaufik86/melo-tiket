@@ -1,216 +1,106 @@
 import { RequestHandler } from "express";
-import TicketModel, { TicketStatus } from "../models/TicketModel";
-import { BAD_REQUEST, CREATED, NOT_FOUND, OK } from "../constants/http";
-import mongoose from "mongoose";
-import path from 'path';
+import TicketModel from "../models/TicketModel";
+import EventModel from "../models/EventModel";
+import appAssert from "../utils/appAssert";
+import { BAD_REQUEST, CREATED, NO_CONTENT, NOT_FOUND, OK } from "../constants/http";
 
-export const getAllTicketHandler: RequestHandler = async (req, res, next) => {
+export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next) => {
   try {
-    const tickets = await TicketModel.find();
-    return res.status(OK).json({
-      message: "Ticket fetched uccessfully!",
-      data: tickets
-    })
-  } catch (error) {
-    next(error)
-  }
-}
+    const { eventId } = req.params;
+    const { category, price, stock, templateImage, templateLayout } = req.body;
 
-export const getTicketByIdHandler: RequestHandler = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const tickets = await TicketModel.findById(id);
+    // 1. Validasi input dasar
+    appAssert(category && price !== undefined && stock !== undefined, BAD_REQUEST, "Category, price, and stock are required");
+    appAssert(templateImage && templateLayout, BAD_REQUEST, "Template image and layout are required");
 
-    if(!tickets) {
-      return res.status(NOT_FOUND).json({
-        message: "Ticket not found"
-      })
-    }
+    // 2. Pastikan event induknya ada sebelum menambahkan tiket
+    const parentEvent = await EventModel.findById(eventId);
+    appAssert(parentEvent, NOT_FOUND, "Parent event not found, cannot add ticket");
 
-    return res.status(OK).json({
-      message: "Ticket Fetched Successfully!",
-      data: tickets
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const updateTicketHandler: RequestHandler = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { eventName, category, price, stock, status, content } = req.body;
-
-    // Validation minimal (bisa diganti zod/joi)
-    if (price !== undefined && price < 0) {
-      return res.status(BAD_REQUEST).json({ message: "Price must be a positive number" });
-    }
-    if (stock !== undefined && stock < 0) {
-      return res.status(BAD_REQUEST).json({ message: "Stock must be a positive number" });
-    }
-
-    // Auto update status jika stock = 0
-    let newStatus = status;
-    if (stock === 0) {
-      newStatus = TicketStatus.SOLD_OUT;
-    }
-
-    const updatedTicket = await TicketModel.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          ...(eventName && { eventName }),
-          ...(category && { category }),
-          ...(price !== undefined && { price }),
-          ...(stock !== undefined && { stock }),
-          ...(newStatus && { status: newStatus }),
-          ...(content && { content }),
-        },
-      },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedTicket) {
-      return res.status(NOT_FOUND).json({ message: "Ticket not found" });
-    }
-
-    return res.status(OK).json({
-      message: "Ticket updated successfully",
-      data: updatedTicket,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-
-export const deleteTicketHandler: RequestHandler = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const tickets = await TicketModel.findByIdAndDelete(id);
-
-    if(!tickets) {
-      return res.status(NOT_FOUND).json({
-        message: "Ticket not found"
-      })
-    }
-
-    return res.status(OK).json({
-      message: "Ticket deleted successfully!",
-      data: tickets
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-export const createTicketHandler: RequestHandler = async (req, res, next) => {
-  try {
-    const { eventName, category, price, stock, status, content } = req.body;
-
-    // Basic validation
-    if (!eventName || !category) {
-      return res.status(BAD_REQUEST).json({ message: "Event name and category are required" });
-    }
-    if (typeof price !== "number" || price < 0) {
-      return res.status(BAD_REQUEST).json({ message: "Price must be a positive number" });
-    }
-    if (typeof stock !== "number" || stock < 0) {
-      return res.status(BAD_REQUEST).json({ message: "Stock must be a positive number" });
-    }
-
-    let ticketStatus = status || TicketStatus.UNAVAILABLE;
-    if (stock === 0) ticketStatus = TicketStatus.SOLD_OUT;
-
+    // 3. Buat instance tiket baru, hubungkan dengan eventId
     const newTicket = new TicketModel({
-      eventName,
+      eventId,
       category,
       price,
       stock,
-      status: ticketStatus,
-      content,
+      templateImage,
+      templateLayout,
     });
 
     await newTicket.save();
 
     res.status(CREATED).json({
-      message: "Ticket created successfully",
-      data: newTicket,
+      message: `Ticket category '${category}' added to event '${parentEvent.eventName}' successfully`,
+      ticket: newTicket,
+    });
+
+  } catch (error) {
+    // Error akan ditangani oleh unique index jika kategori duplikat
+    next(error);
+  }
+};
+
+export const getAllTicketTypesForEventHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+
+    const tickets = await TicketModel.find({ eventId });
+
+    res.status(OK).json({
+      count: tickets.length,
+      tickets,
     });
   } catch (error) {
     next(error);
   }
 };
 
-// export const updateTicketHandler: RequestHandler = async (req, res, next) => {
-//   try {
-//     const { ticketId } = req.params;
-//     const { eventName, category, price, stock, content, status } = req.body;
+export const getTicketTypeByIdHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { eventId, ticketId } = req.params;
 
-//     if (!mongoose.Types.ObjectId.isValid(ticketId)) {
-//       res.status(BAD_REQUEST).json({ message: "Invalid ticket ID" });
-//     }
+    // Cari tiket berdasarkan ID-nya DAN ID event-nya untuk keamanan
+    const ticket = await TicketModel.findOne({ _id: ticketId, eventId });
+    appAssert(ticket, NOT_FOUND, "Ticket category not found in this event");
 
+    res.status(OK).json({ ticket });
+  } catch (error) {
+    next(error);
+  }
+};
 
-//     let uploadedImages: string[] = [];
-//     if (req.files && Array.isArray(req.files)) {
-//       uploadedImages = req.files.map((file) => {
-//         let filePath = path.join('/uploads', file.filename);
-//         return filePath.replace(/\\/g, '/'); // Ganti \ dengan /
-//       });
-//     }
+export const updateTicketTypeHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { eventId, ticketId } = req.params;
+    const updateData = req.body;
 
-//     let parsedContent: any = {};
-//     try {
-//       parsedContent = typeof content === "string" ? JSON.parse(content) : content;
-//     } catch (err) {
-//       res.status(BAD_REQUEST).json({ message: "Invalid JSON format in content" });
-//     }
+    // Cari dan update dalam satu query atomik
+    const updatedTicket = await TicketModel.findOneAndUpdate(
+      { _id: ticketId, eventId }, // Kondisi pencarian yang aman
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
 
-//     parsedContent = parsedContent || {};
-//     parsedContent.lineup = parsedContent.lineup || {};
+    appAssert(updatedTicket, NOT_FOUND, "Ticket category not found in this event");
 
-//     parsedContent.lineup = {
-//       lineUpTitle: parsedContent.lineup.lineUpTitle || "",
-//       lineUpImage: parsedContent.lineup.lineUpImage || "",
-//       lineUpDesc: parsedContent.lineup.lineUpDesc || "",
-//       logoImage: parsedContent.lineup.logoImage || "",
-//       instagramUrl: parsedContent.lineup.instagramUrl || "",
-//       spotifyUrl: parsedContent.lineup.spotifyUrl || "",
-//     };
+    res.status(OK).json({
+      message: "Ticket category updated successfully",
+      ticket: updatedTicket,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-//     if (uploadedImages.length > 0) {
-//       parsedContent.headlineImage = uploadedImages[0] || parsedContent.headlineImage;
-//       if (uploadedImages.length > 1) {
-//         parsedContent.lineup.lineUpImage = uploadedImages[1] || parsedContent.lineup.lineUpImage;
-//       }
-//       if (uploadedImages.length > 2) {
-//         parsedContent.lineup.logoImage = uploadedImages[2] || parsedContent.lineup.logoImage;
-//       }
-//     }
+export const deleteTicketTypeHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { eventId, ticketId } = req.params;
 
-//     const updatedTicket = await TicketModel.findByIdAndUpdate(
-//       ticketId,
-//       {
-//         eventName,
-//         category,
-//         price,
-//         stock,
-//         content: parsedContent,
-//         status,
-//       },
-//       { new: true, runValidators: true }
-//     );
+    const result = await TicketModel.findOneAndDelete({ _id: ticketId, eventId });
+    appAssert(result, NOT_FOUND, "Ticket category not found in this event");
 
-//     if (!updatedTicket) {
-//       res.status(NOT_FOUND).json({ message: "Ticket not found" });
-//     }
-
-//     res.status(OK).json({
-//       message: "Ticket updated successfully",
-//       data: updatedTicket,
-//     });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+    res.status(NO_CONTENT).send();
+  } catch (error) {
+    next(error);
+  }
+};

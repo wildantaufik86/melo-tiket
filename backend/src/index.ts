@@ -15,6 +15,8 @@ import { createServer } from "http";
 import operatorRoutes from "./routes/operator.routes";
 import ticketRoutes from "./routes/ticket.routes";
 import profileRoutes from "./routes/profile.routes";
+import eventRoutes from "./routes/event.routes";
+import transactionRoutes from "./routes/transaction.routes";
 
 const allowedOrigins = [
   // Local development
@@ -62,6 +64,8 @@ app.get("/", ({ req, res }: any) => {
 });
 
 app.use("/ticket", ticketRoutes);
+app.use("/transaction", transactionRoutes);
+app.use("/event", eventRoutes);
 app.use("/profile", profileRoutes);
 app.use("/admin", adminRoutes);
 app.use("/operator", operatorRoutes);

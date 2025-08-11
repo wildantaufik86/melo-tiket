@@ -1,86 +1,74 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+// Enum untuk mengontrol status penjualan setiap jenis tiket.
 export enum TicketStatus {
   AVAILABLE = "Available",
   UNAVAILABLE = "Unavailable",
   SOLD_OUT = "Sold Out",
 }
 
-export interface ILineup {
-  lineUpTitle?: string;
-  lineUpImage?: string;
-  lineUpDesc?: string;
-  logoImage?: string;
-  instagramUrl?: string;
-  spotifyUrl?: string;
-}
-
-export interface IContent {
-  date?: string;
-  time?: string;
-  address?: string;
-  addressUrl?: string;
-  descriptionEvent?: string;
-  headlineImage?: string;
-  lineup?: ILineup;
-}
-
+// Interface TypeScript untuk dokumen Tiket.
 export interface ITicket extends Document {
-  _id: Schema.Types.ObjectId;
-  eventName: string;
+  eventId: mongoose.Types.ObjectId;
   category: string;
   price: number;
   stock: number;
   status: TicketStatus;
-  content: IContent;
-  createdAt: Date;
-  updatedAt: Date;
+  templateImage: string;
+  templateLayout: string;
 }
 
-// Sub-schema for lineup
-const LineupSchema = new Schema<ILineup>(
-  {
-    lineUpTitle: { type: String, default: "" },
-    lineUpImage: { type: String, default: "" },
-    lineUpDesc: { type: String, default: "" },
-    logoImage: { type: String, default: "" },
-    instagramUrl: { type: String, default: "" },
-    spotifyUrl: { type: String, default: "" },
-  },
-  { _id: false }
-);
-
-// Sub-schema for content
-const ContentSchema = new Schema<IContent>(
-  {
-    date: { type: String, default: "" },
-    time: { type: String, default: "" },
-    address: { type: String, default: "" },
-    addressUrl: { type: String, default: "" },
-    descriptionEvent: { type: String, default: "" },
-    headlineImage: { type: String, default: "" },
-    lineup: { type: LineupSchema, default: {} },
-  },
-  { _id: false }
-);
-
+// Skema Mongoose untuk Tiket.
 const TicketSchema = new Schema<ITicket>(
   {
-    eventName: { type: String, required: true, trim: true, index: true },
-    category: { type: String, required: true, trim: true, index: true },
-    price: { type: Number, required: true, min: 0 },
-    stock: { type: Number, required: true, min: 0 },
+    // Kunci asing yang menghubungkan ke Event. Ini adalah fondasi desainnya.
+    eventId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Event',
+      required: true,
+      index: true
+    },
+    // Nama kategori tiket (e.g., "Presale 1", "VIP").
+    category: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    price: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    stock: {
+      type: Number,
+      required: true,
+      min: 0
+    },
+    // Status yang bisa diubah oleh admin untuk menonaktifkan penjualan.
     status: {
       type: String,
       enum: Object.values(TicketStatus),
-      default: TicketStatus.UNAVAILABLE,
+      default: TicketStatus.AVAILABLE,
     },
-    content: { type: ContentSchema, default: {} },
+    // Nama file gambar template (e.g., "template-vip.png").
+    templateImage: {
+      type: String,
+      required: true
+    },
+    // Nama file JSON layout (e.g., "layout-vip.json").
+    templateLayout: {
+      type: String,
+      required: true
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-TicketSchema.index({ eventName: 1, category: 1 }); // compound index example
+// Mencegah ada 2 kategori tiket yang sama untuk 1 event.
+TicketSchema.index({ eventId: 1, category: 1 }, { unique: true });
 
 const TicketModel = mongoose.model<ITicket>("Ticket", TicketSchema);
+
 export default TicketModel;

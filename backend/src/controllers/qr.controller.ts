@@ -100,7 +100,7 @@ export const scanQRHandler: RequestHandler = async (req: any, res: any) => {
       return res.status(404).json({ message: 'Tiket dengan QR code ini tidak ditemukan.', status: false });
     }
 
-    const ticketToUpdate = transaction.tickets.find(ticket => ticket.uniqueTicketId.equals(uniqueTicketId));
+    const ticketToUpdate = transaction.tickets.find(ticket => ticket._id.equals(uniqueTicketId));
 
     if (ticketToUpdate) {
       if (ticketToUpdate.isScanned === false) {
@@ -109,7 +109,7 @@ export const scanQRHandler: RequestHandler = async (req: any, res: any) => {
 
         // Simpan data ke model ScannedTicket
         const scannedTicket = new ScannedTicketModel({
-          uniqueTicketId: ticketToUpdate.uniqueTicketId,
+          uniqueTicketId: ticketToUpdate._id,
           transactionId: transaction._id,
           qrCodeData: qrCodeData,
           scannedByOperatorId: req.userId, // Ambil ID user dari req.user

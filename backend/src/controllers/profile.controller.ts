@@ -10,7 +10,7 @@ export const getMyProfileHandler: RequestHandler = async (req, res, next) => {
       return res.status(401).json({ message: "Authentication required" });
     }
 
-    const user = await UserModel.findById(userId);
+    const user = await UserModel.findById(userId).populate('historyTransaction');
 
     if (!user) {
       return res.status(NOT_FOUND).json({ message: "User not found" });

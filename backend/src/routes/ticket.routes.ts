@@ -1,14 +1,18 @@
 import { Router } from "express";
+import {
+  addTicketTypeToEventHandler,
+  getAllTicketTypesForEventHandler,
+  getTicketTypeByIdHandler,
+  updateTicketTypeHandler,
+  deleteTicketTypeHandler
+} from "../controllers/ticket.controller"; // Asumsi nama controller
 import authenticate from "../middleware/authenticate";
 import validateRole from "../middleware/validateRole";
-import { createTicketHandler, deleteTicketHandler, getAllTicketHandler, getTicketByIdHandler, updateTicketHandler } from "../controllers/ticket.controller";
 
 const ticketRoutes = Router();
 
-ticketRoutes.get("/", authenticate, validateRole("superadmin", "admin"), getAllTicketHandler)
-ticketRoutes.get("/:id", authenticate, validateRole("superadmin", "admin"), getTicketByIdHandler)
-ticketRoutes.post("/create", authenticate, validateRole("superadmin", "admin"), createTicketHandler)
-ticketRoutes.patch("/:id", authenticate, validateRole("superadmin", "admin"), updateTicketHandler)
-ticketRoutes.delete("/delete", authenticate, validateRole("superadmin", "admin"), deleteTicketHandler)
+ticketRoutes.get("/:eventId", getAllTicketTypesForEventHandler);
+ticketRoutes.get("/:eventId/:ticketId", getTicketTypeByIdHandler);
+ticketRoutes.delete("/:ticketId", authenticate, validateRole("superadmin"), deleteTicketTypeHandler);
 
 export default ticketRoutes;
