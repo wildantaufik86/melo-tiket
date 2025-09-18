@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 interface UserPayload {
   _id: mongoose.Types.ObjectId | string;
+  email: string;
   role: 'user' | 'admin' | 'superadmin';
 }
 

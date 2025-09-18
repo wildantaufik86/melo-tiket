@@ -56,10 +56,10 @@ export const updateMyProfileHandler: RequestHandler = async (req, res, next) => 
 
 export const changeMyPasswordHandler: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?._id;
-    const { currentPassword, newPassword, newPasswordConfirmation } = req.body;
+    const userId = req.user?.email;
+    const { email, currentPassword, newPassword, newPasswordConfirmation } = req.body;
 
-    if(!currentPassword || !newPassword || !newPasswordConfirmation) {
+    if(!email || !currentPassword || !newPassword || !newPasswordConfirmation) {
       return res.status(BAD_REQUEST).json({
         message: "All fields are required",
       })

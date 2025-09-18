@@ -7,6 +7,6 @@ const profileRoutes = Router();
 
 profileRoutes.get("/", authenticate, getMyProfileHandler);
 profileRoutes.patch("/update", authenticate, updateMyProfileHandler);
-profileRoutes.patch("/update-password", authenticate, changeMyPasswordHandler);
+profileRoutes.patch("/update-password", changeMyPasswordHandler);
 
 export default profileRoutes;
