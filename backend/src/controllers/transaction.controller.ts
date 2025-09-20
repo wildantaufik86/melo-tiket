@@ -3,22 +3,19 @@ import { RequestHandler } from "express";
 import TransactionModel from "../models/TransactionModel";
 import TicketModel from "../models/TicketModel";
 import UserModel from "../models/UserModel";
-import { BAD_REQUEST, CREATED, FORBIDDEN, NOT_FOUND } from "../constants/http";
+import { BAD_REQUEST, CREATED, FORBIDDEN, NOT_FOUND, OK } from "../constants/http";
 import appAssert from "../utils/appAssert";
 import AppError from "../utils/appError";
 import { processAndGenerateTicket } from "../services/ticket.service";
 
 export const createTransactionHandler: RequestHandler = async (req, res, next) => {
-  // Logika retry dan transaksi Anda sudah sangat baik, kita pertahankan
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const initiator = req.user;
     appAssert(initiator, FORBIDDEN, "Authentication failed, user not found.")
-    const { tickets: ticketRequests, transactionMethod, userId: targetUserIdFromAdmin } = req.body; // Divalidasi oleh Zod/Joi
-
-    // 1. Tentukan untuk siapa transaksi ini dibuat
+    const { tickets: ticketRequests, transactionMethod, userId: targetUserIdFromAdmin } = req.body;
     let targetUserId;
 
     if (initiator.role === 'user') {
@@ -39,13 +36,12 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
 
     appAssert(
       !existingPendingTransaction,
-      BAD_REQUEST, // Status 400
+      BAD_REQUEST,
       "You already have a pending transaction. Please complete it first or wait for it to expire."
     );
-    // 2. Fetch semua jenis tiket yang diminta dan populate data event-nya
     const ticketIds = ticketRequests.map((t: any) => t.ticketId);
     const ticketsFromDb = await TicketModel.find({ _id: { $in: ticketIds } })
-      .populate({ path: 'eventId', select: 'eventName date' }) // Populate data dari EventModel
+      .populate({ path: 'eventId', select: 'eventName date' })
       .session(session);
 
     appAssert(ticketsFromDb.length === ticketIds.length, NOT_FOUND, "Some ticket types were not found");
@@ -55,7 +51,6 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
     let totalTicket = 0;
     const ticketProcessingPromises = [];
 
-    // 3. Validasi stok, hitung harga, dan siapkan proses pembuatan aset
     for (const request of ticketRequests) {
       const ticketDoc = ticketMap.get(request.ticketId);
       appAssert(ticketDoc, NOT_FOUND, `Ticket type ${request.ticketId} not found`);
@@ -64,28 +59,24 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
 
       totalPrice += ticketDoc.price * request.quantity;
       totalTicket += request.quantity;
-      ticketDoc.stock -= request.quantity; // Update stok secara lokal
+      ticketDoc.stock -= request.quantity;
 
       for (let i = 0; i < request.quantity; i++) {
-        // Panggil service untuk tugas berat (Non-Blocking)
         ticketProcessingPromises.push(processAndGenerateTicket(ticketDoc));
       }
     }
 
-    // 4. Jalankan semua pembuatan file (QR & Gambar) secara paralel
     const formattedTickets = await Promise.all(ticketProcessingPromises);
 
-    // 5. Update stok di database
     const stockUpdatePromises = ticketsFromDb.map(t => t.save({ session }));
     await Promise.all(stockUpdatePromises);
 
-    // 6. Buat dokumen transaksi
     const transaction = new TransactionModel({
       userId: targetUserId,
       tickets: formattedTickets,
       totalTicket,
-      totalPrice, // Harga AMAN dari server
-      status: transactionMethod === 'On The Site' ? 'paid' : 'pending', // Jika OTS, langsung paid
+      totalPrice,
+      status: transactionMethod === 'On The Site' ? 'paid' : 'pending',
       transactionMethod,
       expiredAt: new Date(Date.now() + 15 * 60 * 1000),
     });
@@ -93,11 +84,10 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
 
     await UserModel.findByIdAndUpdate(
       targetUserId,
-      { $push: { historyTransaction: transaction._id } },
+      { $push: { historyTransaction: transaction._id} },
       { session }
     )
 
-    // 7. Commit transaksi
     await session.commitTransaction();
 
     res.status(CREATED).json({
@@ -108,6 +98,188 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       expiredAt: transaction.expiredAt,
     });
 
+  } catch (error) {
+    await session.abortTransaction();
+    next(error);
+  } finally {
+    session.endSession();
+  }
+};
+
+export const getAllTransactionsHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const filter: { status?: string; deletedAt: null } = { deletedAt: null };;
+    if (req.query.status) {
+      filter.status = req.query.status as string;
+    }
+
+    const [transactions, totalTransactions] = await Promise.all([
+      TransactionModel.find(filter)
+        .populate({ path: "userId", select: "name email" })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      TransactionModel.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(totalTransactions / limit);
+
+    res.status(OK).json({
+      message: "Transactions retrieved successfully",
+      data: transactions,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalTransactions,
+        limit,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTransactionByIdHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { transactionId } = req.params;
+    const user = req.user;
+    appAssert(user, FORBIDDEN, "Authentication failed, user not found.");
+    const transaction = await TransactionModel.findById(transactionId)
+      .populate({ path: "userId", select: "name email profile" })
+      .populate({ path: "verifiedBy", select: "name" })
+      .populate({
+        path: "tickets.ticketId",
+        select: "category price eventId",
+        populate: {
+          path: "eventId",
+          model: "Event",
+          select: "eventName date",
+        },
+      });
+
+    appAssert(transaction, NOT_FOUND, "Transaction not found");
+
+    if (user.role === 'user' && transaction.userId._id.toString() !== user._id.toString()) {
+      throw new AppError(FORBIDDEN, "You are not authorized to view this transaction");
+    }
+
+    res.status(OK).json({
+      message: "Transaction details retrieved successfully",
+      data: transaction,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyTransactionHandler: RequestHandler = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { transactionId } = req.params;
+    const { status } = req.body;
+    const admin = req.user;
+    appAssert(admin, FORBIDDEN, "Authentication failed, admin not found.");
+
+    appAssert(status === 'paid' || status === 'reject', BAD_REQUEST, "Invalid status. Must be 'paid' or 'reject'.");
+
+    const transaction = await TransactionModel.findById(transactionId).session(session);
+    appAssert(transaction, NOT_FOUND, "Transaction not found");
+    appAssert(transaction.status === 'pending', BAD_REQUEST, "This transaction has already been processed.");
+
+    transaction.status = status;
+    transaction.verifiedBy = admin._id;
+    transaction.verifiedAt = new Date();
+
+    // Jika transaksi ditolak, kembalikan stok tiket
+    if (status === 'reject') {
+        for (const purchasedTicket of transaction.tickets) {
+            await TicketModel.findByIdAndUpdate(
+                purchasedTicket.ticketId,
+                { $inc: { stock: 1 } },
+                { session }
+            );
+        }
+    }
+
+    await transaction.save({ session });
+    await session.commitTransaction();
+
+    res.status(OK).json({
+      message: `Transaction has been successfully ${status}.`,
+      data: transaction,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    next(error);
+  } finally {
+    session.endSession();
+  }
+};
+
+
+/**
+ * DELETE TRANSACTION (Superadmin Only)
+ * Menghapus transaksi dari database.
+ */
+export const deleteTransactionHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { transactionId } = req.params;
+
+    const transaction = await TransactionModel.findByIdAndDelete(transactionId);
+    appAssert(transaction, NOT_FOUND, "Transaction not found");
+
+
+    res.status(OK).json({
+      message: "Transaction deleted successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const softDeleteTransactionHandler: RequestHandler = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { transactionId } = req.params;
+
+    const transaction = await TransactionModel.findById(transactionId).session(session);
+
+    appAssert(transaction, NOT_FOUND, "Transaction not found");
+    appAssert(transaction.deletedAt === null, BAD_REQUEST, "This transaction has already been deleted.");
+
+    if (transaction.status !== 'paid') {
+        for (const purchasedTicket of transaction.tickets) {
+            await TicketModel.findByIdAndUpdate(
+                purchasedTicket.ticketId,
+                { $inc: { stock: 1 } },
+                { session }
+            );
+        }
+    }
+
+    transaction.deletedAt = new Date();
+    await transaction.save({ session });
+
+    // Hapus referensi dari riwayat user
+    await UserModel.findByIdAndUpdate(
+      transaction.userId,
+      { $pull: { historyTransaction: transaction._id } },
+      { session }
+    );
+
+    await session.commitTransaction();
+
+    res.status(OK).json({
+      message: "Transaction has been successfully soft-deleted.",
+    });
   } catch (error) {
     await session.abortTransaction();
     next(error);

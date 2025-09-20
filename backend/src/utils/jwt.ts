@@ -1,7 +1,7 @@
 import jwt, { SignOptions, VerifyOptions } from "jsonwebtoken";
-import { SessionDocument } from "../models/SessionModel";
-import { UserDocument } from "../models/UserModel";
 import { JWT_REFRESH_SECRET, JWT_SECRET } from "../constants/env";
+import { SessionDocument } from "../types/Session";
+import { UserDocument } from "../types/User";
 
 export type RefreshTokenPayload = {
   sessionId: SessionDocument['_id'];

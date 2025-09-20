@@ -36,7 +36,7 @@ export async function processAndGenerateTicket(ticketDoc: any) {
   const ticketImageBase64 = await generateTicketImage(ticketDataForImage, qrCodeFilePath, templatePath);
 
   // 3. Simpan Gambar Tiket Final
-  const ticketFileName = `ticket-${subdocumentId}-${timestamp}.jpg`;
+  const ticketFileName = `ticket-${subdocumentId}-${timestamp}.png`;
   const ticketsDir = path.join(__dirname, '../../uploads/tickets');
   await fs.mkdir(ticketsDir, { recursive: true });
   const ticketFilePath = path.join(ticketsDir, ticketFileName);

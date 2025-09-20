@@ -1,37 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { compareValue, hashValue } from "../utils/bcrypt";
-
-export interface UserDocument extends mongoose.Document {
-  email: string;
-  name: string;
-  profile?: {
-    picture: string;
-    phoneNumber: string;
-    idNumber: string;
-    dateOfBirth: string;
-    fullname: string;
-    gender: string;
-    address?: {
-      street?: string;
-      village?: string;
-      subDistrict?: string;
-      city?: string;
-      state?: string;
-      postalCode?: string;
-      country: string;
-    };
-  };
-  historyTransaction?: mongoose.Types.ObjectId[];
-  role?: "user" | "admin" | "superadmin";
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
-  comparePassword(val: string): Promise<boolean>;
-  omitPassword(): Pick<
-    UserDocument,
-    "_id" | "email" | "name" | "profile" | "role" | "createdAt" | "updatedAt"
-  >;
-}
+import { UserDocument } from "../types/User";
 
 const userSchema = new mongoose.Schema(
   {
@@ -48,6 +17,7 @@ const userSchema = new mongoose.Schema(
       phoneNumber: { type: String, default: "" },
       idNumber: { type: String, default: "" },
       dateOfBirth: { type: String, default: "" },
+      fullname: { type: String, default: "" },
       gender: { type: String, default: "" },
       address: {
         street: { type: String, default: ""  },
@@ -59,11 +29,10 @@ const userSchema = new mongoose.Schema(
         country: { type: String, default: ""  },
       },
     },
-    historyTransaction: {
-      type: [Schema.Types.ObjectId],
-      ref: "Transaction",
-      default: [],
-    },
+    historyTransaction: [{
+      type: Schema.Types.ObjectId,
+      ref: 'Transaction'
+    }],
   },
   { timestamps: true }
 );
@@ -81,9 +50,8 @@ userSchema.methods.comparePassword = async function (val: string) {
 };
 
 userSchema.methods.omitPassword = function () {
-  const user = this.toObject();
-  delete user.password;
-  return user;
+  const { password, ...userObject } = this.toObject();
+  return userObject;
 };
 
 const UserModel = mongoose.model<UserDocument>("User", userSchema);

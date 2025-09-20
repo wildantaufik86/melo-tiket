@@ -1,9 +1,10 @@
 import { RequestHandler } from "express";
 import EventModel from "../models/EventModel";
 import { BAD_REQUEST, CREATED, NO_CONTENT, NOT_FOUND, OK } from "../constants/http";
-import TicketModel, { TicketStatus } from "../models/TicketModel";
+import TicketModel from "../models/TicketModel";
 import appAssert from "../utils/appAssert";
 import mongoose from "mongoose";
+import { TicketStatus } from "../types/Ticket";
 
 export const createEventHandler: RequestHandler = async (req, res, next) => {
   try {
@@ -53,14 +54,9 @@ export const getAllEventsHandler: RequestHandler = async (req, res, next) => {
 export const getEventByIdHandler: RequestHandler = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-
-    // 1. Cari event berdasarkan ID
     const event = await EventModel.findById(eventId);
-
-    // 2. Jika tidak ada atau belum di-publish, anggap tidak ditemukan
     appAssert(event && event.isPublished, NOT_FOUND, "Event not found");
 
-    // 3. Cari tiket yang terkait dan HANYA yang statusnya "Available"
     const availableTickets = await TicketModel.find({
       eventId: eventId,
       status: TicketStatus.AVAILABLE,

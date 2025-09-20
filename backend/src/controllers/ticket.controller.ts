@@ -35,7 +35,6 @@ export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next
     });
 
   } catch (error) {
-    // Error akan ditangani oleh unique index jika kategori duplikat
     next(error);
   }
 };
@@ -74,9 +73,8 @@ export const updateTicketTypeHandler: RequestHandler = async (req, res, next) =>
     const { eventId, ticketId } = req.params;
     const updateData = req.body;
 
-    // Cari dan update dalam satu query atomik
     const updatedTicket = await TicketModel.findOneAndUpdate(
-      { _id: ticketId, eventId }, // Kondisi pencarian yang aman
+      { _id: ticketId, eventId },
       { $set: updateData },
       { new: true, runValidators: true }
     );
