@@ -8,12 +8,14 @@
   "category": {
     "x": 830,
     "y": 600,
+    "font": "bold 120px Montserrat",
     "fillStyle": "#FFFFFF",
     "textAlign": "center"
   },
   "eventName": {
     "x": 170,
     "y": 800,
+    "font": "42px Montserrat",
     "fillStyle": "#FFFFFF",
     "textAlign": "left"
   }

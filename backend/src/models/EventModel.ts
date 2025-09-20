@@ -1,10 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-
-export interface ILineup {
-  name: string;
-  image?: string;
-  instagramUrl?: string;
-}
+import { IEvent, ILineup } from "../types/Event";
 
 const LineupSchema = new Schema<ILineup>(
   {
@@ -15,19 +10,6 @@ const LineupSchema = new Schema<ILineup>(
   { _id: false }
 );
 
-// Interface utama untuk dokumen Event.
-export interface IEvent extends Document {
-  eventName: string;
-  date: Date;
-  time: string;
-  address: string;
-  description: string;
-  headlineImage?: string;
-  lineup: ILineup[];
-  isPublished: boolean;
-}
-
-// Skema Mongoose untuk Event.
 const EventSchema = new Schema<IEvent>(
   {
     eventName: { type: String, required: true, unique: true, trim: true},

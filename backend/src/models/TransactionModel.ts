@@ -1,26 +1,5 @@
-// src/models/TransactionModel.ts
-import mongoose, { Document, Schema } from "mongoose";
-
-interface IPurchasedTicket {
-  _id: mongoose.Types.ObjectId;
-  ticketId: mongoose.Types.ObjectId;
-  qrCode: string;
-  ticketImage: string;
-  isScanned: boolean;
-}
-
-export interface ITransaction extends Document {
-  userId: mongoose.Types.ObjectId;
-  tickets: IPurchasedTicket[];
-  totalTicket: number;
-  totalPrice: number;
-  status: "reject" | "pending" | "paid";
-  transactionMethod: "Online" | "On Site";
-  expiredAt: Date;
-  paymentProof?: string;
-  verifiedBy?: mongoose.Types.ObjectId;
-  verifiedAt?: Date;
-}
+import mongoose, { Schema } from "mongoose";
+import { IPurchasedTicket, ITransaction } from "../types/Transaction";
 
 const PurchasedTicketSchema = new Schema<IPurchasedTicket>({
   ticketId: { type: Schema.Types.ObjectId, ref: "Ticket", required: true },
@@ -49,6 +28,7 @@ const TransactionSchema = new Schema<ITransaction>(
     paymentProof: { type: String },
     verifiedBy: { type: Schema.Types.ObjectId, ref: "User" },
     verifiedAt: { type: Date },
+    deletedAt: { type: Date, default: null, index: true },
   },
   { timestamps: true }
 );

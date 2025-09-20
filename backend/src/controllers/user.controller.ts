@@ -2,62 +2,153 @@ import { RequestHandler } from "express";
 import UserModel from "../models/UserModel";
 import mongoose from "mongoose";
 import { BAD_REQUEST, FORBIDDEN, NOT_FOUND, OK } from "../constants/http";
-import { NodeXHR } from "socket.io-client";
-import TicketModel from "../models/TicketModel";
+import { IEvent } from "../types/Event";
+import { ITicket } from "../types/Ticket";
+import { ITransaction } from "../types/Transaction";
 
-export const getAllUserHandler: RequestHandler = async (req, res) => {
+type PopulatedTicket = {
+  ticketId: {
+    _id: mongoose.Types.ObjectId;
+    eventId: IEvent;
+  } & ITicket;
+} & ITransaction['tickets'][number];
+
+type PopulatedTransaction = {
+  tickets: PopulatedTicket[];
+} & ITransaction;
+
+export const getAllUserHandler: RequestHandler = async (req, res, next) => {
   try {
-    const users = await UserModel.find(
-      {},
-      "_id email profile role historyTransaction"
-    );
-    const formattedUsers = await Promise.all(
-      users.map(async (user) => {
-        const validTransactions = await UserModel.find({
-          _id: { $in: user.historyTransaction },
-        });
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
 
-        const validTransactionIds = validTransactions.map((t) => t._id as mongoose.Types.ObjectId);
-        if (validTransactionIds.length !== user.historyTransaction?.length) {
-          user.historyTransaction = validTransactionIds;
-          await user.save();
+    // Query
+    const [users, totalUsers] = await Promise.all([
+      UserModel.find({})
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: "historyTransaction",
+          options: { sort: { createdAt: -1 } },
+          populate: {
+            path: "tickets.ticketId",
+            model: "Ticket",
+            select: "category price eventId",
+            populate: {
+              path: "eventId",
+              model: "Event",
+              select: "eventName date address headlineImage",
+            },
+          },
+        }),
+      UserModel.countDocuments({}),
+    ]);
+
+    const processedUsers = users.map((user) => {
+      const eventsMap = new Map<string, IEvent & { transactions: PopulatedTransaction[] }>();
+
+      user.historyTransaction?.forEach((transaction) => {
+        const populatedTransaction = transaction as unknown as PopulatedTransaction;
+        const event = populatedTransaction.tickets[0]?.ticketId?.eventId;
+        if (!event) return;
+        const eventId = event._id.toString();
+
+        if (!eventsMap.has(eventId)) {
+          eventsMap.set(eventId, {
+            ...(event as IEvent).toObject(),
+            transactions: [],
+          });
         }
-        return {
-          id: user._id,
-          profile: user.profile,
-          email: user.email,
-          role: user.role,
-          historyTransaction: validTransactionIds,
-        };
-      })
-    );
+        eventsMap.get(eventId)?.transactions.push(populatedTransaction);
+      });
+
+      const historyByEvent = Array.from(eventsMap.values());
+      const { historyTransaction, ...finalUserData } = user.omitPassword();
+
+      return {
+        user: finalUserData,
+        historyByEvent: historyByEvent,
+      };
+    });
+
+    const totalPages = Math.ceil(totalUsers / limit);
 
     return res.status(OK).json({
       message: "Data Successfully Retrieved",
-      data: formattedUsers,
+      data: processedUsers,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalUsers: totalUsers,
+        limit: limit,
+      },
     });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong", error });
+    next(error);
   }
-}
+};
 
 export const getUserByIdHandler: RequestHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const user = await UserModel.findById(id);
+
+    const user = await UserModel.findById(id).populate({
+      path: "historyTransaction",
+      options: { sort: { createdAt: -1 } },
+      populate: {
+        path: "tickets.ticketId",
+        model: "Ticket",
+        select: "category price eventId",
+        populate: {
+          path: "eventId",
+          model: "Event",
+          select: "eventName date address headlineImage",
+        },
+      },
+    });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const eventsMap = new Map<string, IEvent & { transactions: PopulatedTransaction[] }>();
+
+    user.historyTransaction?.forEach((transaction) => {
+      const populatedTransaction = transaction as unknown as PopulatedTransaction;
+      const event = populatedTransaction.tickets[0]?.ticketId?.eventId;
+
+      if (!event) return;
+
+      const eventId = event._id.toString();
+
+      if (!eventsMap.has(eventId)) {
+        eventsMap.set(eventId, {
+          ...(event as IEvent).toObject(),
+          transactions: [],
+        });
+      }
+
+      eventsMap.get(eventId)?.transactions.push(populatedTransaction);
+    });
+
+    const historyByEvent = Array.from(eventsMap.values());
+
+    const userData = user.omitPassword();
+    const { historyTransaction, ...finalUserData } = userData;
+
     return res.status(OK).json({
-      message: "Data retrieved Successfully",
-      data: user.omitPassword()
-    })
+      message: "Data retrieved successfully",
+      data: {
+        user: finalUserData,
+        historyByEvent: historyByEvent,
+      },
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 export const updateUserProfileHandler: RequestHandler = async (req, res, next) => {
   try {

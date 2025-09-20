@@ -7,11 +7,6 @@ import AppError from './appError';
 import { INTERNAL_SERVER_ERROR } from '../constants/http';
 import { registerFont } from 'canvas';
 
-// Daftarkan font kustom sekali saja
-const FONT_DIR = path.join(__dirname, '../assets/fonts');
-registerFont(path.join(FONT_DIR, 'Montserrat-Bold.ttf'), { family: 'Montserrat', weight: 'bold' });
-registerFont(path.join(FONT_DIR, 'Montserrat-Regular.ttf'), { family: 'Montserrat' });
-
 export async function generateTicketImage(
   ticketData: any,
   qrCodeImagePath: string,
