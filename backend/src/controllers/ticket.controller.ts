@@ -3,24 +3,25 @@ import TicketModel from "../models/TicketModel";
 import EventModel from "../models/EventModel";
 import appAssert from "../utils/appAssert";
 import { BAD_REQUEST, CREATED, NO_CONTENT, NOT_FOUND, OK } from "../constants/http";
+import CategoryModel from "../models/CategoryModel";
 
 export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    const { category, price, stock, templateImage, templateLayout } = req.body;
+    const { categoryId, price, stock, templateImage, templateLayout } = req.body;
 
-    // 1. Validasi input dasar
-    appAssert(category && price !== undefined && stock !== undefined, BAD_REQUEST, "Category, price, and stock are required");
+    appAssert(categoryId && price !== undefined && stock !== undefined, BAD_REQUEST, "Category, price, and stock are required");
     appAssert(templateImage && templateLayout, BAD_REQUEST, "Template image and layout are required");
 
-    // 2. Pastikan event induknya ada sebelum menambahkan tiket
+    const categoryExists = await CategoryModel.findById(categoryId);
+    appAssert(categoryExists, NOT_FOUND, "Category not found");
+
     const parentEvent = await EventModel.findById(eventId);
     appAssert(parentEvent, NOT_FOUND, "Parent event not found, cannot add ticket");
 
-    // 3. Buat instance tiket baru, hubungkan dengan eventId
     const newTicket = new TicketModel({
       eventId,
-      category,
+      category: categoryId,
       price,
       stock,
       templateImage,
@@ -30,7 +31,7 @@ export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next
     await newTicket.save();
 
     res.status(CREATED).json({
-      message: `Ticket category '${category}' added to event '${parentEvent.eventName}' successfully`,
+      message: `Ticket category '${categoryId}' added to event '${parentEvent.eventName}' successfully`,
       ticket: newTicket,
     });
 
@@ -43,12 +44,9 @@ export const getAllTicketTypesForEventHandler: RequestHandler = async (req, res,
   try {
     const { eventId } = req.params;
 
-    const tickets = await TicketModel.find({ eventId });
+    const tickets = await TicketModel.find({ eventId }).populate('category', 'name slug');
 
-    res.status(OK).json({
-      count: tickets.length,
-      tickets,
-    });
+    res.status(OK).json({ count: tickets.length, tickets });
   } catch (error) {
     next(error);
   }
@@ -58,11 +56,13 @@ export const getTicketTypeByIdHandler: RequestHandler = async (req, res, next) =
   try {
     const { eventId, ticketId } = req.params;
 
-    // Cari tiket berdasarkan ID-nya DAN ID event-nya untuk keamanan
-    const ticket = await TicketModel.findOne({ _id: ticketId, eventId });
+    const ticket = await TicketModel.findOne({ _id: ticketId, eventId }).populate('category', 'name slug');;
     appAssert(ticket, NOT_FOUND, "Ticket category not found in this event");
 
-    res.status(OK).json({ ticket });
+    res.status(OK).json({
+      message: "Ticket successfully received.",
+      data: ticket
+    });
   } catch (error) {
     next(error);
   }
@@ -70,14 +70,20 @@ export const getTicketTypeByIdHandler: RequestHandler = async (req, res, next) =
 
 export const updateTicketTypeHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { eventId, ticketId } = req.params;
+    const { categoryId, eventId, ticketId } = req.params;
     const updateData = req.body;
+
+    if (categoryId) {
+      const categoryExists = await CategoryModel.findById(categoryId);
+      appAssert(categoryExists, NOT_FOUND, "New category not found");
+      (updateData as any).category = categoryId;
+    }
 
     const updatedTicket = await TicketModel.findOneAndUpdate(
       { _id: ticketId, eventId },
       { $set: updateData },
       { new: true, runValidators: true }
-    );
+    ).populate('category', 'name slug');
 
     appAssert(updatedTicket, NOT_FOUND, "Ticket category not found in this event");
 
