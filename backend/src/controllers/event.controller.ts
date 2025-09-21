@@ -8,22 +8,26 @@ import { TicketStatus } from "../types/Ticket";
 
 export const createEventHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { eventName, date, time, address, description } = req.body;
+    const { eventName, date, time, address, eventDesc, ticketDesc } = req.body;
 
-    // Validasi dasar (lebih baik menggunakan Zod atau Joi untuk proyek besar)
     appAssert(eventName && date && time && address, BAD_REQUEST, "Missing required event fields");
 
-    // Cek duplikasi nama event
     const existingEvent = await EventModel.findOne({ eventName });
     appAssert(!existingEvent, BAD_REQUEST, `Event with name "${eventName}" already exists`);
+
+    if(!eventDesc && !ticketDesc) {
+      res.status(BAD_REQUEST).json({
+        message: "Event Description or Ticket Description is empty."
+      })
+    }
 
     const newEvent = new EventModel({
       eventName,
       date,
       time,
       address,
-      description,
-      // Field lain bisa ditambahkan di sini, seperti isPublished, headlineImage, dll.
+      eventDesc,
+      ticketDesc
     });
 
     await newEvent.save();
@@ -98,21 +102,14 @@ export const deleteEventHandler: RequestHandler = async (req, res, next) => {
   session.startTransaction();
   try {
     const { eventId } = req.params;
-
-    // Cari event terlebih dahulu untuk memastikan ada
     const eventToDelete = await EventModel.findById(eventId).session(session);
+
     appAssert(eventToDelete, NOT_FOUND, "Event not found");
-
-    // 1. Hapus semua tiket yang terkait dengan event ini
     await TicketModel.deleteMany({ eventId: eventId }).session(session);
-
-    // 2. Hapus event itu sendiri
     await eventToDelete.deleteOne({ session });
-
-    // Jika semua berhasil, commit transaksi
     await session.commitTransaction();
 
-    res.status(NO_CONTENT).send(); // Status 204 No Content adalah standar untuk delete sukses
+    res.status(NO_CONTENT).send();
 
   } catch (error) {
     await session.abortTransaction();

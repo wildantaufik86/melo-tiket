@@ -56,7 +56,7 @@ export const registerSchema = loginSchema
     confirmPassword: z.string().min(6).max(255),
     name: nameSchema,
     profile: profileSchema.omit({ fullname: true }),
-    idNUmber: z.number().min(16).max(16),
+    idNumber: z.number().min(16).max(16),
     role: roleSchema,
     historyTransaction: z.array(transactionSchema).optional()
   })
