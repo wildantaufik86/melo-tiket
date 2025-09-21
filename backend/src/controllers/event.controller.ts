@@ -8,12 +8,10 @@ import { TicketStatus } from "../types/Ticket";
 
 export const createEventHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { eventName, date, time, address, description } = req.body;
+    const { eventName, date, time, address, eventDesc, ticketDesc } = req.body;
 
-    // Validasi dasar (lebih baik menggunakan Zod atau Joi untuk proyek besar)
     appAssert(eventName && date && time && address, BAD_REQUEST, "Missing required event fields");
 
-    // Cek duplikasi nama event
     const existingEvent = await EventModel.findOne({ eventName });
     appAssert(!existingEvent, BAD_REQUEST, `Event with name "${eventName}" already exists`);
 
@@ -22,8 +20,8 @@ export const createEventHandler: RequestHandler = async (req, res, next) => {
       date,
       time,
       address,
-      description,
-      // Field lain bisa ditambahkan di sini, seperti isPublished, headlineImage, dll.
+      eventDesc,
+      ticketDesc
     });
 
     await newEvent.save();
