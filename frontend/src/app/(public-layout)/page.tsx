@@ -1,5 +1,3 @@
 export default function homepage() {
-  return (
-    <main></main>
-  )
-};
+  return <main>tes</main>;
+}
