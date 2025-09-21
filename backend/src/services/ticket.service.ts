@@ -32,7 +32,7 @@ export async function processAndGenerateTicket(ticketDoc: any) {
     category: ticketDoc.category
   };
 
-  const templatePath = path.join(__dirname, `../assets/templates/${ticketDoc.templateImage}`);
+  const templatePath = path.join(__dirname, `../../public/templates/${ticketDoc.templateImage}`);
   const ticketImageBase64 = await generateTicketImage(ticketDataForImage, qrCodeFilePath, templatePath);
 
   // 3. Simpan Gambar Tiket Final

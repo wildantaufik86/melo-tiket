@@ -10,12 +10,11 @@ import { registerFont } from 'canvas';
 export async function generateTicketImage(
   ticketData: any,
   qrCodeImagePath: string,
-  templatePath: string // Menerima path yang pasti, tidak menebak-nebak
+  templatePath: string
 ): Promise<string> {
   try {
-    // Dapatkan nama file layout dari nama file template
     const templateFileName = path.basename(templatePath, path.extname(templatePath));
-    const layoutPath = path.join(__dirname, `../assets/layouts/${templateFileName}.json`);
+    const layoutPath = path.join(__dirname, `../../public/layouts/${templateFileName}.json`);
 
     // Baca file layout dan muat semua gambar secara paralel
     const layoutConfig = JSON.parse(await fs.readFile(layoutPath, 'utf-8'));
