@@ -18,11 +18,11 @@ export type CreateAccountParams = {
   email: string;
   name: string;
   password: string;
+  idNumber: number;
   profile?: {
     picture: string;
     phoneNumber: string;
     fullname: string;
-    idNumber?: string;
     dateOfBirth: string;
     gender: string;
     address?: {
@@ -49,7 +49,7 @@ export const createAccount = async (data: CreateAccountParams) => {
   const user = await UserModel.create({
     email: data.email,
     name: data.name,
-    idNumber: data.profile?.idNumber,
+  idNumber: data.idNumber || null,
     profile: {
       picture: data.profile?.picture || "",
       fullname: data.name,

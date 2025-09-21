@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ICategory } from "./Category";
 
 export enum TicketStatus {
   AVAILABLE = "Available",
@@ -8,7 +9,7 @@ export enum TicketStatus {
 
 export interface ITicket extends Document {
   eventId: mongoose.Types.ObjectId;
-  category: string;
+  category: mongoose.Types.ObjectId | ICategory ;
   price: number;
   stock: number;
   status: TicketStatus;
