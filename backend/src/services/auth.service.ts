@@ -49,10 +49,10 @@ export const createAccount = async (data: CreateAccountParams) => {
   const user = await UserModel.create({
     email: data.email,
     name: data.name,
+    idNumber: data.profile?.idNumber,
     profile: {
       picture: data.profile?.picture || "",
       fullname: data.name,
-      idNumber: data.profile?.idNumber || "",
       phoneNumber: data.profile?.phoneNumber || "",
       gender: data.profile?.gender || "",
       dateOfBirth: data.profile?.dateOfBirth || "",

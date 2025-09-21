@@ -14,7 +14,7 @@ const profileSchema = z.object({
   phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
   gender: z.string(),
   dateOfBirth: z.string(),
-  idNumber: z.string().min(1, "ID Number Required"),
+  idNumber: z.number(),
   address: z.object({
     street: z.string().optional(),
     village: z.string().optional(),
@@ -56,6 +56,7 @@ export const registerSchema = loginSchema
     confirmPassword: z.string().min(6).max(255),
     name: nameSchema,
     profile: profileSchema.omit({ fullname: true }),
+    idNUmber: z.number().min(16).max(16),
     role: roleSchema,
     historyTransaction: z.array(transactionSchema).optional()
   })

@@ -12,10 +12,10 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "superadmin"],
       default: "user",
     },
+    idNumber: { type: Number, required: true },
     profile: {
       picture: { type: String, default: "" },
       phoneNumber: { type: String, default: "" },
-      idNumber: { type: String, default: "" },
       dateOfBirth: { type: String, default: "" },
       fullname: { type: String, default: "" },
       gender: { type: String, default: "" },
@@ -33,6 +33,7 @@ const userSchema = new mongoose.Schema(
       type: Schema.Types.ObjectId,
       ref: 'Transaction'
     }],
+    deletedAt: { type: Date, default: null, index: true },
   },
   { timestamps: true }
 );
