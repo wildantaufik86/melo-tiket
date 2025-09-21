@@ -8,15 +8,13 @@ import {NODE_ENV, PORT } from "./constants/env";
 import { OK } from "./constants/http";
 import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.routes";
-import path from "path";
-import adminRoutes from "./routes/admin.routes";
 import { createServer } from "http";
-import operatorRoutes from "./routes/operator.routes";
 import ticketRoutes from "./routes/ticket.routes";
 import profileRoutes from "./routes/profile.routes";
 import eventRoutes from "./routes/event.routes";
 import transactionRoutes from "./routes/transaction.routes";
 import categoryRoutes from "./routes/category.routes";
+
 
 const allowedOrigins = [
   // Local development
@@ -66,12 +64,8 @@ app.use("/ticket", express.json(), express.urlencoded({ extended: true }), ticke
 app.use("/transaction", express.json(), express.urlencoded({ extended: true }), transactionRoutes);
 app.use("/event", express.json(), express.urlencoded({ extended: true }), eventRoutes);
 app.use("/profile", express.json(), express.urlencoded({ extended: true }), profileRoutes);
-app.use("/admin", express.json(), express.urlencoded({ extended: true }), adminRoutes);
-app.use("/operator", express.json(), express.urlencoded({ extended: true }), operatorRoutes);
 app.use("/categories", express.json(), express.urlencoded({ extended: true }), categoryRoutes);
-
 app.use("/auth", express.json(), express.urlencoded({ extended: true }), authRoutes);
-
 app.use("/user", express.json(), express.urlencoded({ extended: true }), userRoutes);
 
 app.use(errorHandler);
