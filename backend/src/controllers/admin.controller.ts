@@ -282,7 +282,6 @@ export const updateUserProfile: RequestHandler = async (req: any, res: any) => {
         // Use type assertion to define the profile structure
         user.profile = {
           picture: '',
-          idNumber: '',
           fullname: '',
           gender: '',
           phoneNumber: '',

@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 export interface UserDocument extends mongoose.Document {
   email: string;
   name: string;
+  idNumber: number;
   profile?: {
     picture: string;
     phoneNumber: string;
-    idNumber: string;
     dateOfBirth: string;
     fullname?: string;
     gender: string;
@@ -23,6 +23,7 @@ export interface UserDocument extends mongoose.Document {
   historyTransaction?: mongoose.Types.ObjectId[];
   role?: "user" | "admin" | "superadmin";
   password: string;
+  deletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
   comparePassword(val: string): Promise<boolean>;

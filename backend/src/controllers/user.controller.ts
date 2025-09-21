@@ -5,6 +5,9 @@ import { BAD_REQUEST, FORBIDDEN, NOT_FOUND, OK } from "../constants/http";
 import { IEvent } from "../types/Event";
 import { ITicket } from "../types/Ticket";
 import { ITransaction } from "../types/Transaction";
+import appAssert from "../utils/appAssert";
+import TransactionModel from "../models/TransactionModel";
+import TicketModel from "../models/TicketModel";
 
 type PopulatedTicket = {
   ticketId: {
@@ -182,10 +185,20 @@ export const updateUserProfileHandler: RequestHandler = async (req, res, next) =
 
 export const createUserHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { name, email, role, profile, password } = req.body;
+    const { name, email, role, profile, idNumber, password } = req.body;
 
     if(!email || !password) {
       return res.status(BAD_REQUEST).json({message: "Email and password are required",});
+    }
+
+    if(!idNumber) {
+      res.status(BAD_REQUEST).json({message: "ID Number is Required!"})
+      return;
+    }
+
+    if(idNumber.length !== 16 || !/^\d+$/.test(idNumber)) {
+      res.status(BAD_REQUEST).json({message: "Invalid ID Number. It must be exactly 16 digits and contain only numbers."})
+      return;
     }
 
     const existingUser = await UserModel.findOne({email});
@@ -193,7 +206,7 @@ export const createUserHandler: RequestHandler = async (req, res, next) => {
       return res.status(BAD_REQUEST).json({message: "Email already exists"});
     }
 
-    const newUser = await UserModel.create({name, email, role, profile, password});
+    const newUser = await UserModel.create({name, email, role, profile, idNumber, password});
     res.status(201).json({
       message: "User created successfully with profile data",
       data: newUser.omitPassword(),
@@ -223,3 +236,65 @@ export const deleteUserHandler: RequestHandler = async (req, res, next) => {
     next(error)
   }
 }
+
+// src/controllers/user.controller.ts
+
+export const softDeleteUserHandler: RequestHandler = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findById(id).session(session);
+
+    appAssert(user, NOT_FOUND, "User not found");
+    appAssert(user.deletedAt === null, BAD_REQUEST, "User has already been deleted.");
+
+    const pendingTransactions = await TransactionModel.find({
+      userId: user._id,
+      status: 'pending'
+    }).session(session);
+
+    for (const transaction of pendingTransactions) {
+      // Langkah 1: Hitung semua stok yang perlu dikembalikan per transaksi
+      const stockToReturn = new Map<string, number>();
+
+      for (const purchasedTicket of transaction.tickets) {
+        const ticketId = purchasedTicket.ticketId.toString();
+        stockToReturn.set(ticketId, (stockToReturn.get(ticketId) || 0) + 1);
+      }
+
+      // Langkah 2: Jalankan update stok
+      const updatePromises = [];
+      for (const [ticketId, quantity] of stockToReturn.entries()) {
+        updatePromises.push(
+          TicketModel.findByIdAndUpdate(
+            ticketId,
+            { $inc: { stock: quantity } }, // Kembalikan stok sesuai jumlah
+            { session }
+          )
+        );
+      }
+      await Promise.all(updatePromises);
+
+      // Ubah status transaksi menjadi 'reject'
+      transaction.status = 'reject';
+      await transaction.save({ session });
+    }
+
+    user.deletedAt = new Date();
+    await user.save({ session });
+
+    await session.commitTransaction();
+
+    res.status(OK).json({
+      message: "User soft-deleted successfully, and all pending transactions have been cancelled.",
+    });
+
+  } catch (error) {
+    await session.abortTransaction();
+    next(error);
+  } finally {
+    session.endSession();
+  }
+};
