@@ -15,7 +15,7 @@ export default function HomepageLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="font-mono">
+    <div className="font-mono  text-white">
       <MainNavbar />
       <AuthProvider>{children}</AuthProvider>
     </div>

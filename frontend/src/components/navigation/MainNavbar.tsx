@@ -30,7 +30,7 @@ export default function MainNavbar() {
   }, []);
 
   return (
-    <nav className="fixed top-0 inset-x-0 py-4 px-[5%] flex justify-between bg-secondary text-white items-center">
+    <nav className="fixed top-0 inset-x-0 py-4 px-[5%] flex justify-between bg-secondary text-white items-center z-50">
       <div className="">
         <Link href="/">
           <Image
