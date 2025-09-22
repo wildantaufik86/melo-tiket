@@ -3,7 +3,7 @@ import AboutSection from '@/components/pages/ticket/AboutSection';
 import HeaderSection from '@/components/pages/ticket/HeaderSection';
 import ListTicketSection from '@/components/pages/ticket/ListTicketSection';
 
-export default function homepage() {
+export default function TicketPage() {
   return (
     <main className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
       <div className="relative flex flex-col">
