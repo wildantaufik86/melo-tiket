@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function TicketSection() {
   return (
-    <div className="relative flex flex-col items-center py-[28%]">
+    <section className="relative flex flex-col items-center py-[28%]">
       {/* Judul */}
       <h2 className="z-10 text-xl font-semibold text-center w-[50%]  md:text-3xl lg:text-5xl">
         Melophile Festival Vol 2
@@ -70,6 +70,6 @@ export default function TicketSection() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

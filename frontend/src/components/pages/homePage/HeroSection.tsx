@@ -2,7 +2,7 @@ import Image from 'next/image';
 
 export default function HeroSection() {
   return (
-    <div className="absolute -top-5 w-full aspect-video">
+    <section className="absolute -top-5 w-full aspect-video">
       <Image
         src="/images/hero-image.jpg"
         alt="melofest hero"
@@ -11,6 +11,6 @@ export default function HeroSection() {
         className="object-contain object-top pd-lr z-10"
         priority
       />
-    </div>
+    </section>
   );
 }
