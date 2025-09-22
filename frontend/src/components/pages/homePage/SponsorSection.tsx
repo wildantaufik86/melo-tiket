@@ -116,7 +116,7 @@ export default function SponsorSection() {
       </div>
       <div className="flex flex-col gap-8 mt-12">
         <Label text="MEDIA PARTNER" />
-        <div className="grid grid-cols-6 gap-4 place-items-center md:gap-6">
+        <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 place-items-center md:gap-6">
           {dummyDataMedia.map((sponsort) => (
             <SponsorCard
               key={sponsort.id}
