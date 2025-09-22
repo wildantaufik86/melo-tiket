@@ -1,8 +1,13 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* color yang ada di figma */
+  --primary: #b70a0a;
+  --secondary: #252222;
+  --bg-color: #2e2d35;
 }
 
 @theme inline {
@@ -10,17 +15,52 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --breakpoint-1600: 1600px;
+  --breakpoint-1200: 1200px;
+
+  --padding-pd-lr-base: 0 14%;
+  --padding-pd-lr-1600: 0 8%;
+  --padding-pd-lr-1200: 0 4%;
+
+  --padding-pd-full-base: 74px 14%;
+  --padding-pd-full-1600: 62px 8%;
+  --padding-pd-full-1200: 32px 4%;
+
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #EDEDED;
+    --background: #ededed;
     --foreground: #171717;
   }
 }
 
 body {
-  background: var(--background);
+  background: var(--bg-color);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@utility pd-lr {
+  padding: var(--padding-pd-lr-base);
+  @media (max-width: theme(screens.1600)) {
+    padding: var(--padding-pd-lr-1600);
+  }
+  @media (max-width: theme(screens.1200)) {
+    padding: var(--padding-pd-lr-1200);
+  }
+}
+
+@utility pd-full {
+  padding: var(--padding-pd-full-base);
+  @media (max-width: theme(screens.1600)) {
+    padding: var(--padding-pd-full-1600);
+  }
+  @media (max-width: theme(screens.1200)) {
+    padding: var(--padding-pd-full-1200);
+  }
 }
