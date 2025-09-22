@@ -45,7 +45,7 @@ export default function MainNavbar() {
       </div>
 
       {/* desktop navbar */}
-      <div className=" justify-center items-center gap-6 hidden lg:flex">
+      <div className=" justify-center items-center gap-6 hidden md:flex">
         <Link
           href="/about"
           className="text-lg font-medium hover:text-primary transition-colors"
@@ -95,7 +95,7 @@ export default function MainNavbar() {
 
         <div
           onClick={toggleSidebar}
-          className="flex justify-center items-center cursor-pointer lg:hidden"
+          className="flex justify-center items-center cursor-pointer md:hidden"
         >
           <FiMenu size={24} />
         </div>
