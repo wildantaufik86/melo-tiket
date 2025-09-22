@@ -38,12 +38,12 @@ export default function GalerySection() {
         className="aspect-video"
       >
         {dummyImages.map((image) => (
-          <SwiperSlide key={image.id}>
+          <SwiperSlide key={image.id} className="relative lg:mt-40">
             <Image
               src={image.url}
               alt={image.alt}
               fill
-              className="object-contain"
+              className="object-center object-contain"
             />
           </SwiperSlide>
         ))}

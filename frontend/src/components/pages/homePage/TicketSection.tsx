@@ -25,7 +25,7 @@ export default function TicketSection() {
                 src="/images/VIP.png"
                 alt="VIP Ticket"
                 fill
-                className="object-contain"
+                className="object-contain hover:scale-110 duration-300 ease-in-out"
               />
             </Link>
 
@@ -37,7 +37,7 @@ export default function TicketSection() {
                 src="/images/fest-a.png"
                 alt="Festival A Ticket"
                 fill
-                className="object-contain"
+                className="object-contain hover:scale-115 duration-500 ease-in-out"
               />
             </Link>
 
@@ -49,7 +49,7 @@ export default function TicketSection() {
                 src="/images/fest-b.png"
                 alt="Festival B Ticket"
                 fill
-                className="object-contain"
+                className="object-contain hover:scale-110 duration-300 ease-in-out"
               />
             </Link>
 
@@ -61,7 +61,7 @@ export default function TicketSection() {
                 src="/images/TRIBUN.png"
                 alt="Tribun Ticket"
                 fill
-                className="object-contain"
+                className="object-contain hover:scale-110 duration-300 ease-in-out"
               />
             </Link>
           </div>

@@ -8,7 +8,7 @@ export default function HeroSection() {
         alt="melofest hero"
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 1200px"
-        className="object-contain object-top pd-lr z-10"
+        className="object-contain object-top pd-lr z-10 rounded-2xl"
         priority
       />
     </section>
