@@ -136,7 +136,7 @@ export default function ListTicketSection() {
           <span>{formattedPrice(totalPrice)}</span>
         </p>
         <Link
-          href="/ticket/transaction"
+          href="/checkout"
           className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white"
         >
           Lanjutkan
