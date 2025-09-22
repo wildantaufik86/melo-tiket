@@ -1,3 +1,4 @@
+import Footer from '@/components/navigation/Footer';
 import MainNavbar from '@/components/navigation/MainNavbar';
 import { AuthProvider } from '@/context/authUserContext';
 import { Metadata } from 'next';
@@ -18,6 +19,7 @@ export default function HomepageLayout({
     <div className="font-mono  text-white">
       <MainNavbar />
       <AuthProvider>{children}</AuthProvider>
+      <Footer />
     </div>
   );
 }

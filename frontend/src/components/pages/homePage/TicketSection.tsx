@@ -1,3 +1,4 @@
+import Label from '@/components/fragments/label/Label';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -10,11 +11,7 @@ export default function TicketSection() {
       </h2>
 
       {/* Label */}
-      <div className="z-10 bg-[url(/images/label.png)] bg-center bg-contain bg-no-repeat py-2 px-6 mt-4">
-        <span className="text-xs flex justify-center items-center md:text-lg lg:text-xl">
-          GET YOUR TICKET NOW
-        </span>
-      </div>
+      <Label text="GET YOUR TICKET NOW" />
 
       <div className="absolute inset-0 top-15 mt-16">
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
