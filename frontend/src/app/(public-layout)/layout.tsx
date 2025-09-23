@@ -5,8 +5,8 @@ import { Metadata } from 'next';
 import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Melotiket | Page Admin',
-  description: 'This is Melotiket Admin Page',
+  title: 'Melotiket | Homepage',
+  description: 'This is Melotiket Homepage',
   icons: {
     icon: '',
   },
