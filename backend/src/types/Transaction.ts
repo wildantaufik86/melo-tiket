@@ -14,7 +14,7 @@ export interface ITransaction extends Document {
   totalTicket: number;
   totalPrice: number;
   status: "reject" | "pending" | "paid";
-  transactionMethod: "Online" | "On Site";
+  transactionMethod: "Online" | "Onsite";
   expiredAt: Date;
   paymentProof?: string;
   verifiedBy?: mongoose.Types.ObjectId | string;
