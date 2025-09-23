@@ -222,27 +222,6 @@ export const verifyTransactionHandler: RequestHandler = async (req, res, next) =
   }
 };
 
-
-/**
- * DELETE TRANSACTION (Superadmin Only)
- * Menghapus transaksi dari database.
- */
-export const deleteTransactionHandler: RequestHandler = async (req, res, next) => {
-  try {
-    const { transactionId } = req.params;
-
-    const transaction = await TransactionModel.findByIdAndDelete(transactionId);
-    appAssert(transaction, NOT_FOUND, "Transaction not found");
-
-
-    res.status(OK).json({
-      message: "Transaction deleted successfully",
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
 export const softDeleteTransactionHandler: RequestHandler = async (req, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();

@@ -21,7 +21,7 @@ const TransactionSchema = new Schema<ITransaction>(
     },
     transactionMethod: {
       type: String,
-      enum: ["Online", "On The Site"],
+      enum: ["Online", "Onsite"],
       default: "Online",
     },
     expiredAt: { type: Date, required: true },

@@ -10,32 +10,26 @@ import { registerFont } from 'canvas';
 export async function generateTicketImage(
   ticketData: any,
   qrCodeImagePath: string,
-  templatePath: string // Menerima path yang pasti, tidak menebak-nebak
+  templatePath: string
 ): Promise<string> {
   try {
-    // Dapatkan nama file layout dari nama file template
     const templateFileName = path.basename(templatePath, path.extname(templatePath));
-    const layoutPath = path.join(__dirname, `../assets/layouts/${templateFileName}.json`);
+    const layoutPath = path.join(__dirname, `../../public/layouts/template-layout.json`);
 
-    // Baca file layout dan muat semua gambar secara paralel
     const layoutConfig = JSON.parse(await fs.readFile(layoutPath, 'utf-8'));
     const [templateImage, qrImage] = await Promise.all([
       loadImage(templatePath),
       loadImage(qrCodeImagePath)
     ]);
 
-    // Setup Canvas
     const canvas = createCanvas(templateImage.width, templateImage.height);
     const ctx = canvas.getContext('2d');
 
-    // Gambar template sebagai background
     ctx.drawImage(templateImage, 0, 0);
 
-    // Gambar QR Code sesuai konfigurasi layout
     const { qrCode } = layoutConfig;
     ctx.drawImage(qrImage, qrCode.x, qrCode.y, qrCode.width, qrCode.height);
 
-    // Gambar semua teks sesuai konfigurasi layout
     for (const key in ticketData) {
       if (layoutConfig[key]) {
         const element = layoutConfig[key];
@@ -50,7 +44,6 @@ export async function generateTicketImage(
 
   } catch (error) {
     console.error('Error generating dynamic ticket image:', error);
-    // Lemparkan error agar service yang memanggil bisa menanganinya
     throw new AppError(INTERNAL_SERVER_ERROR, "Failed to generate ticket image.");
   }
 }
