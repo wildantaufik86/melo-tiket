@@ -10,7 +10,7 @@ export default function TicketPage() {
         <HeroSection />
         <HeaderSection />
       </div>
-      <div className="flex flex-col mt-8 pd-full md:flex-row md:gap-6">
+      <div className="flex flex-col mt-8 pd-full md:flex-row md:gap-6 lg:gap-12">
         <AboutSection />
         <ListTicketSection />
       </div>

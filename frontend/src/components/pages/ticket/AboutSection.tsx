@@ -56,8 +56,10 @@ export default function AboutSection() {
   return (
     <section className="w-full flex flex-col gap-8 md:w-[60%]">
       <div className="flex flex-col gap-4">
-        <Label text="TENTANG MELOFEST" />
-        <div className="bg-secondary rounded-md p-4 text-justify flex flex-col gap-2 text-xs">
+        <div className="flex justify-start">
+          <Label text="TENTANG MELOFEST" />
+        </div>
+        <div className="bg-secondary rounded-md p-4 text-justify flex flex-col gap-4 text-xs">
           <p>
             • Melofest atau Melophile Festival merupakan sebuah acara yang unik
             yang menonjolkan konsep yang menciptakan pengalaman yang berbeda
@@ -85,9 +87,11 @@ export default function AboutSection() {
         </div>
       </div>
       <div className="flex flex-col gap-4">
-        <Label text="TENTANG TIKET" />
+        <div className="flex justify-start">
+          <Label text="TENTANG TIKET" />
+        </div>
         <div className="bg-secondary rounded-md p-4 text-xs">
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-4">
             {listText.map((item, index) => (
               <li key={index}>{item.text}</li>
             ))}
