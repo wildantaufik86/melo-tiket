@@ -1,5 +1,3 @@
-// src/services/ticketService.ts
-
 import fs from "fs/promises";
 import path from "path";
 import qrcode from "qrcode";

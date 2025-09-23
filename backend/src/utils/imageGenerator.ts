@@ -14,7 +14,7 @@ export async function generateTicketImage(
 ): Promise<string> {
   try {
     const templateFileName = path.basename(templatePath, path.extname(templatePath));
-    const layoutPath = path.join(__dirname, `../../public/layouts/${templateFileName}.json`);
+    const layoutPath = path.join(__dirname, `../../public/layouts/template-layout.json`);
 
     const layoutConfig = JSON.parse(await fs.readFile(layoutPath, 'utf-8'));
     const [templateImage, qrImage] = await Promise.all([

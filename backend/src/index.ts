@@ -15,6 +15,7 @@ import eventRoutes from "./routes/event.routes";
 import transactionRoutes from "./routes/transaction.routes";
 import categoryRoutes from "./routes/category.routes";
 import path from "path";
+import templateRoutes from "./routes/template.route";
 
 
 const allowedOrigins = [
@@ -68,6 +69,7 @@ app.use("/profile", express.json(), express.urlencoded({ extended: true }), prof
 app.use("/categories", express.json(), express.urlencoded({ extended: true }), categoryRoutes);
 app.use("/auth", express.json(), express.urlencoded({ extended: true }), authRoutes);
 app.use("/user", express.json(), express.urlencoded({ extended: true }), userRoutes);
+app.use("/template", templateRoutes);
 app.use("/public", express.static(path.resolve("./public")));
 
 app.use(errorHandler);
