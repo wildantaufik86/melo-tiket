@@ -45,10 +45,10 @@ export default function TicketSection() {
       <div className="absolute inset-0 top-15 mt-16">
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
           {/* Grid tiket */}
-          <div className="grid grid-cols-4 justify-items-center mt-4 w-full max-w-5xl">
+          <div className="grid grid-cols-5 justify-items-center mt-4 w-full max-w-5xl lg:gap-8">
             <Link
               href="/ticket/vip"
-              className="relative w-full max-w-[600px] aspect-square"
+              className="relative w-full max-w-[600px] aspect-square lg:aspect-1/2"
             >
               <Image
                 src="/images/VIP.png"
@@ -57,10 +57,21 @@ export default function TicketSection() {
                 className="object-contain hover:scale-110 duration-300 ease-in-out"
               />
             </Link>
+            <Link
+              href="/ticket/vip-tribun"
+              className="relative w-full max-w-[600px] aspect-square lg:aspect-1/2"
+            >
+              <Image
+                src="/images/vip-tribun.png"
+                alt="VIP Ticket"
+                fill
+                className="object-contain hover:scale-110 duration-300 ease-in-out"
+              />
+            </Link>
 
             <Link
               href="/ticket/festival-a"
-              className="relative w-full max-w-[600px] aspect-square"
+              className="relative w-full max-w-[600px] aspect-square lg:aspect-1/2"
             >
               <Image
                 src="/images/fest-a.png"
@@ -72,7 +83,7 @@ export default function TicketSection() {
 
             <Link
               href="/ticket/festival-b"
-              className="relative w-full max-w-[600px] aspect-square"
+              className="relative w-full max-w-[600px] aspect-square lg:aspect-1/2"
             >
               <Image
                 src="/images/fest-b.png"
@@ -84,7 +95,7 @@ export default function TicketSection() {
 
             <Link
               href="/ticket/tribun"
-              className="relative w-full max-w-[600px] aspect-square"
+              className="relative w-full max-w-[600px] aspect-square lg:aspect-1/2"
             >
               <Image
                 src="/images/TRIBUN.png"
