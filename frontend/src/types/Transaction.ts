@@ -1,3 +1,5 @@
+import { IUser } from "./User";
+
 export interface IPurchasedTicket {
   _id?: string;
   ticketId?: string;
@@ -7,12 +9,12 @@ export interface IPurchasedTicket {
 }
 
 export interface ITransaction extends Document {
-  userId?: string;
+  userId?: string | IUser;
   tickets: IPurchasedTicket[];
   totalTicket: number;
   totalPrice: number;
   status: "reject" | "pending" | "paid";
-  transactionMethod: "Online" | "On Site";
+  transactionMethod: "Online" | "Onsite";
   expiredAt: Date;
   paymentProof?: string;
   verifiedBy?: string;

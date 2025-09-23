@@ -1,8 +1,37 @@
+'use client'
+
+import { fetchEvent } from '@/app/api/event';
 import Label from '@/components/fragments/label/Label';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
+import { IEvent } from '@/types/Event';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCallback, useEffect, useState } from 'react';
 
 export default function TicketSection() {
+  const [event, setEvent] = useState<IEvent[]>([])
+  const [loading, setLoading] = useState(true);
+
+  const getEvent = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchEvent();
+      if (response.status == 'success' && response.data) {
+        setEvent(response.data as unknown as IEvent[]);
+      } else {
+        ToastError(response.message);
+      }
+    } catch (err: any) {
+      ToastError(err.message);
+    } finally {
+      setLoading(false)
+    }
+  }, []);
+
+  useEffect(() => {
+    getEvent();
+  }, [getEvent])
+console.log("Result Data TEsting: ", event);
   return (
     <section className="relative flex flex-col items-center py-[28%]">
       {/* Judul */}
