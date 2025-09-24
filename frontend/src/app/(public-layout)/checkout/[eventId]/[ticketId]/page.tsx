@@ -1,5 +1,5 @@
 import CheckoutSection from '@/components/pages/checkout/CheckoutSection';
-import DetailOrderSection from '../../../components/pages/checkout/DetailOrderSection';
+import DetailOrderSection from '@/components/pages/checkout/DetailOrderSection';
 
 export default function TicketPage() {
   return (

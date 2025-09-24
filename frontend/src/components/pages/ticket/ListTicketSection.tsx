@@ -1,6 +1,5 @@
 'use client';
 
-import TicketCard from '@/components/fragments/card/TicketCard';
 import { ITicket } from '@/types/Ticket';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
@@ -34,7 +33,7 @@ export default function ListTicketSection({ tickets }: TicketProps) {
   useEffect(() => {
     if (tickets.length > 0) {
       const mapped: TicketWithState[] = tickets.map((ticket, index) => ({
-        ...ticket, // ⬅️ ini penting biar `_id` dan semua field ITicket tetap ada
+        ...ticket,
         quantity: 0,
         isOpen: false,
         name: 'VIP',
@@ -43,8 +42,6 @@ export default function ListTicketSection({ tickets }: TicketProps) {
       setAvailableTickets(mapped);
     }
   }, [tickets]);
-
-  console.log(availableTickets);
 
   const totalPrice = availableTickets.reduce(
     (total, ticket) => total + ticket.price * ticket.quantity,
@@ -77,56 +74,6 @@ export default function ListTicketSection({ tickets }: TicketProps) {
     );
   };
 
-  const TicketCard = ({
-    ticket,
-    toggleOpen,
-    decrementQty,
-    incrementQty,
-  }: TicketCardProps) => {
-    return (
-      <div className="flex flex-col rounded-sm p-4 bg-secondary">
-        <p
-          onClick={toggleOpen}
-          className="font-semibold flex justify-between items-center  cursor-pointer"
-        >
-          {ticket.name}{' '}
-          <span>
-            <FaChevronDown
-              className={`transition-transform duration-300 ${
-                ticket.isOpen ? 'rotate-180' : 'rotate-0'
-              }`}
-            />
-          </span>
-        </p>
-        <div
-          className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all ${
-            ticket.isOpen ? 'scale-y-100 flex ' : 'scale-y-0 hidden'
-          }`}
-        >
-          <p className="flex flex-col font-semibold">
-            {ticket.name}{' '}
-            <span className="font-light">{formattedPrice(ticket.price)}</span>
-          </p>
-          <div className="flex items-center">
-            <div
-              onClick={decrementQty}
-              className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
-            >
-              -
-            </div>
-            <span className="px-4">{ticket.quantity}</span>
-            <div
-              onClick={incrementQty}
-              className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
-            >
-              +
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <section className="flex flex-col md:flex-1 md:mt-10">
       <div className="relative aspect-2/3">
@@ -141,7 +88,7 @@ export default function ListTicketSection({ tickets }: TicketProps) {
         <h3 className="text-lg font-semibold">Ticket</h3>
         <div className="flex flex-col gap-4">
           {availableTickets.map((data) => (
-            <TicketCard
+            <TickedAccordion
               key={data.idTicket}
               ticket={data}
               toggleOpen={() => toggleOpen(data.idTicket)}
@@ -166,3 +113,57 @@ export default function ListTicketSection({ tickets }: TicketProps) {
     </section>
   );
 }
+
+const TickedAccordion = ({
+  ticket,
+  toggleOpen,
+  decrementQty,
+  incrementQty,
+}: TicketCardProps) => {
+  return (
+    <div className="flex flex-col rounded-sm p-4 bg-secondary">
+      <p
+        onClick={ticket.status === 'Available' ? toggleOpen : undefined}
+        className={`font-semibold flex justify-between items-center ${
+          ticket.status === 'Available'
+            ? 'cursor-pointer'
+            : 'cursor-not-allowed'
+        } `}
+      >
+        {ticket.name}{' '}
+        <span>
+          <FaChevronDown
+            className={`transition-transform duration-300 ${
+              ticket.isOpen ? 'rotate-180' : 'rotate-0'
+            }`}
+          />
+        </span>
+      </p>
+      <div
+        className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all ${
+          ticket.isOpen ? 'scale-y-100 flex ' : 'scale-y-0 hidden'
+        }`}
+      >
+        <p className="flex flex-col font-semibold">
+          {ticket.name}{' '}
+          <span className="font-light">{formattedPrice(ticket.price)}</span>
+        </p>
+        <div className="flex items-center">
+          <div
+            onClick={decrementQty}
+            className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
+          >
+            -
+          </div>
+          <span className="px-4">{ticket.quantity}</span>
+          <div
+            onClick={incrementQty}
+            className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
+          >
+            +
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

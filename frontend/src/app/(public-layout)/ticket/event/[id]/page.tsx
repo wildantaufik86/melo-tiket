@@ -51,7 +51,7 @@ export default function EventDetailPage({
         <HeaderSection event={eventDetail?.event} />
       </div>
       <div className="flex flex-col mt-8 pd-full md:flex-row md:gap-6 lg:gap-12">
-        <AboutSection />
+        <AboutSection eventDetail={eventDetail?.event} />
         <ListTicketSection tickets={eventDetail?.tickets || []} />
       </div>
     </main>
