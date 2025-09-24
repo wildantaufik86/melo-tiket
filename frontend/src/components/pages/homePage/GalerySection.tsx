@@ -28,7 +28,7 @@ const dummyImages: Image[] = [
 
 export default function GalerySection() {
   return (
-    <section className="w-full mt-20">
+    <section className="w-full mt-[70%] sm:mt-[40%] lg:mt-0">
       <Swiper
         modules={[Pagination, Autoplay]}
         spaceBetween={30}
