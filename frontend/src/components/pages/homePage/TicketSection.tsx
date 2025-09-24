@@ -41,11 +41,14 @@ export default function TicketSection() {
     getEvent();
   }, [getEvent]);
   console.log('Result Data TEsting: ', event);
+
+  if (loading) return null;
+
   return (
     <section className="relative flex flex-col items-center py-[28%]">
       {/* Judul */}
       <h2 className="z-10 text-xl font-semibold text-center w-[50%]  md:text-3xl lg:text-5xl">
-        Melophile Festival Vol 2
+        {event[0]?.eventName || 'Melophile Festival Vol 2'}
       </h2>
 
       {/* Label */}
@@ -56,7 +59,11 @@ export default function TicketSection() {
           {/* Grid tiket */}
           <div className="grid grid-cols-3 gap-4 w-full pd-lr mt-[25%] place-items-center md:gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-8  lg:mt-0">
             {dummyTickets.map((ticket) => (
-              <TicketCard key={ticket.id} ticket={ticket} />
+              <TicketCard
+                key={ticket.id}
+                ticket={ticket}
+                idEvent={event[0]?._id}
+              />
             ))}
           </div>
         </div>
