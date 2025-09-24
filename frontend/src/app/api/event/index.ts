@@ -23,14 +23,9 @@ export interface ITicketPayload {
   templateLayout: string;
 }
 
-//=========================================================
-// UTILITY FUNCTION (Tidak perlu diubah)
-//=========================================================
-
 export async function fetchWithToken(url: string, options?: RequestInit): Promise<Response> {
-  // ... (kode ini tetap sama)
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const headers: HeadersInit = { ...(options?.headers || {}) };
+  const headers: HeadersInit = { ...(options?.headers || {})  };
   if (!(options?.body instanceof FormData)) {
     (headers as Record<string, string>)['Content-Type'] = 'application/json';
   }
