@@ -1,6 +1,6 @@
 'use client';
 
-import { fetchAllEvents } from '@/app/api/event';
+import { fetchAllEvents, fetchEventById } from '@/app/api/event';
 import TicketCard from '@/components/fragments/card/TicketCard';
 import Label from '@/components/fragments/label/Label';
 import { ToastError } from '@/lib/validations/toast/ToastNofication';
@@ -10,23 +10,19 @@ import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function TicketSection() {
-  const [event, setEvent] = useState<IEvent[]>([]);
+  const [event, setEvent] = useState<IEvent | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const dummyTickets = [
-    { id: 1, title: 'VIP', price: 350000 },
-    { id: 2, title: 'VIP TRIBUN', price: 350000 },
-    { id: 3, title: 'FESTIVAL A', price: 350000 },
-    { id: 4, title: 'FESTIVAL B', price: 350000 },
-    { id: 5, title: 'TRIBUN', price: 450000 },
-  ];
 
   const getEvent = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetchAllEvents();
+      const response = await fetchEventById('6899f694bbde0daae146f849');
       if (response.status == 'success' && response.data) {
-        setEvent(response.data as unknown as IEvent[]);
+        const combinedData: IEvent = {
+          ...response.data.event,
+          tickets: response.data.tickets
+        }
+        setEvent(combinedData);
       } else {
         ToastError(response.message);
       }
@@ -40,7 +36,7 @@ export default function TicketSection() {
   useEffect(() => {
     getEvent();
   }, [getEvent]);
-  console.log('Result Data TEsting: ', event);
+  // console.log('Result Data TEsting: ', event);
 
   if (loading) return null;
 
@@ -48,7 +44,7 @@ export default function TicketSection() {
     <section className="relative flex flex-col items-center py-[28%]">
       {/* Judul */}
       <h2 className="z-10 text-xl font-semibold text-center w-[50%]  md:text-3xl lg:text-5xl">
-        {event[0]?.eventName || 'Melophile Festival Vol 2'}
+        {event?.eventName || 'Melophile Festival Vol 2'}
       </h2>
 
       {/* Label */}
@@ -58,12 +54,13 @@ export default function TicketSection() {
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
           {/* Grid tiket */}
           <div className="grid grid-cols-3 gap-4 w-full pd-lr mt-[25%] place-items-center md:gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-8  lg:mt-0">
-            {dummyTickets.map((ticket) => (
+            {event?.tickets && event?.tickets.map((tc) => (
               <TicketCard
-                key={ticket.id}
-                ticket={ticket}
-                idEvent={event[0]?._id}
-              />
+                key={tc._id}
+                ticket={tc}
+                idTicket={tc._id}
+                idEvent={event?._id}
+                />
             ))}
           </div>
         </div>

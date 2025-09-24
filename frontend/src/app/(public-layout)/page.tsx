@@ -5,13 +5,13 @@ import TicketSection from '@/components/pages/homePage/TicketSection';
 
 export default function homepage() {
   return (
-    <main className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
+    <section className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
       <div className="relative">
         <HeroSection />
         <TicketSection />
         <GalerySection />
         <SponsorSection />
       </div>
-    </main>
+    </section>
   );
 }

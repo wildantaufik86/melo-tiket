@@ -2,17 +2,18 @@ import { formattedPrice } from '@/utils/universalUtils';
 import Link from 'next/link';
 
 type TicketCard = {
-  id: number;
-  title: string;
+  id?: number;
+  title?: string;
   price: number;
 };
 
 type TicketCardProps = {
+  idTicket?: string;
   ticket: TicketCard;
   idEvent?: string;
 };
 
-export default function TicketCard({ ticket, idEvent }: TicketCardProps) {
+export default function TicketCard({ ticket, idEvent, idTicket}: TicketCardProps) {
   return (
     <div className="bg-[url(/images/bg-ticket.webp)] bg-contain bg-center bg-no-repeat aspect-2/3 flex justify-center items-center w-full max-w-[150px] md:max-w-[180px] lg:max-w-[200px] hover:scale-110 duration-200 ease-in-out">
       <div className="flex flex-col items-center gap-4 py-4">
@@ -26,7 +27,7 @@ export default function TicketCard({ ticket, idEvent }: TicketCardProps) {
           </span>
         </p>
         <Link
-          href={`/ticket/event/${idEvent}`}
+          href={`/ticket/event/${idEvent}/${idTicket}`}
           className="p-[1px] rounded-sm bg-gradient-to-r from-blue-500 via-purple-500 to-red-500"
         >
           <div className="rounded-sm bg-secondary text-center text-xs py-2 px-4 lg:text-sm">

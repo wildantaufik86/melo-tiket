@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Melotiket | Homepage',
   description: 'This is Melotiket Homepage',
   icons: {
-    icon: '',
+    icon: '/images/melo-logo.png',
   },
 };
 
@@ -16,10 +16,12 @@ export default function HomepageLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="font-mono  text-white">
-      <MainNavbar />
+    <>
+    <MainNavbar />
+    <main className="font-mono  text-white">
       <AuthProvider>{children}</AuthProvider>
-      <Footer />
-    </div>
+    </main>
+    <Footer />
+    </>
   );
 }

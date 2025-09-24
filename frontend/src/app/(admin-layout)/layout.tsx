@@ -6,17 +6,17 @@ export const metadata: Metadata = {
   title: "Melotiket | Page Admin",
   description: "This is Melotiket Admin Page",
   icons: {
-    icon: '',
+    icon: '/images/melo-logo.png',
   },
 };
 
 export default function AdminLayout({children}: Readonly<{children: ReactNode}>) {
 
  return (
-  <div>
+  <main>
     <AuthProvider>
     {children}
     </AuthProvider>
-  </div>
+  </main>
  )
 };

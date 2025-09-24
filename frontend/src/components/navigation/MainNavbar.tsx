@@ -47,7 +47,7 @@ export default function MainNavbar() {
       {/* desktop navbar */}
       <div className=" justify-center items-center gap-6 hidden md:flex">
         <Link
-          href="/about"
+          href="#"
           className="text-lg font-medium hover:text-primary transition-colors"
         >
           About
@@ -81,13 +81,13 @@ export default function MainNavbar() {
       {/* button navigation */}
       <div className="flex items-center gap-4">
         <Link
-          href="/register"
+          href="/auth/register"
           className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm"
         >
           Daftar
         </Link>
         <Link
-          href="/login"
+          href="/auth/login"
           className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm"
         >
           Masuk

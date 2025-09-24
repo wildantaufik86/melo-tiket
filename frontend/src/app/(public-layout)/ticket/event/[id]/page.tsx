@@ -42,8 +42,6 @@ export default function EventDetailPage({
     if (id) getDetailEvent();
   }, [id, getDetailEvent]);
 
-  console.log('Result Data TEsting: ', eventDetail);
-
   if (loading) return null;
 
   return (

@@ -5,6 +5,7 @@ export enum TicketStatus {
 }
 
 export interface ITicket {
+  _id?: string;
   eventId?: string;
   category: string;
   price: number;
