@@ -31,7 +31,7 @@ export default function TicketCard({
           </span>
         </p>
         <Link
-          href={`/checkout/${idEvent}/${idTicket}`}
+          href={`/checkout/event/${idEvent}`}
           className="p-[1px] rounded-sm bg-gradient-to-r from-blue-500 via-purple-500 to-red-500"
         >
           <div className="rounded-sm bg-secondary text-center text-xs py-2 px-4 lg:text-sm">

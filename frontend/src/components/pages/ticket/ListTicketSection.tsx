@@ -1,6 +1,7 @@
 'use client';
 
 import { ITicket } from '@/types/Ticket';
+import { setLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,6 +10,7 @@ import { FaChevronDown } from 'react-icons/fa';
 
 type TicketProps = {
   tickets: ITicket[];
+  eventId: string;
 };
 
 type TicketWithState = ITicket & {
@@ -25,10 +27,12 @@ type TicketCardProps = {
   decrementQty?: () => void;
 };
 
-export default function ListTicketSection({ tickets }: TicketProps) {
+export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   const [availableTickets, setAvailableTickets] = useState<TicketWithState[]>(
     []
   );
+
+  const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
 
   useEffect(() => {
     if (tickets.length > 0) {
@@ -74,6 +78,17 @@ export default function ListTicketSection({ tickets }: TicketProps) {
     );
   };
 
+  const createTemporaryOrder = (): void => {
+    if (selectedTickets.length > 0) setLocalStorage('order', selectedTickets);
+  };
+
+  useEffect(() => {
+    if (availableTickets.length > 0) {
+      const selected = availableTickets.filter((data) => data.quantity > 0);
+      setSelectedTickets(selected);
+    }
+  }, [availableTickets]);
+
   return (
     <section className="flex flex-col md:flex-1 md:mt-10">
       <div className="relative aspect-2/3">
@@ -104,7 +119,8 @@ export default function ListTicketSection({ tickets }: TicketProps) {
           <span>{formattedPrice(totalPrice)}</span>
         </p>
         <Link
-          href="/checkout"
+          onClick={createTemporaryOrder}
+          href={`/checkout/event/${eventId}`}
           className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white"
         >
           Lanjutkan

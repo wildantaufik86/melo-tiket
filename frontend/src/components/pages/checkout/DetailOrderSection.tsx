@@ -24,7 +24,11 @@ const dummyTicket = [
   },
 ];
 
-export default function DetailOrderSection() {
+type OrderProps = {
+  orders: [] | any;
+};
+
+export default function DetailOrderSection({ orders }: OrderProps) {
   const userData = {
     email: 'Mellowfestsite@gmail.com',
     fullName: 'Melophile Festival',
@@ -70,19 +74,20 @@ export default function DetailOrderSection() {
 
         {/* list order ticket */}
         <div className="flex flex-col gap-4 mt-4 max-h-[200px] overflow-auto">
-          {dummyTicket.map((ticket) => (
-            <div key={ticket.id} className="flex flex-col">
-              <h4 className="text-lg font-semibold">{ticket.name}</h4>
-              <div className="grid grid-cols-2 text-[10px] opacity-80">
-                <p>Harga Ticket </p>
-                <p className="text-left">: {formattedPrice(ticket.price)}</p>
-                <p className="">Jumlah </p>
-                <p>: {ticket.quantity} pcs</p>
-                <p className="">Total </p>
-                <p>: {formattedPrice(ticket.price * ticket.quantity)} </p>
+          {orders.length > 0 &&
+            orders.map((ticket, index) => (
+              <div key={index} className="flex flex-col">
+                <h4 className="text-lg font-semibold">{ticket.name}</h4>
+                <div className="grid grid-cols-2 text-[10px] opacity-80">
+                  <p>Harga Ticket </p>
+                  <p className="text-left">: {formattedPrice(ticket.price)}</p>
+                  <p className="">Jumlah </p>
+                  <p>: {ticket.quantity} pcs</p>
+                  <p className="">Total </p>
+                  <p>: {formattedPrice(ticket.price * ticket.quantity)} </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
 
         {/* hr */}

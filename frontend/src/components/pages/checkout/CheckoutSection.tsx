@@ -5,11 +5,17 @@ import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 
 type Props = {
-  listOrder: [];
+  listOrder: [] | any;
 };
 
 export default function CheckoutSection({ listOrder }: Props) {
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const subTotal = listOrder?.reduce(
+    (acc, data) => acc + data.price * data.quantity,
+    0
+  );
+  const platformFee = 0;
+  const total = subTotal + platformFee;
 
   const toggleConfirm = (e: ChangeEvent) => {
     const target = e.target as HTMLInputElement;
@@ -21,14 +27,16 @@ export default function CheckoutSection({ listOrder }: Props) {
       <div className="flex-1 flex flex-col gap-2 bg-secondary p-4 rounded-sm">
         <div className="flex items-center justify-between">
           <p className="text-sm">Subtotal</p>
-          <p className="text-sm">{formattedPrice(40000)}</p>
+          <p className="text-sm">{formattedPrice(subTotal)}</p>
         </div>
         <div className="flex items-center justify-between">
           <p className="text-sm flex flex-col">
             Platform Fee
             <span className="text-[10px] opacity-50">Non Refundable</span>
           </p>
-          <p className="text-sm">Gratis</p>
+          <p className="text-sm">
+            {platformFee === 0 ? 'Gratis' : platformFee}
+          </p>
         </div>
 
         {/* hr */}
@@ -41,7 +49,7 @@ export default function CheckoutSection({ listOrder }: Props) {
               Pembayaran ini sudah termasuk pajak
             </span>
           </p>
-          <p className="text-sm">{formattedPrice(400000)}</p>
+          <p className="text-sm">{formattedPrice(total)}</p>
         </div>
       </div>
 
