@@ -3,7 +3,7 @@ import DetailOrderSection from '../../../components/pages/checkout/DetailOrderSe
 
 export default function TicketPage() {
   return (
-    <main className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-20">
+    <section className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-20">
       <div className="pd-full flex flex-col">
         <h3 className="text-lg font-semibold md:text-xl lg:text-3xl">
           RINCIAN PESANAN
@@ -13,6 +13,6 @@ export default function TicketPage() {
           <CheckoutSection listOrder={[]} />
         </div>
       </div>
-    </main>
+    </section>
   );
 }

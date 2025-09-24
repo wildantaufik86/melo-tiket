@@ -6,7 +6,7 @@ import ListTicketSection from '@/components/pages/ticket/ListTicketSection';
 export default function TicketPage() {
   // default detail event page, remove if not used again
   return (
-    <main className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
+    <section className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
       <div className="relative flex flex-col">
         <HeroSection />
         <HeaderSection />
@@ -15,6 +15,6 @@ export default function TicketPage() {
         <AboutSection />
         {/* <ListTicketSection /> */}
       </div>
-    </main>
+    </section>
   );
 }

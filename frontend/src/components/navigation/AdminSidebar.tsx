@@ -37,7 +37,7 @@ export default function AdminSidebar() {
 
         <Link href={'/admin'} className="flex items-center space-x-2">
           <img
-            src=""
+            src="/images/melo-logo.png"
             alt="Logo_Melotiket"
             className="w-20"
           />
@@ -66,7 +66,7 @@ export default function AdminSidebar() {
           <Link href={'/admin'} className="">
             <div className="p-2 space-x-1 w-max h-full bg-black/80 rounded-lg">
               <img
-                src=""
+                src="/images/melo-logo.png"
                 alt="Logo_Melotiket"
                 className="max-w-[85px] object-cover"
               />
@@ -85,7 +85,7 @@ export default function AdminSidebar() {
           {/* Profile Section */}
           <div className="flex items-center px-4 space-x-4 bg-gray-50 border rounded-lg border-black/10">
             <img
-              src=""
+              src="/images/melo-logo.png"
               alt="Profile"
               className="w-12 h-12 object-cover rounded-full"
             />
@@ -123,21 +123,21 @@ export default function AdminSidebar() {
                   <span>Event Managements{' '}</span>
               </div>
               <span className="duration-200">
-                {productsManagementOpen ? <ChevronUp /> : <ChevronDown />}
+                {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
               </span>
             </li>
-            {/* list product management */}
             <div className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${eventsManagementOpen ? 'max-h-96' : 'max-h-0'}`}>
-              <Link
-                href={'/admin/event'}
-                className={`${
-                  pathname.startsWith('/admin/event')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
+              <Link href={'/admin/event-management/event'} className={`${ pathname.startsWith('/admin/event-management/event') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
                 Event
+              </Link>
+              <Link href={'/admin/event-management/ticket'} className={`${ pathname.startsWith('/admin/event-management/ticket') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+                Ticket
+              </Link>
+              <Link href={'/admin/event-management/template'} className={`${ pathname.startsWith('/admin/event-management/template') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+                Template
+              </Link>
+              <Link href={'/admin/event-management/category'} className={`${ pathname.startsWith('/admin/event-management/category') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+                Category
               </Link>
             </div>
 
@@ -200,7 +200,6 @@ export default function AdminSidebar() {
                 {productsManagementOpen ? <ChevronUp /> : <ChevronDown />}
               </span>
             </li>
-            {/* list product management */}
             <div
               className={`flex flex-col transition-transform duration-300 origin-top gap-2 px-4 ${
                 productsManagementOpen ? 'scale-y-100' : 'scale-y-0'
