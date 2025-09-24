@@ -1,57 +1,78 @@
 'use client';
 
+import TicketCard from '@/components/fragments/card/TicketCard';
+import { ITicket } from '@/types/Ticket';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
-type Ticket = {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  isOpen: boolean;
+type TicketProps = {
+  tickets: ITicket[];
 };
 
-type TicketProps = {
-  ticket: Ticket;
+type TicketWithState = ITicket & {
+  quantity: number;
+  isOpen: boolean;
+  name: string;
+  idTicket: number;
+};
+
+type TicketCardProps = {
+  ticket: ITicket & TicketWithState;
   toggleOpen?: () => void;
   incrementQty?: () => void;
   decrementQty?: () => void;
 };
 
-export default function ListTicketSection() {
-  const [tickets, setTickets] = useState<Ticket[]>([
-    { id: 1, name: 'VIP', price: 1000000, quantity: 0, isOpen: false },
-    { id: 2, name: 'Festival 1', price: 750000, quantity: 0, isOpen: false },
-    { id: 3, name: 'Festival 2', price: 500000, quantity: 0, isOpen: false },
-    { id: 4, name: 'Tribun', price: 250000, quantity: 0, isOpen: false },
-  ]);
+export default function ListTicketSection({ tickets }: TicketProps) {
+  const [availableTickets, setAvailableTickets] = useState<TicketWithState[]>(
+    []
+  );
 
-  const totalPrice = tickets.reduce(
+  useEffect(() => {
+    if (tickets.length > 0) {
+      const mapped: TicketWithState[] = tickets.map((ticket, index) => ({
+        ...ticket, // ⬅️ ini penting biar `_id` dan semua field ITicket tetap ada
+        quantity: 0,
+        isOpen: false,
+        name: 'VIP',
+        idTicket: index + 1,
+      }));
+      setAvailableTickets(mapped);
+    }
+  }, [tickets]);
+
+  console.log(availableTickets);
+
+  const totalPrice = availableTickets.reduce(
     (total, ticket) => total + ticket.price * ticket.quantity,
     0
   );
 
   const toggleOpen = (id: number) => {
-    setTickets((prevTickets) =>
+    setAvailableTickets((prevTickets) =>
       prevTickets.map((ticket) =>
-        ticket.id === id ? { ...ticket, isOpen: !ticket.isOpen } : ticket
+        ticket.idTicket === id ? { ...ticket, isOpen: !ticket.isOpen } : ticket
       )
     );
   };
 
   const incrementQty = (id: number) => {
-    setTickets((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, quantity: t.quantity + 1 } : t))
+    setAvailableTickets((prev) =>
+      prev.map((t) =>
+        t.idTicket === id ? { ...t, quantity: t.quantity + 1 } : t
+      )
     );
   };
 
   const decrementQty = (id: number) => {
-    setTickets((prev) =>
+    setAvailableTickets((prev) =>
       prev.map((t) =>
-        t.id === id && t.quantity > 0 ? { ...t, quantity: t.quantity - 1 } : t
+        t.idTicket === id && t.quantity > 0
+          ? { ...t, quantity: t.quantity - 1 }
+          : t
       )
     );
   };
@@ -61,7 +82,7 @@ export default function ListTicketSection() {
     toggleOpen,
     decrementQty,
     incrementQty,
-  }: TicketProps) => {
+  }: TicketCardProps) => {
     return (
       <div className="flex flex-col rounded-sm p-4 bg-secondary">
         <p
@@ -119,13 +140,13 @@ export default function ListTicketSection() {
       <div className="flex flex-col gap-4">
         <h3 className="text-lg font-semibold">Ticket</h3>
         <div className="flex flex-col gap-4">
-          {tickets.map((ticket) => (
+          {availableTickets.map((data) => (
             <TicketCard
-              key={ticket.id}
-              ticket={ticket}
-              toggleOpen={() => toggleOpen(ticket.id)}
-              incrementQty={() => incrementQty(ticket.id)}
-              decrementQty={() => decrementQty(ticket.id)}
+              key={data.idTicket}
+              ticket={data}
+              toggleOpen={() => toggleOpen(data.idTicket)}
+              incrementQty={() => incrementQty(data.idTicket)}
+              decrementQty={() => decrementQty(data.idTicket)}
             />
           ))}
         </div>
