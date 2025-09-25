@@ -34,8 +34,6 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
     []
   );
 
-  const [loading, setLoading] = useState(true);
-
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
 
   useEffect(() => {
@@ -49,8 +47,6 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       }));
       setAvailableTickets(mapped);
     }
-
-    getAllTickets();
   }, [tickets]);
 
   const totalPrice = availableTickets.reduce(
@@ -74,22 +70,6 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
     );
   };
 
-  const getAllTickets = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetchAllTicket(eventId);
-      if (response.status == 'success' && response.data) {
-        console.log(response.data);
-      } else {
-        ToastError(response.message);
-      }
-    } catch (err: any) {
-      ToastError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const decrementQty = (id: number) => {
     setAvailableTickets((prev) =>
       prev.map((t) =>
@@ -110,7 +90,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       setSelectedTickets(selected);
     }
   }, [availableTickets]);
-console.log(availableTickets)
+  console.log(availableTickets);
   return (
     <section className="flex flex-col md:flex-1 md:mt-10">
       <div className="relative aspect-2/3">
