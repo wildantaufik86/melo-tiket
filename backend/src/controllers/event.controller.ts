@@ -15,11 +15,7 @@ export const createEventHandler: RequestHandler = async (req, res, next) => {
     const existingEvent = await EventModel.findOne({ eventName });
     appAssert(!existingEvent, BAD_REQUEST, `Event with name "${eventName}" already exists`);
 
-    if(!eventDesc && !ticketDesc) {
-      res.status(BAD_REQUEST).json({
-        message: "Event Description or Ticket Description is empty."
-      })
-    }
+    appAssert(eventDesc || ticketDesc, BAD_REQUEST, "Event Description or Ticket Description cannot be both empty.");
 
     const newEvent = new EventModel({
       eventName,
@@ -64,7 +60,7 @@ export const getEventByIdHandler: RequestHandler = async (req, res, next) => {
     const availableTickets = await TicketModel.find({
       eventId: eventId,
       status: TicketStatus.AVAILABLE,
-    });
+    }).populate('category', 'name slug');
 
     res.status(OK).json({
       event,

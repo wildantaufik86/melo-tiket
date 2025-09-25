@@ -88,7 +88,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       setSelectedTickets(selected);
     }
   }, [availableTickets]);
-
+console.log(availableTickets)
   return (
     <section className="flex flex-col md:flex-1 md:mt-10">
       <div className="relative aspect-2/3">

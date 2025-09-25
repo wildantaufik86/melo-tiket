@@ -13,6 +13,8 @@ export interface IEvent extends Document {
   time: string;
   address: string;
   description: string;
+  eventDesc?: string;
+  ticketDesc?: string;
   headlineImage?: string;
   tickets: ITicket[];
   lineup: ILineup[];
