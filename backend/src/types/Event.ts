@@ -10,8 +10,8 @@ export interface IEvent extends Document {
   date: Date;
   time: string;
   address: string;
-  eventDesc: string;
-  ticketDesc: string;
+  eventDesc?: string;
+  ticketDesc?: string;
   headlineImage?: string;
   lineup: ILineup[];
   isPublished: boolean;

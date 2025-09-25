@@ -1,8 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { fetchAllTicket, fetchTicketById } from '@/app/api/ticket';
+import { ITicket } from '@/types/Ticket';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
 
 const formattedDate = (dateString: Date | string) => {
   if (!dateString) return '';
@@ -18,54 +21,31 @@ const formattedDate = (dateString: Date | string) => {
 
 export default function AdminDashbordDisplay() {
   const [isLoading, setIsLoading] = useState(true);
+  const [ticket, setTicket] = useState<ITicket[]>([]);
   const [totalPosts, setTotalPosts] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
   const [totalPortofolioItems, setTotalPortofolioItems] = useState(0);
-  // const [latestPosts, setLatestPosts] = useState<IPost[]>([]);
-  // const [latestPortofolioItems, setLatestPortofolioItems] = useState<IPortofolio[]>([]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true);
-  //     try {
-  //       const postsResult = await fetchPosts({ page: 1, limit: 5 });
-  //       if (postsResult.status === 'success' && postsResult.data) {
-  //         setTotalPosts(postsResult.pagination?.totalPosts || 0);
-  //         const processedPosts = postsResult.data.map(post => ({
-  //           ...post,
-  //           categoryNameForDisplay: typeof post.categoryId === 'object' && post.categoryId !== null
-  //             ? (post.categoryId as unknown as ICategory).name
-  //             : 'Tidak Berkategori'
-  //         }));
-  //         setLatestPosts(processedPosts);
-  //       } else {
-  //         console.error('Failed to fetch posts for dashboard:', postsResult.message);
-  //       }
+    const getData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetchAllTicket('6899f920f101bb1cc321dd12');
+      if (response.status == 'success' && response.data) {
+        setTicket(response.data as unknown as ITicket[]);
+      } else {
+        ToastError(response.message);
+      }
+    } catch (err: any) {
+      ToastError(err.message);
+    } finally {
+      setTimeout(() => setIsLoading(false), 500)
+    }
+  }, []);
 
-  //       const categoriesResult = await fetchCategories();
-  //       if (categoriesResult.status === 'success' && categoriesResult.data) {
-  //         setTotalCategories(categoriesResult.data.length);
-  //       } else {
-  //         console.error('Failed to fetch categories for dashboard:', categoriesResult.message);
-  //       }
-
-  //       const portofolioResult = await fetchPortofolioItems({ page: 1, limit: 5 }); // Fetch top 5 latest portofolio items
-  //       if (portofolioResult.status === 'success' && portofolioResult.data) {
-  //         setTotalPortofolioItems(portofolioResult.pagination?.totalItems || 0);
-  //         setLatestPortofolioItems(portofolioResult.data);
-  //       } else {
-  //         console.error('Failed to fetch portofolio for dashboard:', portofolioResult.message);
-  //       }
-
-  //     } catch (error: any) {
-  //       console.error('Error fetching dashboard data:', error.message);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    getData();
+  }, [getData])
+  console.log(ticket);
 
   if (isLoading) {
     return (
@@ -76,8 +56,6 @@ export default function AdminDashbordDisplay() {
   }
 
   return (
-    <React.Fragment>
-
-    </React.Fragment>
+    <section>Dashboard</section>
   );
 }

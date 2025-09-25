@@ -1,6 +1,7 @@
+import AdminSidebar from "@/components/navigation/AdminSidebar";
 import { AuthProvider } from "@/context/authUserContext";
 import { Metadata } from "next";
-import { ReactNode } from "react";
+import React, { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: "Melotiket | Page Admin",
@@ -13,10 +14,10 @@ export const metadata: Metadata = {
 export default function AdminLayout({children}: Readonly<{children: ReactNode}>) {
 
  return (
-  <main>
+  <React.Fragment>
     <AuthProvider>
     {children}
     </AuthProvider>
-  </main>
+  </React.Fragment>
  )
 };

@@ -59,7 +59,7 @@ export const getTicketTypeByIdHandler: RequestHandler = async (req, res, next) =
   try {
     const { eventId, ticketId } = req.params;
 
-    const ticket = await TicketModel.findOne({ _id: ticketId, eventId }).populate('category', 'name slug');;
+    const ticket = await TicketModel.findOne({ _id: ticketId, eventId }).populate('category', 'name slug');
     appAssert(ticket, NOT_FOUND, "Ticket category not found in this event");
 
     res.status(OK).json({
