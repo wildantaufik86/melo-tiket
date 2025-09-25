@@ -12,9 +12,13 @@ interface IOrderItem {
 
 type OrderProps = {
   orders: IOrderItem[];
+  handlePaymentProof: (file: File) => void;
 };
 
-export default function DetailOrderSection({ orders }: OrderProps) {
+export default function DetailOrderSection({
+  orders,
+  handlePaymentProof,
+}: OrderProps) {
   const userData = {
     email: 'Mellowfestsite@gmail.com',
     fullName: 'Melophile Festival',
@@ -194,7 +198,17 @@ export default function DetailOrderSection({ orders }: OrderProps) {
             <BsPaperclip size={24} />
             Attach File
           </label>
-          <input type="file" id="file" className="hidden" />
+          <input
+            type="file"
+            id="file"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0] || null;
+              if (file) {
+                handlePaymentProof(file);
+              }
+            }}
+          />
         </div>
       </div>
       <p className="text-xs px-4 mt-2 italic font-medium lg:text-xl">
