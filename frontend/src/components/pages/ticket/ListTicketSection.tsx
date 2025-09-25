@@ -1,11 +1,13 @@
 'use client';
 
+import { fetchAllTicket } from '@/app/api/ticket';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITicket } from '@/types/Ticket';
 import { setLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 type TicketProps = {
@@ -32,6 +34,8 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
     []
   );
 
+  const [loading, setLoading] = useState(true);
+
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
 
   useEffect(() => {
@@ -45,6 +49,8 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       }));
       setAvailableTickets(mapped);
     }
+
+    getAllTickets();
   }, [tickets]);
 
   const totalPrice = availableTickets.reduce(
@@ -67,6 +73,22 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       )
     );
   };
+
+  const getAllTickets = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchAllTicket(eventId);
+      if (response.status == 'success' && response.data) {
+        console.log(response.data);
+      } else {
+        ToastError(response.message);
+      }
+    } catch (err: any) {
+      ToastError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const decrementQty = (id: number) => {
     setAvailableTickets((prev) =>

@@ -33,15 +33,19 @@ export default function CheckoutSection({ listOrder }: Props) {
     <section className="flex flex-col mt-8 md:flex-1 md:mt-0 md:max-h-[200px]">
       <div className="flex-1 flex flex-col gap-2 bg-secondary p-4 rounded-sm">
         <div className="flex items-center justify-between">
-          <p className="text-sm">Subtotal</p>
-          <p className="text-sm">{formattedPrice(subTotal)}</p>
+          <p className="text-sm lg:text-xl font-medium">Subtotal</p>
+          <p className="text-sm lg:text-xl font-medium">
+            {formattedPrice(subTotal)}
+          </p>
         </div>
         <div className="flex items-center justify-between">
-          <p className="text-sm flex flex-col">
+          <p className="text-sm flex flex-col lg:text-xl font-medium">
             Platform Fee
-            <span className="text-[10px] opacity-50">Non Refundable</span>
+            <span className="text-[10px] opacity-50 lg:text-xs font-medium">
+              Non Refundable
+            </span>
           </p>
-          <p className="text-sm">
+          <p className="text-sm lg:text-xl font-medium">
             {platformFee === 0 ? 'Gratis' : platformFee}
           </p>
         </div>
@@ -50,20 +54,22 @@ export default function CheckoutSection({ listOrder }: Props) {
         <div className="w-full h-[1px] bg-white"></div>
 
         <div className="flex items-center justify-between">
-          <p className="text-sm flex flex-col font-semibold">
+          <p className="text-sm flex flex-col lg:text-xl font-bold">
             TOTAL :
-            <span className="text-[10px] opacity-50">
+            <span className="text-[10px] opacity-50 lg:text-xs font-medium">
               Pembayaran ini sudah termasuk pajak
             </span>
           </p>
-          <p className="text-sm">{formattedPrice(total)}</p>
+          <p className="text-sm lg:text-xl font-bold">
+            {formattedPrice(total)}
+          </p>
         </div>
       </div>
 
       {/* konfirm input */}
       <div className="flex items-center gap-2 px-4 mt-4 cursor-pointer">
         <input type="checkbox" id="confirm" onChange={toggleConfirm} />
-        <label htmlFor="confirm" className="text-xs">
+        <label htmlFor="confirm" className="text-xs lg:text-sm font-bold">
           Dengan ini saya setuju dengan{' '}
           <Link
             href="/terms"
@@ -80,7 +86,9 @@ export default function CheckoutSection({ listOrder }: Props) {
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
         }`}
       >
-        Konfirmasi Pembelian
+        <span className="text-sm lg:text-xl font-bold">
+          Konfirmasi Pembelian
+        </span>
       </div>
     </section>
   );
