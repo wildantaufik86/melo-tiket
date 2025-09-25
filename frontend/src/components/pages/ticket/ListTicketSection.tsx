@@ -1,11 +1,13 @@
 'use client';
 
+import { fetchAllTicket } from '@/app/api/ticket';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITicket } from '@/types/Ticket';
 import { setLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 type TicketProps = {
@@ -16,8 +18,6 @@ type TicketProps = {
 type TicketWithState = ITicket & {
   quantity: number;
   isOpen: boolean;
-  name: string;
-  idTicket: number;
 };
 
 type TicketCardProps = {
@@ -31,7 +31,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   const [availableTickets, setAvailableTickets] = useState<TicketWithState[]>(
     []
   );
-
+  console.log(availableTickets);
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
 
   useEffect(() => {
@@ -40,8 +40,6 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
         ...ticket,
         quantity: 0,
         isOpen: false,
-        name: 'VIP',
-        idTicket: index + 1,
       }));
       setAvailableTickets(mapped);
     }
@@ -52,28 +50,24 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
     0
   );
 
-  const toggleOpen = (id: number) => {
+  const toggleOpen = (id?: string) => {
     setAvailableTickets((prevTickets) =>
       prevTickets.map((ticket) =>
-        ticket.idTicket === id ? { ...ticket, isOpen: !ticket.isOpen } : ticket
+        ticket._id === id ? { ...ticket, isOpen: !ticket.isOpen } : ticket
       )
     );
   };
 
-  const incrementQty = (id: number) => {
+  const incrementQty = (id?: string) => {
     setAvailableTickets((prev) =>
-      prev.map((t) =>
-        t.idTicket === id ? { ...t, quantity: t.quantity + 1 } : t
-      )
+      prev.map((t) => (t._id === id ? { ...t, quantity: t.quantity + 1 } : t))
     );
   };
 
-  const decrementQty = (id: number) => {
+  const decrementQty = (id?: string) => {
     setAvailableTickets((prev) =>
       prev.map((t) =>
-        t.idTicket === id && t.quantity > 0
-          ? { ...t, quantity: t.quantity - 1 }
-          : t
+        t._id === id && t.quantity > 0 ? { ...t, quantity: t.quantity - 1 } : t
       )
     );
   };
@@ -88,7 +82,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       setSelectedTickets(selected);
     }
   }, [availableTickets]);
-console.log(availableTickets)
+
   return (
     <section className="flex flex-col md:flex-1 md:mt-10">
       <div className="relative aspect-2/3">
@@ -104,11 +98,11 @@ console.log(availableTickets)
         <div className="flex flex-col gap-4">
           {availableTickets.map((data) => (
             <TickedAccordion
-              key={data.idTicket}
+              key={data._id}
               ticket={data}
-              toggleOpen={() => toggleOpen(data.idTicket)}
-              incrementQty={() => incrementQty(data.idTicket)}
-              decrementQty={() => decrementQty(data.idTicket)}
+              toggleOpen={() => toggleOpen(data?._id)}
+              incrementQty={() => incrementQty(data?._id)}
+              decrementQty={() => decrementQty(data?._id)}
             />
           ))}
         </div>
@@ -161,7 +155,7 @@ const TickedAccordion = ({
         }`}
       >
         <p className="flex flex-col font-semibold">
-          {ticket.name}{' '}
+          {ticket.category.name}{' '}
           <span className="font-light">{formattedPrice(ticket.price)}</span>
         </p>
         <div className="flex items-center">

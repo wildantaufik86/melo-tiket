@@ -7,7 +7,7 @@ import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { IEvent } from '@/types/Event';
 import { ITicket } from '@/types/Ticket';
 import { useCallback, useEffect, useState } from 'react';
-import localFont from 'next/font/local'
+import localFont from 'next/font/local';
 
 export default function TicketSection() {
   const [event, setEvent] = useState<IEvent | null>(null);
@@ -58,7 +58,7 @@ export default function TicketSection() {
       <Label text="GET YOUR TICKET NOW" />
       <div className="absolute inset-0 top-15 mt-32">
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
-          <div className="grid grid-cols-3 gap-4 w-full pd-lr mt-[25%] place-items-center md:gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-8  lg:mt-0">
+          <div className="grid grid-cols-2 gap-4 w-full pd-lr mt-[25%] place-items-center md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-8  lg:mt-0">
             {availableTickets.length > 0 &&
               availableTickets.map((tc) => (
                 <TicketCard

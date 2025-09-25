@@ -27,28 +27,28 @@ export default function DetailOrderSection({ orders }: OrderProps) {
   };
 
   return (
-    <section className="flex flex-col md:w-[60%]">
+    <section className="flex flex-col md:w-[60%] lg:w-[55%]">
       {/* detail order */}
       <div className="flex-1 flex flex-col bg-secondary p-4 rounded-sm">
         {/* header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
-          <div className="relative w-full aspect-3/1 md:aspect-3/2 md:w-1/2">
+          <div className="relative w-full aspect-3/1 md:aspect-3/2 md:w-1/2 lg:h-[140px]">
             <Image
-              src="/images/hero-image.jpg"
+              src="/images/post-dewa-panel-2-1.png"
               alt="event image"
               fill
               className="object-contain object-top md:object-center"
             />
           </div>
           <div className="w-full flex flex-col gap-4 md:flex-1 ">
-            <h4 className="text-sm font-semibold md:text-lg lg:text-2xl">
+            <h4 className="text-sm font-black md:text-lg lg:text-2xl">
               MELOPHILE FESTIVAL
             </h4>
             <div className="flex items-center justify-between md:flex-col md:items-start">
-              <p className="text-[10px] lg:text-sm">
+              <p className="text-[10px] lg:text-base">
                 Tanggal : 29 NOVEMBER 2025
               </p>
-              <p className="text-[10px] lg:text-sm">
+              <p className="text-[10px] lg:text-base">
                 Tempat : Lhokseumawe, Aceh
               </p>
             </div>
@@ -63,8 +63,10 @@ export default function DetailOrderSection({ orders }: OrderProps) {
           {orders &&
             orders.map((ticket, index) => (
               <div key={index} className="flex flex-col">
-                <h4 className="text-lg font-semibold">{ticket.name}</h4>
-                <div className="grid grid-cols-2 text-[10px] opacity-80">
+                <h4 className="text-lg font-black lg:text-2xl">
+                  {ticket.name}
+                </h4>
+                <div className="grid grid-cols-2 text-[10px] opacity-80 lg:text-lg font-medium">
                   <p>Harga Ticket </p>
                   <p className="text-left">: {formattedPrice(ticket.price)}</p>
                   <p className="">Jumlah </p>
@@ -80,8 +82,8 @@ export default function DetailOrderSection({ orders }: OrderProps) {
         <div className="w-full bg-white h-[2px] mt-4 opacity-80"></div>
 
         {/* bank information */}
-        <div className="flex gap-2 mt-4">
-          <div className="relative w-[40%]">
+        <div className="flex gap-4 mt-4 p-4">
+          <div className="relative w-[30%]">
             <Image
               src="/images/bsi-logo.png"
               alt="bank-logo"
@@ -90,40 +92,47 @@ export default function DetailOrderSection({ orders }: OrderProps) {
             />
           </div>
           <div className="flex-1 grid grid-cols-[1fr_auto]">
-            <p className="text-[10px] md:text-sm lg:text-base">Nama Rekening</p>
-            <p className="text-[10px] md:text-sm lg:text-base">
+            <p className="text-[10px] md:text-sm lg:text-lg font-bold">
+              Nama Rekening
+            </p>
+            <p className="text-[10px] md:text-sm lg:text-lg">
               : M. MAULANA RIDWAN
             </p>
-            <p className="text-[10px] md:text-sm lg:text-base">
+            <p className="text-[10px] md:text-sm lg:text-lg font-bold">
               Nomor Rekening
             </p>
-            <p className="text-[10px] md:text-sm lg:text-base">: 1707071717</p>
+            <p className="text-[10px] md:text-sm lg:text-lg">: 1707071717</p>
           </div>
         </div>
       </div>
 
       {/* detail pembeli */}
       <div className="flex-1 flex flex-col bg-secondary p-4 rounded-sm mt-8">
-        <div className="flex flex-col">
-          <p className="font-semibold mb-2">Email</p>
+        <h3 className="font-black text-sm md:text-lg lg:text-3xl">
+          DETAIL PEMBELI
+        </h3>
+        <div className="flex flex-col mt-4">
+          <p className="font-extrabold mb-2 lg:text-xl">Email</p>
           <div className="bg-white p-2 rounded-t-sm">
-            <p className="text-sm font-semibold text-black">{userData.email}</p>
+            <p className="text-sm font-bold lg:text-xl text-black">
+              {userData.email}
+            </p>
           </div>
-          <p className="text-[9px] p-1 text-black font-light bg-[#FBD300]">
+          <p className="text-[9px] p-2 lg:text-base text-black font-light bg-[#FBD300]">
             Email ini akan digunakan untuk mengirimkan faktur dan e-tiket
           </p>
 
-          <p className="font-semibold mb-2 mt-4">Nama Lengkap</p>
+          <p className="font-extrabold mb-2 lg:text-xl mt-4">Nama Lengkap</p>
           <div className="bg-white p-2 rounded-sm">
-            <p className="text-sm font-semibold text-black">
+            <p className="text-sm font-bold lg:text-xl text-black">
               {userData.fullName}
             </p>
           </div>
 
-          <p className="font-semibold mb-2 mt-4">Tanggal Lahir</p>
+          <p className="font-extrabold mb-2 lg:text-xl mt-4">Tanggal Lahir</p>
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white p-2 rounded-sm">
-              <p className="flex justify-between items-center text-sm text-black">
+              <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
                 {userData.birthDate.day}{' '}
                 <span>
                   <FaChevronDown />
@@ -131,7 +140,7 @@ export default function DetailOrderSection({ orders }: OrderProps) {
               </p>
             </div>
             <div className="bg-white p-2 rounded-sm">
-              <p className="flex justify-between items-center text-sm text-black">
+              <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
                 {userData.birthDate.month}{' '}
                 <span>
                   <FaChevronDown />
@@ -139,7 +148,7 @@ export default function DetailOrderSection({ orders }: OrderProps) {
               </p>
             </div>
             <div className="bg-white p-2 rounded-sm">
-              <p className="flex justify-between items-center text-sm text-black">
+              <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
                 {userData.birthDate.year}{' '}
                 <span>
                   <FaChevronDown />
@@ -148,10 +157,10 @@ export default function DetailOrderSection({ orders }: OrderProps) {
             </div>
           </div>
 
-          <p className="font-semibold mb-2 mt-4">Jenis Kelamin</p>
+          <p className="font-extrabold mb-2 lg:text-xl mt-4">Jenis Kelamin</p>
           <div className="flex gap-2">
             <div className="flex-1 bg-white p-2 rounded-sm">
-              <div className="text-sm text-black flex items-center gap-2">
+              <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
                 <div
                   className={`w-3 h-3 rounded-full border ${
                     userData.gender === 'male' ? 'bg-blue-700' : ''
@@ -161,7 +170,7 @@ export default function DetailOrderSection({ orders }: OrderProps) {
               </div>
             </div>
             <div className="flex-1 bg-white p-2 rounded-sm">
-              <div className="text-sm text-black flex items-center gap-2">
+              <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
                 <div
                   className={`w-3 h-3 rounded-full border ${
                     userData.gender === 'female' ? 'bg-blue-700' : ''
@@ -175,15 +184,20 @@ export default function DetailOrderSection({ orders }: OrderProps) {
       </div>
 
       {/* upload file  */}
-      <div className="flex-1 flex justify-between bg-secondary p-4 rounded-sm mt-8">
-        <p>Bukti Transfer</p>
+      <div className="flex-1 flex justify-between items-center bg-secondary p-4 rounded-sm mt-8">
+        <p className="font-extrabold lg:text-xl">Bukti Transfer</p>
         <div className="flex items-center gap-2">
-          <BsPaperclip />
-          <label htmlFor="file">Attach File</label>
+          <label
+            htmlFor="file"
+            className="font-medium lg:text-xl cursor-pointer flex items-center gap-2"
+          >
+            <BsPaperclip size={24} />
+            Attach File
+          </label>
           <input type="file" id="file" className="hidden" />
         </div>
       </div>
-      <p className="text-xs px-4 mt-2">
+      <p className="text-xs px-4 mt-2 italic font-medium lg:text-xl">
         Pastikan untuk mencantumkan bukti transfer*
       </p>
     </section>
