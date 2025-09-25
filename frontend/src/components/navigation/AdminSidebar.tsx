@@ -28,7 +28,7 @@ export default function AdminSidebar() {
   };
 
   return (
-    <div className="bg-white static z-12">
+    <nav className="bg-white static z-12">
       {/* Mobile and Tablet Navbar */}
       <div className="flex lg:hidden items-center justify-between py-3 px-5 bg-white shadow-md fixed top-0 left-0 w-full z-50">
         <button className="text-2xl text-gray-800" onClick={toggleDrawer}>
@@ -64,11 +64,11 @@ export default function AdminSidebar() {
           {/* Sidebar Header with Logo and Title */}
           <div className="flex items-center justify-between space-x-4 bg-gray-50 border rounded-lg border-black/10 mb-3">
           <Link href={'/admin'} className="">
-            <div className="p-2 space-x-1 w-max h-full bg-black/80 rounded-lg">
+            <div className="p-2 space-x-1 h-full rounded-lg">
               <img
                 src="/images/melo-logo.png"
                 alt="Logo_Melotiket"
-                className="max-w-[85px] object-cover"
+                className="w-[45px] object-cover"
               />
             </div>
           </Link>
@@ -189,57 +189,6 @@ export default function AdminSidebar() {
                 </div>
               </Link>
             </li>
-            <li
-              onClick={() => setProductManagementOpen(!productsManagementOpen)}
-              className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between">
-              <div className='flex items-center'>
-                  <Folders size={24} className='text-black/75 mr-2' weight="light" />
-                  <span>Post Managements{' '}</span>
-              </div>
-              <span className="duration-200">
-                {productsManagementOpen ? <ChevronUp /> : <ChevronDown />}
-              </span>
-            </li>
-            <div
-              className={`flex flex-col transition-transform duration-300 origin-top gap-2 px-4 ${
-                productsManagementOpen ? 'scale-y-100' : 'scale-y-0'
-              }`}
-            >
-              <Link
-                href={'/admin/post'}
-                className={`${
-                  pathname.startsWith('/admin/post')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                Post
-              </Link>
-
-              <Link
-                href={'/admin/post/portofolio'}
-                className={`${
-                  pathname.startsWith('/admin/post/portofolio')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                Portofolio
-              </Link>
-              <Link
-                href={'/admin/post/categories'}
-                className={`${
-                  pathname.startsWith('/admin/post/categories')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                Categories
-              </Link>
-            </div>
           </ul>
         </div>
 
@@ -265,6 +214,6 @@ export default function AdminSidebar() {
           onClick={toggleDrawer}
         />
       )}
-    </div>
+    </nav>
   );
 }

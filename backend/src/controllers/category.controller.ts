@@ -7,7 +7,7 @@ import { BAD_REQUEST, FORBIDDEN, NOT_FOUND, OK } from '../constants/http';
 
 export const getCategories: RequestHandler = async (req, res) => {
   try {
-    const categories = await CategoryModel.find({});
+    const categories = await CategoryModel.find({ deletedAt: null });
     res.status(200).json({ status: 'success', message: 'Category successfully retrieved.', data: categories });
   } catch (error: any) {
     console.error('Error getting categories:', error);
@@ -17,7 +17,10 @@ export const getCategories: RequestHandler = async (req, res) => {
 
 export const getCategoryById: RequestHandler = async (req, res) => {
   try {
-    const category = await CategoryModel.findById(req.params.id);
+    const category = await CategoryModel.findOne({
+      _id: req.params.id,
+      deletedAt: null
+    });
     if (!category) {
       res.status(404).json({ message: 'Category not found.' });
       return;
