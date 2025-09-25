@@ -9,7 +9,8 @@ export enum TicketStatus {
 
 export interface ITicket extends Document {
   eventId: mongoose.Types.ObjectId;
-  category: mongoose.Types.ObjectId | ICategory ;
+  category: mongoose.Types.ObjectId | ICategory;
+  name: string;
   price: number;
   stock: number;
   status: TicketStatus;

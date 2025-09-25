@@ -8,10 +8,12 @@ import CategoryModel from "../models/CategoryModel";
 export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    const { categoryId, price, stock, templateImage, templateLayout } = req.body;
+    const { categoryId, price, stock, name, templateImage, templateLayout } = req.body;
 
     appAssert(categoryId && price !== undefined && stock !== undefined, BAD_REQUEST, "Category, price, and stock are required");
     appAssert(templateImage && templateLayout, BAD_REQUEST, "Template image and layout are required");
+    appAssert(name, BAD_REQUEST, "Name is required");
+
 
     const categoryExists = await CategoryModel.findById(categoryId);
     appAssert(categoryExists, NOT_FOUND, "Category not found");
@@ -22,6 +24,7 @@ export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next
     const newTicket = new TicketModel({
       eventId,
       category: categoryId,
+      name,
       price,
       stock,
       templateImage,

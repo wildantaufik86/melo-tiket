@@ -8,6 +8,7 @@ export interface ITicket {
   _id?: string;
   eventId?: string;
   category: string;
+  name: string;
   price: number;
   stock: number;
   status: TicketStatus;

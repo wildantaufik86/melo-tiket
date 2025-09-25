@@ -51,8 +51,8 @@ export default function EventDetailPage({
         <HeaderSection event={eventDetail?.event} />
       </div>
       <div className="flex flex-col mt-8 pd-full md:flex-row md:gap-6 lg:gap-12">
-        <AboutSection />
-        <ListTicketSection tickets={eventDetail?.tickets || []} />
+        <AboutSection eventDetail={eventDetail?.event} />
+        <ListTicketSection tickets={eventDetail?.tickets || []} eventId={id} />
       </div>
     </main>
   );

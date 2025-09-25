@@ -2,7 +2,14 @@ import Footer from '@/components/navigation/Footer';
 import MainNavbar from '@/components/navigation/MainNavbar';
 import { AuthProvider } from '@/context/authUserContext';
 import { Metadata } from 'next';
+import { Montserrat } from 'next/font/google';
 import { ReactNode } from 'react';
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  variable: "--font-montserrat",
+})
 
 export const metadata: Metadata = {
   title: 'Melotiket | Homepage',
@@ -18,7 +25,7 @@ export default function HomepageLayout({
   return (
     <>
     <MainNavbar />
-    <main className="font-mono  text-white">
+    <main className={`${montserrat.className} text-white`}>
       <AuthProvider>{children}</AuthProvider>
     </main>
     <Footer />

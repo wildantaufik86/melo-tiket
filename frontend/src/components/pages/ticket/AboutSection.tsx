@@ -1,4 +1,5 @@
 import Label from '@/components/fragments/label/Label';
+import { IEvent } from '@/types/Event';
 
 type textList = {
   text: string;
@@ -52,7 +53,11 @@ const listText: textList[] = [
   },
 ];
 
-export default function AboutSection() {
+type EventDetailProps = {
+  eventDetail?: IEvent;
+};
+
+export default function AboutSection({ eventDetail }: EventDetailProps) {
   return (
     <section className="w-full flex flex-col gap-8 md:w-[60%]">
       <div className="flex flex-col gap-4">
@@ -60,30 +65,7 @@ export default function AboutSection() {
           <Label text="TENTANG MELOFEST" />
         </div>
         <div className="bg-secondary rounded-md p-4 text-justify flex flex-col gap-4 text-xs">
-          <p>
-            • Melofest atau Melophile Festival merupakan sebuah acara yang unik
-            yang menonjolkan konsep yang menciptakan pengalaman yang berbeda
-            bagi para penonton. Festival ini juga menonjolkan kecintaan
-            seseorang terhadap musik.
-          </p>
-          <p>
-            • Selain itu, Melophile Festival memiliki unsur kejutan yang tak
-            terduga dengan adanya aktifitas social berupa Donor Darah, dan
-            Santunan Disabilita. Melalui konsep-konsep inovatif ini, Melophile
-            Festival di Lhokseumawe berharap dapat memberikan pengalaman yang
-            tidak hanya menghibur namun juga memberikan perhatian terhadap
-            kepedulian terhadap aksi social.
-          </p>
-          <p>
-            • Harapannya menjadi pionir Festival Musik dengan pengalaman terbaik
-            di Kota Lhokseumawe, menciptakan momen tak terlupakan bagi setiap
-            penonton. Kami berkomitmen untuk menghadirkan inovasi dan keunikan
-            dalam penyelenggaraan festival, menjadikan Melophile Festival
-            sebagai destinasi utama bagi pecinta seni, musik, budaya, kuliner
-            dan menjadi destinasi yang dinantikan setiap tahunnya juga sumber
-            inspirasi bagi festival-festival lain di seluruh Indonesia khususnya
-            Aceh.
-          </p>
+          <p>{eventDetail?.description || ''}</p>
         </div>
       </div>
       <div className="flex flex-col gap-4">
