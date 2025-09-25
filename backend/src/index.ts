@@ -63,13 +63,13 @@ app.get("/", ({ req, res }: any) => {
 });
 
 app.use("/ticket", express.json(), express.urlencoded({ extended: true }), ticketRoutes);
-app.use("/transaction", express.json(), express.urlencoded({ extended: true }), transactionRoutes);
+app.use("/transaction",express.json(), express.urlencoded({ extended: true }), transactionRoutes);
 app.use("/event", express.json(), express.urlencoded({ extended: true }), eventRoutes);
 app.use("/profile", express.json(), express.urlencoded({ extended: true }), profileRoutes);
 app.use("/categories", express.json(), express.urlencoded({ extended: true }), categoryRoutes);
 app.use("/auth", express.json(), express.urlencoded({ extended: true }), authRoutes);
 app.use("/user", express.json(), express.urlencoded({ extended: true }), userRoutes);
-app.use("/template", templateRoutes);
+app.use("/template", express.json(), express.urlencoded({ extended: true }), templateRoutes);
 app.use("/public", express.static(path.resolve("./public")));
 
 app.use(errorHandler);

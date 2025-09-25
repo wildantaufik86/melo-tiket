@@ -16,7 +16,7 @@ const TransactionSchema = new Schema<ITransaction>(
     totalPrice: { type: Number, required: true, min: 0 },
     status: {
       type: String,
-      enum: ["reject", "pending", "paid"],
+      enum: ["expired", "reject", "pending", "paid"],
       default: "pending",
     },
     transactionMethod: {
@@ -25,7 +25,7 @@ const TransactionSchema = new Schema<ITransaction>(
       default: "Online",
     },
     expiredAt: { type: Date, required: true },
-    paymentProof: { type: String },
+    paymentProof: { type: String, required: true },
     verifiedBy: { type: Schema.Types.ObjectId, ref: "User" },
     verifiedAt: { type: Date },
     deletedAt: { type: Date, default: null, index: true },
