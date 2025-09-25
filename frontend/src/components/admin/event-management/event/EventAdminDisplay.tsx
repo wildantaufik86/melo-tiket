@@ -57,55 +57,57 @@ export default function AdminEventDisplay() {
   return (
     <section>
       <BreadCrumb items={breadcrumbItems} />
-      <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-extrabold text-gray-900">Event Management</h1>
-          <Link href="/admin/event-management/event/new" className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 flex items-center gap-2">
-            <PlusIcon size={16} />
-            <span>Create Event</span>
-          </Link>
-        </div>
-        {message && <p className="mb-4 text-center p-2 bg-gray-100 rounded-md">{message}</p>}
+      <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200 flex justify-center items-center">
+        <div className="w-full max-w-2xl">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-xl font-extrabold text-gray-900">Event Management</h1>
+            <Link href="/admin/event-management/event/new" className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 flex items-center gap-2">
+              <PlusIcon size={16} />
+              <span>Create Event</span>
+            </Link>
+          </div>
+          {message && <p className="mb-4 text-center p-2 bg-gray-100 rounded-md">{message}</p>}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100 text-left text-gray-700 uppercase text-sm">
-                <th className="py-3 px-6">Event Name</th>
-                <th className="py-3 px-6">Date</th>
-                <th className="py-3 px-6 text-center">Status</th>
-                <th className="py-3 px-6 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600 text-sm">
-              {events.map((event) => (
-                <tr key={event._id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-6 font-medium">{event.eventName}</td>
-                  <td className="py-3 px-6">{formatDate(event.date)}</td>
-                  <td className="py-3 px-6 text-center">
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      event.isPublished ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
-                    }`}>
-                      {event.isPublished ? 'Published' : 'Draft'}
-                    </span>
-                  </td>
-                  <td className="py-3 px-6 text-center">
-                    <div className="flex item-center justify-center space-x-2">
-                      <Link href={`/admin/event-management/event/${event._id}/view`} target="_blank" className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600" title="View Public Page">
-                        <EyeIcon size={16} />
-                      </Link>
-                      <Link href={`/admin/event-management/event/${event._id}/edit`} className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" title="Edit Event">
-                        <PencilIcon size={16} />
-                      </Link>
-                      <button onClick={() => handleDelete(event._id!)} className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700" title="Delete Event">
-                        <TrashIcon size={16} />
-                      </button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white">
+              <thead>
+                <tr className="bg-gray-100 text-left text-gray-700 uppercase text-sm">
+                  <th className="py-3 px-6 rounded-tl-2xl">Event Name</th>
+                  <th className="py-3 px-6">Date</th>
+                  <th className="py-3 px-6 text-center">Status</th>
+                  <th className="py-3 px-6 text-center rounded-tr-2xl">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-gray-600 text-sm">
+                {events.map((event) => (
+                  <tr key={event._id} className="border-b hover:bg-gray-50">
+                    <td className="py-3 px-6 font-medium rounded-bl-2xl">{event.eventName}</td>
+                    <td className="py-3 px-6">{formatDate(event.date)}</td>
+                    <td className="py-3 px-6 text-center">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        event.isPublished ? 'bg-green-200 text-green-800' : 'bg-yellow-200 text-yellow-800'
+                      }`}>
+                        {event.isPublished ? 'Published' : 'Draft'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-6 text-center rounded-br-2xl">
+                      <div className="flex item-center justify-center space-x-2">
+                        {/* <Link href={`/admin/event-management/event/${event._id}/view`} target="_blank" className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600" title="View Public Page">
+                          <EyeIcon size={16} />
+                        </Link> */}
+                        <Link href={`/admin/event-management/event/${event._id}/edit`} className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" title="Edit Event">
+                          <PencilIcon size={16} />
+                        </Link>
+                        <button onClick={() => handleDelete(event._id!)} className="p-2 bg-red-600 text-white rounded-md hover:bg-red-700" title="Delete Event">
+                          <TrashIcon size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>

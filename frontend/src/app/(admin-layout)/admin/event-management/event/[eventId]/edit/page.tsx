@@ -23,9 +23,11 @@ export default function EditEventPage({ params }: EditEventPageProps) {
     return (
         <section>
             <BreadCrumb items={breadcrumbItems} />
-            <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200">
+            <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200 flex justify-center items-center">
+              <div className="max-w-2xl w-full">
                 <h1 className="text-xl font-extrabold text-gray-900 mb-6">Edit Event</h1>
                 <EventForm eventId={eventId} />
+              </div>
             </div>
         </section>
     )
