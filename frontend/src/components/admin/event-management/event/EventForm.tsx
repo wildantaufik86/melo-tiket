@@ -89,8 +89,6 @@ export default function EventForm({ eventId }: EventFormProps) {
     return (
         <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
             {message && <p className="text-center p-2 bg-gray-100 rounded-md">{message}</p>}
-
-            {/* Input untuk setiap field */}
             <div>
                 <label>Event Name</label>
                 <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} className="w-full border p-2 rounded-md" />
@@ -121,8 +119,6 @@ export default function EventForm({ eventId }: EventFormProps) {
                 <label>Ticket Description</label>
                 <textarea name="ticketDesc" value={formData.ticketDesc} onChange={handleChange} className="w-full border p-2 rounded-md" rows={4}></textarea>
             </div>
-
-            {/* Tambahkan input untuk Lineup dan Headline Image di sini jika diperlukan */}
 
             <div className="flex items-center gap-4">
                 <input type="checkbox" name="isPublished" id="isPublished" checked={formData.isPublished} onChange={handleChange} className="h-4 w-4" />

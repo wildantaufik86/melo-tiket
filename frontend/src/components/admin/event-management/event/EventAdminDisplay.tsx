@@ -91,7 +91,7 @@ export default function AdminEventDisplay() {
                   </td>
                   <td className="py-3 px-6 text-center">
                     <div className="flex item-center justify-center space-x-2">
-                      <Link href={`/events/${event._id}`} target="_blank" className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600" title="View Public Page">
+                      <Link href={`/admin/event-management/event/${event._id}/view`} target="_blank" className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600" title="View Public Page">
                         <EyeIcon size={16} />
                       </Link>
                       <Link href={`/admin/event-management/event/${event._id}/edit`} className="p-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" title="Edit Event">

@@ -7,6 +7,40 @@ import { BAD_REQUEST, CREATED, FORBIDDEN, NOT_FOUND, OK } from "../constants/htt
 import appAssert from "../utils/appAssert";
 import AppError from "../utils/appError";
 import { processAndGenerateTicket } from "../services/ticket.service";
+import nodeCron from "node-cron";
+
+nodeCron.schedule("*/1 * * * *", async () => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const expiredTransactions = await TransactionModel.find({
+      status: "pending",
+      expiredAt: { $lt: new Date() }
+    }).session(session);
+
+    for (const transaction of expiredTransactions) {
+      for (const purchasedTicket of transaction.tickets) {
+        await TicketModel.findByIdAndUpdate(
+          purchasedTicket.ticketId,
+          { $inc: { stock: 1 } },
+          { session }
+        );
+      }
+
+      // ubah status transaksi jadi expired
+      transaction.status = "expired";
+      await transaction.save({ session });
+    }
+
+    await session.commitTransaction();
+  } catch (err) {
+    await session.abortTransaction();
+    console.error("Error expiring transactions:", err);
+  } finally {
+    session.endSession();
+  }
+});
 
 export const createTransactionHandler: RequestHandler = async (req, res, next) => {
   const session = await mongoose.startSession();
@@ -31,7 +65,8 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
 
     const existingPendingTransaction = await TransactionModel.findOne({
       userId: targetUserId,
-      status: 'pending'
+      status: 'pending',
+      expiredAt: { $gt: new Date() }
     });
 
     appAssert(
@@ -39,6 +74,7 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       BAD_REQUEST,
       "You already have a pending transaction. Please complete it first or wait for it to expire."
     );
+
     const ticketIds = ticketRequests.map((t: any) => t.ticketId);
     const ticketsFromDb = await TicketModel.find({ _id: { $in: ticketIds } })
       .populate({ path: 'eventId', select: 'eventName date' })
@@ -66,6 +102,9 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       }
     }
 
+    appAssert(req.file, BAD_REQUEST, "You have to upload payment proof");
+    const paymentProofPath = `/uploads/paymentProof/${req.file.filename}`;
+
     const formattedTickets = await Promise.all(ticketProcessingPromises);
 
     const stockUpdatePromises = ticketsFromDb.map(t => t.save({ session }));
@@ -76,9 +115,10 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       tickets: formattedTickets,
       totalTicket,
       totalPrice,
+      paymentProof: paymentProofPath,
       status: transactionMethod === 'On The Site' ? 'paid' : 'pending',
       transactionMethod,
-      expiredAt: new Date(Date.now() + 15 * 60 * 1000),
+      expiredAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     });
     await transaction.save({ session });
 
@@ -95,6 +135,7 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       transactionId: transaction._id,
       totalPrice: transaction.totalPrice,
       status: transaction.status,
+      paymentProof: transaction.paymentProof,
       expiredAt: transaction.expiredAt,
     });
 
@@ -153,7 +194,7 @@ export const getTransactionByIdHandler: RequestHandler = async (req, res, next) 
       .populate({ path: "verifiedBy", select: "name" })
       .populate({
         path: "tickets.ticketId",
-        select: "category price eventId",
+        select: "category price eventId quantity",
         populate: {
           path: "eventId",
           model: "Event",
@@ -167,6 +208,10 @@ export const getTransactionByIdHandler: RequestHandler = async (req, res, next) 
       throw new AppError(FORBIDDEN, "You are not authorized to view this transaction");
     }
 
+    if (transaction.status === "pending" && transaction.expiredAt < new Date()) {
+      transaction.status = "expired";
+      await transaction.save();
+    }
     res.status(OK).json({
       message: "Transaction details retrieved successfully",
       data: transaction,
@@ -186,7 +231,7 @@ export const verifyTransactionHandler: RequestHandler = async (req, res, next) =
     const admin = req.user;
     appAssert(admin, FORBIDDEN, "Authentication failed, admin not found.");
 
-    appAssert(status === 'paid' || status === 'reject', BAD_REQUEST, "Invalid status. Must be 'paid' or 'reject'.");
+    appAssert(status === 'paid' || status === 'reject' || status === 'expired', BAD_REQUEST, "Invalid status. Must be 'paid' or 'reject'.");
 
     const transaction = await TransactionModel.findById(transactionId).session(session);
     appAssert(transaction, NOT_FOUND, "Transaction not found");
@@ -196,7 +241,6 @@ export const verifyTransactionHandler: RequestHandler = async (req, res, next) =
     transaction.verifiedBy = admin._id;
     transaction.verifiedAt = new Date();
 
-    // Jika transaksi ditolak, kembalikan stok tiket
     if (status === 'reject') {
         for (const purchasedTicket of transaction.tickets) {
             await TicketModel.findByIdAndUpdate(
