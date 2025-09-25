@@ -6,6 +6,7 @@ const TicketSchema = new Schema<ITicket>(
   {
     eventId: { type: Schema.Types.ObjectId, ref: 'Event', required: true, index: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    name: { type: String, required: true },
     price: { type: Number, required: true, min: 0 },
     stock: { type: Number, required: true, min: 0 },
     status: { type: String, enum: Object.values(TicketStatus), default: TicketStatus.AVAILABLE, },

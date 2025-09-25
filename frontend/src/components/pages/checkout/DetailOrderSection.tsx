@@ -3,29 +3,15 @@ import Image from 'next/image';
 import { BsPaperclip } from 'react-icons/bs';
 import { FaChevronDown } from 'react-icons/fa';
 
-const dummyTicket = [
-  {
-    id: 1,
-    name: 'Festival A',
-    price: 150000,
-    quantity: 2,
-  },
-  {
-    id: 2,
-    name: 'Festival B',
-    price: 200000,
-    quantity: 1,
-  },
-  {
-    id: 3,
-    name: 'VIP',
-    price: 200000,
-    quantity: 1,
-  },
-];
+interface IOrderItem {
+  id?: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
 
 type OrderProps = {
-  orders: [] | any;
+  orders: IOrderItem[];
 };
 
 export default function DetailOrderSection({ orders }: OrderProps) {
@@ -74,7 +60,7 @@ export default function DetailOrderSection({ orders }: OrderProps) {
 
         {/* list order ticket */}
         <div className="flex flex-col gap-4 mt-4 max-h-[200px] overflow-auto">
-          {orders.length > 0 &&
+          {orders &&
             orders.map((ticket, index) => (
               <div key={index} className="flex flex-col">
                 <h4 className="text-lg font-semibold">{ticket.name}</h4>

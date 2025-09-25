@@ -7,6 +7,7 @@ import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { IEvent } from '@/types/Event';
 import { ITicket } from '@/types/Ticket';
 import { useCallback, useEffect, useState } from 'react';
+import localFont from 'next/font/local'
 
 export default function TicketSection() {
   const [event, setEvent] = useState<IEvent | null>(null);
@@ -38,8 +39,8 @@ export default function TicketSection() {
   }, [getEvent]);
 
   useEffect(() => {
-    if (event?.tickets.length > 0) {
-      const filteredTicket = event?.tickets.filter(
+    if (event && event.tickets) {
+      const filteredTicket = event.tickets.filter(
         (tc: ITicket) => tc.status === 'Available'
       );
       setAvailableTickets(filteredTicket);
@@ -50,17 +51,13 @@ export default function TicketSection() {
 
   return (
     <section className="relative flex flex-col items-center py-[28%]">
-      {/* Judul */}
       <h2 className="z-10 text-xl font-semibold text-center w-[50%]  md:text-3xl lg:text-5xl">
         {event?.eventName || 'Melophile Festival Vol 2'}
       </h2>
 
-      {/* Label */}
       <Label text="GET YOUR TICKET NOW" />
-
       <div className="absolute inset-0 top-15 mt-32">
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
-          {/* Grid tiket */}
           <div className="grid grid-cols-3 gap-4 w-full pd-lr mt-[25%] place-items-center md:gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-8  lg:mt-0">
             {availableTickets.length > 0 &&
               availableTickets.map((tc) => (

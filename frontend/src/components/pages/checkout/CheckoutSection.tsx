@@ -4,8 +4,15 @@ import { formattedPrice } from '@/utils/universalUtils';
 import Link from 'next/link';
 import { ChangeEvent, useState } from 'react';
 
+interface IOrderItem {
+  id?: number;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
 type Props = {
-  listOrder: [] | any;
+  listOrder: IOrderItem[];
 };
 
 export default function CheckoutSection({ listOrder }: Props) {
