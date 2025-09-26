@@ -1,7 +1,7 @@
 import { model, Schema } from 'mongoose';
-import { ITicketTemplate } from '../types/Template';
+import { ITemplate } from '../types/Template';
 
-const ticketTemplateSchema = new Schema<ITicketTemplate>(
+const ticketTemplateSchema = new Schema<ITemplate>(
   {
     name: { type: String, required: true, trim: true, unique: true },
     description: { type: String, trim: true },
@@ -13,6 +13,6 @@ const ticketTemplateSchema = new Schema<ITicketTemplate>(
   }
 );
 
-const TicketTemplate = model<ITicketTemplate>('TicketTemplate', ticketTemplateSchema);
+const TicketTemplate = model<ITemplate>('TicketTemplate', ticketTemplateSchema);
 
 export default TicketTemplate;
