@@ -39,7 +39,7 @@ export default function TicketPage() {
   }, []);
 
   useEffect(() => {
-    if (paymentProof) {
+    if (ordersTicket) {
       const combineData: ICreateTransactionPayload = {
         tickets: ordersTicket.map((order) => ({
           ticketId: order._id!,
@@ -51,7 +51,7 @@ export default function TicketPage() {
 
       setPayload(combineData);
     }
-  }, [paymentProof]);
+  }, [ordersTicket, paymentProof]);
 
   return (
     <section className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-20">

@@ -46,7 +46,7 @@ export default function CheckoutSection({ listOrder, payload }: Props) {
 
   const handleCreateTransaction = async () => {
     try {
-      if (!payload) {
+      if (payload && payload?.tickets.length === 0) {
         ToastError('Please orders ticket first');
         return;
       }
