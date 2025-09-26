@@ -3,19 +3,13 @@
 import { ICreateTransactionPayload } from '@/app/api/transcation';
 import CheckoutSection from '@/components/pages/checkout/CheckoutSection';
 import DetailOrderSection from '@/components/pages/checkout/DetailOrderSection';
-import { ITicket } from '@/types/Ticket';
-import { getLocalStorage } from '@/utils/clientUtils';
+import { Orders, useOrder } from '@/context/ordersContext';
 import { useEffect, useState } from 'react';
 
-type TicketWithState = ITicket & {
-  quantity: number;
-  isOpen: boolean;
-  name: string;
-  idTicket: number;
-};
-
 export default function TicketPage() {
-  const [ordersTicket, setOrdersTicket] = useState<TicketWithState[]>([]);
+  const [ordersTicket, setOrdersTicket] = useState<Orders[]>([]);
+  const { orders, getOrders } = useOrder();
+
   const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [payload, setPayload] = useState<ICreateTransactionPayload | null>(
     null
@@ -25,18 +19,17 @@ export default function TicketPage() {
     setPaymentProof(fileParam);
   };
 
-  const getOrder = () => {
-    const data: any = getLocalStorage('order');
-    if (data?.length > 0) {
-      setOrdersTicket(data);
-    }
-  };
-
   console.log('payload', payload);
 
   useEffect(() => {
-    getOrder();
+    getOrders();
   }, []);
+
+  useEffect(() => {
+    if (orders && orders?.length > 0) {
+      setOrdersTicket(orders);
+    }
+  }, [orders]);
 
   useEffect(() => {
     if (ordersTicket) {

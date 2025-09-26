@@ -1,6 +1,7 @@
 'use client';
 
 import { fetchAllTicket } from '@/app/api/ticket';
+import { useOrder } from '@/context/ordersContext';
 import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITicket } from '@/types/Ticket';
 import { setLocalStorage } from '@/utils/clientUtils';
@@ -31,7 +32,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   const [availableTickets, setAvailableTickets] = useState<TicketWithState[]>(
     []
   );
-  console.log(availableTickets);
+  const { orders, saveOrders } = useOrder();
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   };
 
   const createTemporaryOrder = (): void => {
-    if (selectedTickets.length > 0) setLocalStorage('order', selectedTickets);
+    if (selectedTickets.length > 0) saveOrders(selectedTickets);
   };
 
   useEffect(() => {
