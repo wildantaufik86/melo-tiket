@@ -16,7 +16,7 @@ export interface ITransaction extends Document {
   status: "expired" | "reject" | "pending" | "paid";
   transactionMethod: "Online" | "Onsite";
   expiredAt: Date;
-  paymentProof: string;
+  paymentProof?: string;
   verifiedBy?: mongoose.Types.ObjectId | string;
   verifiedAt?: Date;
   deletedAt?: Date;

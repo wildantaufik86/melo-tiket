@@ -76,7 +76,7 @@ export async function createTransaction(
 export async function fetchAllTransactions(
   page: number = 1,
   limit: number = 10,
-  status?: 'pending' | 'paid' | 'reject'
+  status?: 'expired' | 'pending' | 'paid' | 'reject'
 ): Promise<{
   status: string;
   message: string;

@@ -9,15 +9,24 @@ export interface IPurchasedTicket {
 }
 
 export interface ITransaction extends Document {
+  _id?: string;
   userId?: string | IUser;
   tickets: IPurchasedTicket[];
   totalTicket: number;
   totalPrice: number;
-  status: "reject" | "pending" | "paid";
+  status: "expired" | "reject" | "pending" | "paid";
   transactionMethod: "Online" | "Onsite";
-  expiredAt: Date;
+  expiredAt: string;
   paymentProof?: string;
   verifiedBy?: string;
-  verifiedAt?: Date;
-  deletedAt?: Date;
+  verifiedAt?: string;
+  deletedAt?: string;
+  createdAt?: string;
+}
+
+export interface IPaginationInfo {
+    currentPage: number;
+    totalPages: number;
+    totalTransactions: number;
+    limit: number;
 }

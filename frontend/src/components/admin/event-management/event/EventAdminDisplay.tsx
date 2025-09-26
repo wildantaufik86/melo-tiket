@@ -68,19 +68,19 @@ export default function AdminEventDisplay() {
           </div>
           {message && <p className="mb-4 text-center p-2 bg-gray-100 rounded-md">{message}</p>}
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto shadow-2xl">
             <table className="min-w-full bg-white">
               <thead>
                 <tr className="bg-gray-100 text-left text-gray-700 uppercase text-sm">
-                  <th className="py-3 px-6 rounded-tl-2xl">Event Name</th>
+                  <th className="py-3 px-6">Event Name</th>
                   <th className="py-3 px-6">Date</th>
                   <th className="py-3 px-6 text-center">Status</th>
-                  <th className="py-3 px-6 text-center rounded-tr-2xl">Actions</th>
+                  <th className="py-3 px-6 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="text-gray-600 text-sm">
                 {events.map((event) => (
-                  <tr key={event._id} className="border-b hover:bg-gray-50">
+                  <tr key={event._id} className="border-b border-gray-200 duration-500 hover:bg-gray-50">
                     <td className="py-3 px-6 font-medium rounded-bl-2xl">{event.eventName}</td>
                     <td className="py-3 px-6">{formatDate(event.date)}</td>
                     <td className="py-3 px-6 text-center">

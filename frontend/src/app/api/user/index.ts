@@ -16,7 +16,7 @@ export interface ICreateTransactionPayload {
     ticketId: string;
     quantity: number;
   }[];
-  transactionMethod: "Transfer Bank" | "On The Site" | "E-Wallet";
+  transactionMethod: "Transfer Bank" | "Onsite" | "E-Wallet";
   userId?: string;
 }
 
@@ -123,4 +123,16 @@ export async function createUserTransaction(payload: ICreateTransactionPayload):
   } catch (error: any) {
     return { status: 'error', message: error.message, data: null };
   }
+}
+
+export async function searchUsers(query: string): Promise<{ status: 'success' | 'error'; data: IUser[] | null; message: string }> {
+    try {
+        const res = await fetchWithToken(`/user/search?q=${query}`, { method: 'GET' });
+        const responseData = await res.json();
+        if (!res.ok) throw new Error(responseData.message || 'Gagal mencari pengguna.');
+
+        return { status: 'success', data: responseData.data, message: 'Pengguna berhasil ditemukan' };
+    } catch (error: any) {
+        return { status: 'error', data: null, message: error.message };
+    }
 }
