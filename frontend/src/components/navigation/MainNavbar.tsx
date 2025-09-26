@@ -82,13 +82,13 @@ export default function MainNavbar() {
       <div className="flex items-center gap-4">
         <Link
           href="/auth/register"
-          className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm"
+          className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
         >
           Daftar
         </Link>
         <Link
           href="/auth/login"
-          className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm"
+          className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
         >
           Masuk
         </Link>

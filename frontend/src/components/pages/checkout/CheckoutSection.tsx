@@ -197,7 +197,7 @@ export default function CheckoutSection({
         onClick={handleCreateTransaction}
         className={`w-full py-2 mt-4 bg-secondary rounded-full flex justify-center items-center ${
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
-        }`}
+        } hover:bg-primary transition-colors`}
       >
         <span className="text-sm lg:text-xl font-bold">
           Konfirmasi Pembelian

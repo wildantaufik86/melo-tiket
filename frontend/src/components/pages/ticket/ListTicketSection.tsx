@@ -90,7 +90,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
           ))}
         </div>
       </div>
-      <div className="flex items-stretch bg-white rounded-sm mt-4">
+      <div className="flex items-stretch bg-white rounded-sm mt-4 overflow-hidden">
         <p className="flex flex-col font-bold lg:text-xl text-black py-2 px-4">
           TOTAL
           <span className="font-normal lg:text-base">
@@ -100,7 +100,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
         <Link
           onClick={createTemporaryOrder}
           href={`/checkout/event/${eventId}`}
-          className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white font-semibold lg:text-xl"
+          className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white font-semibold lg:text-xl hover:bg-hover transition-colors"
         >
           Lanjutkan
         </Link>

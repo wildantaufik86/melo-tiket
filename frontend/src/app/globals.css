@@ -6,6 +6,7 @@
 
   /* color yang ada di figma */
   --primary: #b70a0a;
+  --hover: #780000;
   --secondary: #252222;
   --bg-color: #2e2d35;
 }
@@ -29,6 +30,7 @@
 
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
+  --color-hover: var(--hover);
 }
 
 @media (prefers-color-scheme: dark) {
