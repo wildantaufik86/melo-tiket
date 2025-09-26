@@ -8,14 +8,14 @@ import CategoryModel from "../models/CategoryModel";
 export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next) => {
   try {
     const { eventId } = req.params;
-    const { categoryId, price, stock, name, templateImage, templateLayout } = req.body;
+    const { category, price, stock, name, templateImage, templateLayout } = req.body;
 
-    appAssert(categoryId && price !== undefined && stock !== undefined, BAD_REQUEST, "Category, price, and stock are required");
+    appAssert(category && price !== undefined && stock !== undefined, BAD_REQUEST, "Category, price, and stock are required");
     appAssert(templateImage && templateLayout, BAD_REQUEST, "Template image and layout are required");
     appAssert(name, BAD_REQUEST, "Name is required");
 
 
-    const categoryExists = await CategoryModel.findById(categoryId);
+    const categoryExists = await CategoryModel.findById(category);
     appAssert(categoryExists, NOT_FOUND, "Category not found");
 
     const parentEvent = await EventModel.findById(eventId);
@@ -23,7 +23,7 @@ export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next
 
     const newTicket = new TicketModel({
       eventId,
-      category: categoryId,
+      category: category,
       name,
       price,
       stock,
@@ -34,7 +34,7 @@ export const addTicketTypeToEventHandler: RequestHandler = async (req, res, next
     await newTicket.save();
 
     res.status(CREATED).json({
-      message: `Ticket category '${categoryId}' added to event '${parentEvent.eventName}' successfully`,
+      message: `Ticket category '${category}' added to event '${parentEvent.eventName}' successfully`,
       ticket: newTicket,
     });
 
@@ -73,13 +73,13 @@ export const getTicketTypeByIdHandler: RequestHandler = async (req, res, next) =
 
 export const updateTicketTypeHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { categoryId, eventId, ticketId } = req.params;
+    const { category, eventId, ticketId } = req.params;
     const updateData = req.body;
 
-    if (categoryId) {
-      const categoryExists = await CategoryModel.findById(categoryId);
+    if (category) {
+      const categoryExists = await CategoryModel.findById(category);
       appAssert(categoryExists, NOT_FOUND, "New category not found");
-      (updateData as any).category = categoryId;
+      (updateData as any).category = category;
     }
 
     const updatedTicket = await TicketModel.findOneAndUpdate(

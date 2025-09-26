@@ -5,9 +5,11 @@ import { PencilIcon, TrashIcon } from "@phosphor-icons/react";
 
 interface TicketListProps {
     tickets: ITicket[];
+    onEdit: (ticket: ITicket) => void;      // DITAMBAHKAN
+    onDelete: (ticketId: string) => void; // DITAMBAHKAN
 }
 
-export default function TicketList({ tickets }: TicketListProps) {
+export default function TicketList({ tickets, onEdit, onDelete }: TicketListProps) { // DITAMBAHKAN props
     return (
         <div className="p-6 rounded-lg shadow-sm border border-gray-200">
             <h2 className="text-lg font-bold mb-4">Existing Tickets</h2>
@@ -34,8 +36,9 @@ export default function TicketList({ tickets }: TicketListProps) {
                                     <td className="p-2 text-right">{ticket.stock}</td>
                                     <td className="p-2">
                                         <div className="flex justify-center gap-2">
-                                            <button className="p-2 bg-blue-500 text-white rounded"><PencilIcon size={16}/></button>
-                                            <button className="p-2 bg-red-500 text-white rounded"><TrashIcon size={16}/></button>
+                                            {/* DIUBAH: Tambahkan onClick untuk memanggil props */}
+                                            <button onClick={() => onEdit(ticket)} className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"><PencilIcon size={16}/></button>
+                                            <button onClick={() => onDelete(ticket._id!)} className="p-2 bg-red-500 text-white rounded hover:bg-red-600"><TrashIcon size={16}/></button>
                                         </div>
                                     </td>
                                 </tr>

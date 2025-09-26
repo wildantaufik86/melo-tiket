@@ -74,7 +74,7 @@ export default function TemplateAdminPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {templates.map(template => (
                             <div key={template._id} className="border rounded p-2 text-center">
-                                <img src={`${template.templateImage}`} alt={template.name} className="h-24 w-full object-contain mb-2"/>
+                                <img src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/templateImage/${template.templateImage}`} alt={template.name} className="h-24 w-full object-contain mb-2"/>
                                 <p className="font-semibold">{template.name}</p>
                             </div>
                         ))}
