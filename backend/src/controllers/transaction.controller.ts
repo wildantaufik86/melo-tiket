@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import TransactionModel from "../models/TransactionModel";
 import TicketModel from "../models/TicketModel";
 import UserModel from "../models/UserModel";
@@ -8,6 +8,8 @@ import appAssert from "../utils/appAssert";
 import AppError from "../utils/appError";
 import { processAndGenerateTicket } from "../services/ticket.service";
 import nodeCron from "node-cron";
+
+const getBaseUrl = (req: Request): string => `${req.protocol}://${req.get('host')}`;
 
 nodeCron.schedule("*/10 * * * *", async () => {
   const session = await mongoose.startSession();
@@ -49,7 +51,10 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
   try {
     const initiator = req.user;
     appAssert(initiator, FORBIDDEN, "Authentication failed, user not found.")
-    const { tickets: ticketRequests, transactionMethod, userId: targetUserIdFromAdmin } = req.body;
+
+    const { transactionMethod, userId: targetUserIdFromAdmin } = req.body;
+
+    const ticketRequests = JSON.parse(req.body.tickets);
     let targetUserId;
 
     if (initiator.role === 'user') {
@@ -77,7 +82,7 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
 
     const ticketIds = ticketRequests.map((t: any) => t.ticketId);
     const ticketsFromDb = await TicketModel.find({ _id: { $in: ticketIds } })
-      .populate({ path: 'eventId', select: 'eventName date' })
+    .populate({ path: 'eventId', select: 'eventName date' })
       .session(session);
 
     appAssert(ticketsFromDb.length === ticketIds.length, NOT_FOUND, "Some ticket types were not found");
@@ -103,7 +108,8 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
     }
 
     appAssert(req.file, BAD_REQUEST, "You have to upload payment proof");
-    const paymentProofPath = `/uploads/paymentProof/${req.file.filename}`;
+    const baseUrl = getBaseUrl(req);
+    const paymentProofPath = `${baseUrl}/uploads/paymentProof/${req.file.filename}`;
 
     const formattedTickets = await Promise.all(ticketProcessingPromises);
 
