@@ -87,7 +87,7 @@ export default function DetailOrderSection({
 
         {/* bank information */}
         <div className="flex gap-4 mt-4 p-4">
-          <div className="relative w-[30%]">
+          <div className="relative w-[22%]">
             <Image
               src="/images/bsi-logo.png"
               alt="bank-logo"
