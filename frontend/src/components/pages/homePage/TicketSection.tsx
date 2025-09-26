@@ -51,7 +51,7 @@ export default function TicketSection() {
 
   return (
     <section className="relative flex flex-col items-center py-[28%]">
-      <h2 className="z-10 text-xl font-semibold text-center w-[50%]  md:text-3xl lg:text-5xl">
+      <h2 className="z-10 text-xl font-bold text-center w-[50%] font-brother md:text-3xl lg:text-6xl">
         {event?.eventName || 'Melophile Festival Vol 2'}
       </h2>
 
