@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/context/authUserContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -7,6 +8,7 @@ import { FiMenu } from 'react-icons/fi';
 
 export default function MainNavbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { authUser, logoutUser, loading } = useAuth();
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -79,27 +81,61 @@ export default function MainNavbar() {
       </div>
 
       {/* button navigation */}
-      <div className="flex items-center gap-4">
-        <Link
-          href="/auth/register"
-          className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
-        >
-          Daftar
-        </Link>
-        <Link
-          href="/auth/login"
-          className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
-        >
-          Masuk
-        </Link>
 
-        <div
-          onClick={toggleSidebar}
-          className="flex justify-center items-center cursor-pointer md:hidden"
-        >
-          <FiMenu size={24} />
-        </div>
-      </div>
+      {loading ? (
+        <div className=""></div>
+      ) : (
+        <>
+          {!authUser && (
+            <div className="flex items-center gap-4">
+              <Link
+                href="/auth/register"
+                className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+              >
+                Daftar
+              </Link>
+              <Link
+                href="/auth/login"
+                className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+              >
+                Masuk
+              </Link>
+
+              <div
+                onClick={toggleSidebar}
+                className="flex justify-center items-center cursor-pointer md:hidden"
+              >
+                <FiMenu size={24} />
+              </div>
+            </div>
+          )}
+
+          {authUser && (
+            <div className="flex items-center gap-4">
+              <button
+                onClick={logoutUser}
+                type="button"
+                className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+              >
+                LOG OUT
+              </button>
+              <Link
+                href="/auth/login"
+                className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+              >
+                PROFILE
+              </Link>
+
+              <div
+                onClick={toggleSidebar}
+                className="flex justify-center items-center cursor-pointer md:hidden"
+              >
+                <FiMenu size={24} />
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* sidebar on mobile */}
       <aside

@@ -24,14 +24,12 @@ export default function HomepageLayout({
   children,
 }: Readonly<{ children: ReactNode }>) {
   return (
-    <>
+    <AuthProvider>
       <MainNavbar />
       <main className={`${montserrat.className} text-white`}>
-        <AuthProvider>
-          <OrderProvider>{children}</OrderProvider>
-        </AuthProvider>
+        <OrderProvider>{children}</OrderProvider>
       </main>
       <Footer />
-    </>
+    </AuthProvider>
   );
 }

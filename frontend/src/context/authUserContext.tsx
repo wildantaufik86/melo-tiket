@@ -1,7 +1,13 @@
 'use client';
 
 import { getCookie } from '@/utils/clientUtils'; // Assuming this is the correct path to your client-side utilities
-import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+} from 'react';
 import { logout } from '@/actions/auth'; // Assuming you want to include logout functionality
 import { useRouter } from 'next/navigation'; // For redirection after logout
 
@@ -19,14 +25,18 @@ interface AuthUserContextType {
   authUser: User | null;
   getUser: () => void;
   logoutUser: () => Promise<void>; // Added logout function
+  loading: boolean;
 }
 
 // Create the context with a default value (important for type inference)
-export const AuthUserContext = createContext<AuthUserContextType | undefined>(undefined);
+export const AuthUserContext = createContext<AuthUserContextType | undefined>(
+  undefined
+);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const router = useRouter(); // Initialize useRouter
+  const [loading, setLoading] = useState(true);
 
   // Use useCallback to memoize getUser to prevent unnecessary re-renders
   const getUser = useCallback(() => {
@@ -39,6 +49,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setAuthUser(null);
     }
+
+    setLoading(false);
   }, []); // Empty dependency array means this function is created once
 
   const logoutUser = useCallback(async () => {
@@ -55,13 +67,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [router]);
 
-
   useEffect(() => {
     getUser();
   }, [getUser]); // Add getUser to dependencies since it's a function from the outer scope
 
   return (
-    <AuthUserContext.Provider value={{ authUser, getUser, logoutUser }}> {/* Include logoutUser in value */}
+    <AuthUserContext.Provider
+      value={{ authUser, getUser, logoutUser, loading }}
+    >
+      {' '}
+      {/* Include logoutUser in value */}
       {children}
     </AuthUserContext.Provider>
   );
