@@ -23,7 +23,9 @@ export const OrderProvider = ({ children }: { children: React.ReactNode }) => {
   const [orders, setOrders] = useState<Orders[] | []>([]);
 
   const saveOrders = (ordersData: Orders[]) => {
-    if (ordersData.length > 0) setLocalStorage('orders', ordersData);
+    if (ordersData.length > 0) {
+      setLocalStorage('orders', ordersData);
+    }
   };
 
   const getOrders = () => {

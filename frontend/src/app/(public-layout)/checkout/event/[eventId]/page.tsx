@@ -19,7 +19,19 @@ export default function TicketPage() {
     setPaymentProof(fileParam);
   };
 
-  console.log('payload', payload);
+  const incrementQty = (id?: string) => {
+    setOrdersTicket((prev) =>
+      prev.map((t) => (t._id === id ? { ...t, quantity: t.quantity + 1 } : t))
+    );
+  };
+
+  const decrementQty = (id?: string) => {
+    setOrdersTicket((prev) =>
+      prev.map((t) =>
+        t._id === id && t.quantity > 0 ? { ...t, quantity: t.quantity - 1 } : t
+      )
+    );
+  };
 
   useEffect(() => {
     getOrders();
@@ -57,7 +69,12 @@ export default function TicketPage() {
             orders={ordersTicket}
             handlePaymentProof={handlePaymentProof}
           />
-          <CheckoutSection listOrder={ordersTicket} payload={payload!} />
+          <CheckoutSection
+            listOrder={ordersTicket}
+            payload={payload!}
+            incrementQty={incrementQty}
+            decrementQty={decrementQty}
+          />
         </div>
       </div>
     </section>

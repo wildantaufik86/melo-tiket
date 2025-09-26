@@ -4,6 +4,8 @@ import {
   createTransaction,
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
+import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
+import { Orders, useOrder } from '@/context/ordersContext';
 import {
   ToastError,
   ToastSuccess,
@@ -12,21 +14,24 @@ import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Link from 'next/link';
 import { ChangeEvent, useEffect, useState } from 'react';
-
-interface IOrderItem {
-  id?: number;
-  name: string;
-  price: number;
-  quantity: number;
-}
+import { FaChevronDown } from 'react-icons/fa';
 
 type Props = {
-  listOrder: IOrderItem[];
+  listOrder: Orders[];
   payload: ICreateTransactionPayload;
+  incrementQty: (params: string) => void;
+  decrementQty: (params: string) => void;
 };
 
-export default function CheckoutSection({ listOrder, payload }: Props) {
+export default function CheckoutSection({
+  listOrder,
+  payload,
+  incrementQty,
+  decrementQty,
+}: Props) {
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [availableTickets, setAvailableTickets] = useState<Orders[] | []>([]);
+  const { saveOrders } = useOrder();
 
   const subTotal = listOrder?.reduce(
     (acc, data) => acc + data.price * data.quantity,
@@ -68,6 +73,19 @@ export default function CheckoutSection({ listOrder, payload }: Props) {
     }
   };
 
+  useEffect(() => {
+    if (listOrder && listOrder.length > 0) {
+      setAvailableTickets(listOrder);
+    }
+  }, [listOrder]);
+
+  useEffect(() => {
+    // handle qty ticket change
+    if (availableTickets.length > 0) {
+      saveOrders(availableTickets);
+    }
+  }, [availableTickets]);
+
   return (
     <section className="flex flex-col mt-8 md:flex-1 md:mt-0 md:max-h-[200px]">
       <div className="flex-1 flex flex-col gap-2 bg-secondary p-4 rounded-sm">
@@ -103,6 +121,61 @@ export default function CheckoutSection({ listOrder, payload }: Props) {
             {formattedPrice(total)}
           </p>
         </div>
+      </div>
+
+      <div className="mt-8 flex flex-col gap-4">
+        {listOrder.map((ticket) => (
+          <div
+            key={ticket._id}
+            className="flex flex-col rounded-sm p-4 bg-secondary"
+          >
+            <p
+              className={`font-black lg:text-xl flex justify-between items-center ${
+                ticket.status === 'Available'
+                  ? 'cursor-pointer'
+                  : 'cursor-not-allowed'
+              } `}
+            >
+              {ticket.name}{' '}
+              <span>
+                <FaChevronDown
+                  className={`transition-transform duration-300 ${
+                    ticket.isOpen ? 'rotate-180' : 'rotate-0'
+                  }`}
+                />
+              </span>
+            </p>
+            <div
+              className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all ${
+                ticket.isOpen ? 'scale-y-100 flex ' : 'scale-y-0 hidden'
+              }`}
+            >
+              <p className="flex flex-col font-bold lg:text-xl">
+                {ticket.category.name}{' '}
+                <span className="font-light lg:text-base">
+                  {formattedPrice(ticket.price)}
+                </span>
+              </p>
+              <div className="flex items-center">
+                <div
+                  onClick={() => decrementQty(ticket._id!)}
+                  className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
+                >
+                  -
+                </div>
+                <span className="px-4 font-semibold lg:text-xl">
+                  {ticket.quantity}
+                </span>
+                <div
+                  onClick={() => incrementQty(ticket._id!)}
+                  className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
+                >
+                  +
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* konfirm input */}
