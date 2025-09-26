@@ -15,7 +15,7 @@ export const createTemplate = async (req: Request, res: Response, next: NextFunc
       return next(new AppError(BAD_REQUEST, 'Gambar template wajib diunggah.'));
     }
     const baseUrl = getBaseUrl(req);
-    const templateImagePath = `${baseUrl}/uploads/templateImage/${req.file.filename}`;
+    const templateImagePath = `${req.file.filename}`;
 
     const newTemplate = await TicketTemplate.create({
       name,

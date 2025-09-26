@@ -29,16 +29,42 @@ export async function fetchAllTicket(eventId: string): Promise<{ status: string;
   }
 }
 
-export async function fetchTicketById(eventId: string, ticketId: string): Promise<{ status: string; message: string; data: { event: IEvent, tickets: ITicket[] } | null }> {
+export async function fetchTicketById(
+  eventId: string,
+  ticketId: string
+): Promise<{ status: string; message: string; data: { event: IEvent; tickets: ITicket[] } | null }> {
   try {
     const res = await fetchWithToken(`/ticket/${eventId}/${ticketId}`, { method: 'GET' });
+
+    const contentType = res.headers.get("content-type");
+
     if (!res.ok) {
-      const errorBody = await res.json();
-      throw new Error(errorBody.message || `Ticket tidak ditemukan`);
+      let errorMessage = `Ticket tidak ditemukan`;
+      if (contentType && contentType.includes("application/json")) {
+        const errorBody = await res.json();
+        errorMessage = errorBody.message || errorMessage;
+      } else {
+        const errorText = await res.text();
+        errorMessage = errorText || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
-    const responseData = await res.json();
-    return { status: 'success', message: 'Ticket dan tiket berhasil diambil!', data: responseData };
+
+    if (contentType && contentType.includes("application/json")) {
+      const responseData = await res.json();
+      return {
+        status: "success",
+        message: "Ticket dan tiket berhasil diambil!",
+        data: responseData,
+      };
+    } else {
+      throw new Error("Response bukan JSON");
+    }
   } catch (error: any) {
-    return { status: 'error', message: error.message || 'Gagal mengambil detail ticket.', data: null };
+    return {
+      status: "error",
+      message: error.message || "Gagal mengambil detail ticket.",
+      data: null,
+    };
   }
 }

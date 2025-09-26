@@ -107,11 +107,20 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       }
     }
 
-    appAssert(req.file, BAD_REQUEST, "You have to upload payment proof");
-    const baseUrl = getBaseUrl(req);
-    const paymentProofPath = `${baseUrl}/uploads/paymentProof/${req.file.filename}`;
+    // ✅ Validate payment proof only for pending transactions
+    const requiresPaymentProof = transactionMethod !== 'On The Site';
+    if (requiresPaymentProof) {
+      appAssert(req.file, BAD_REQUEST, "You have to upload payment proof for this payment method");
+    }
 
     const formattedTickets = await Promise.all(ticketProcessingPromises);
+    const baseUrl = getBaseUrl(req);
+
+    // ✅ Only set payment proof path if file exists
+    let paymentProofPath = null;
+    if (req.file) {
+      paymentProofPath = `${baseUrl}/uploads/paymentProof/${req.file.filename}`;
+    }
 
     const stockUpdatePromises = ticketsFromDb.map(t => t.save({ session }));
     await Promise.all(stockUpdatePromises);
@@ -121,7 +130,7 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       tickets: formattedTickets,
       totalTicket,
       totalPrice,
-      paymentProof: paymentProofPath,
+      paymentProof: paymentProofPath, // Will be null for 'On The Site' transactions
       status: transactionMethod === 'On The Site' ? 'paid' : 'pending',
       transactionMethod,
       expiredAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
@@ -136,14 +145,21 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
 
     await session.commitTransaction();
 
-    res.status(CREATED).json({
+    // ✅ Only include paymentProof in response if it exists
+    const responseData: any = {
       message: "Transaction created successfully.",
       transactionId: transaction._id,
       totalPrice: transaction.totalPrice,
       status: transaction.status,
-      paymentProof: transaction.paymentProof,
       expiredAt: transaction.expiredAt,
-    });
+    };
+
+    // Only add paymentProof to response if it exists
+    if (paymentProofPath) {
+      responseData.paymentProof = paymentProofPath;
+    }
+
+    res.status(CREATED).json(responseData);
 
   } catch (error) {
     await session.abortTransaction();
