@@ -1,5 +1,16 @@
-import { formattedPrice } from '@/utils/universalUtils';
+'use client';
+
+import { fetchEventById } from '@/app/api/event';
+import { useAuth } from '@/context/authUserContext';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
+import { IEvent } from '@/types/Event';
+import {
+  formattedDate,
+  formattedPrice,
+  parseDateOfBirth,
+} from '@/utils/universalUtils';
 import Image from 'next/image';
+import { useCallback, useEffect, useState } from 'react';
 import { BsPaperclip } from 'react-icons/bs';
 import { FaChevronDown } from 'react-icons/fa';
 
@@ -19,16 +30,38 @@ export default function DetailOrderSection({
   orders,
   handlePaymentProof,
 }: OrderProps) {
-  const userData = {
-    email: 'Mellowfestsite@gmail.com',
-    fullName: 'Melophile Festival',
-    birthDate: {
-      day: 15,
-      month: 'Agustus',
-      year: 1998,
-    },
-    gender: 'male',
-  };
+  const { authUser } = useAuth();
+  const { day, month, year } = parseDateOfBirth(authUser?.profile?.dateOfBirth);
+
+  const id = '6899f694bbde0daae146f849';
+  const [eventDetail, setEventDetail] = useState<{
+    event: IEvent;
+  } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const getDetailEvent = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetchEventById(id);
+      if (response.status == 'success' && response.data) {
+        setEventDetail(response.data);
+      } else {
+        ToastError(response.message);
+      }
+    } catch (err: any) {
+      ToastError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (id) {
+      getDetailEvent();
+    }
+  }, [id, getDetailEvent]);
+
+  if (loading) return null;
 
   return (
     <section className="flex flex-col md:w-[60%] lg:w-[55%]">
@@ -46,14 +79,17 @@ export default function DetailOrderSection({
           </div>
           <div className="w-full flex flex-col gap-4 md:flex-1 ">
             <h4 className="text-sm font-black md:text-lg lg:text-2xl">
-              MELOPHILE FESTIVAL
+              {eventDetail?.event?.eventName || 'MELOPHILE FESTIVAL'}
             </h4>
             <div className="flex items-center justify-between md:flex-col md:items-start">
               <p className="text-[10px] lg:text-base">
-                Tanggal : 29 NOVEMBER 2025
+                Tanggal :{' '}
+                {eventDetail?.event?.date
+                  ? formattedDate(eventDetail?.event.date)
+                  : ''}
               </p>
               <p className="text-[10px] lg:text-base">
-                Tempat : Lhokseumawe, Aceh
+                Tempat : {eventDetail?.event?.address || ''}
               </p>
             </div>
           </div>
@@ -119,7 +155,7 @@ export default function DetailOrderSection({
           <p className="font-extrabold mb-2 lg:text-xl">Email</p>
           <div className="bg-white p-2 rounded-t-sm">
             <p className="text-sm font-bold lg:text-xl text-black">
-              {userData.email}
+              {authUser?.email || 'example@gmail.com'}
             </p>
           </div>
           <p className="text-[9px] p-2 lg:text-base text-black font-light bg-[#FBD300]">
@@ -129,7 +165,7 @@ export default function DetailOrderSection({
           <p className="font-extrabold mb-2 lg:text-xl mt-4">Nama Lengkap</p>
           <div className="bg-white p-2 rounded-sm">
             <p className="text-sm font-bold lg:text-xl text-black">
-              {userData.fullName}
+              {authUser?.name || ''}
             </p>
           </div>
 
@@ -137,7 +173,7 @@ export default function DetailOrderSection({
           <div className="grid grid-cols-3 gap-2">
             <div className="bg-white p-2 rounded-sm">
               <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
-                {userData.birthDate.day}{' '}
+                {day}{' '}
                 <span>
                   <FaChevronDown />
                 </span>
@@ -145,7 +181,7 @@ export default function DetailOrderSection({
             </div>
             <div className="bg-white p-2 rounded-sm">
               <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
-                {userData.birthDate.month}{' '}
+                {month}{' '}
                 <span>
                   <FaChevronDown />
                 </span>
@@ -153,7 +189,7 @@ export default function DetailOrderSection({
             </div>
             <div className="bg-white p-2 rounded-sm">
               <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
-                {userData.birthDate.year}{' '}
+                {year}{' '}
                 <span>
                   <FaChevronDown />
                 </span>
@@ -167,7 +203,7 @@ export default function DetailOrderSection({
               <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
                 <div
                   className={`w-3 h-3 rounded-full border ${
-                    userData.gender === 'male' ? 'bg-blue-700' : ''
+                    authUser?.profile?.gender === 'Pria' ? 'bg-blue-700' : ''
                   }`}
                 ></div>
                 Laki-Laki
@@ -177,7 +213,7 @@ export default function DetailOrderSection({
               <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
                 <div
                   className={`w-3 h-3 rounded-full border ${
-                    userData.gender === 'female' ? 'bg-blue-700' : ''
+                    authUser?.profile?.gender === 'Wanita' ? 'bg-blue-700' : ''
                   }`}
                 ></div>
                 Perempuan

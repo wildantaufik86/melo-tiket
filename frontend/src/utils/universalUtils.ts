@@ -25,7 +25,11 @@ export const formattedDate = (date: string | Date): string => {
 export const formatTanggalWIB = (date: string | Date): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  const optionsTanggal: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+  const optionsTanggal: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  };
   const optionsWaktu: Intl.DateTimeFormatOptions = {
     hour: '2-digit',
     minute: '2-digit',
@@ -33,10 +37,32 @@ export const formatTanggalWIB = (date: string | Date): string => {
     timeZone: 'Asia/Jakarta', // Explicitly set timezone for WIB
   };
 
-  const tanggal = new Intl.DateTimeFormat('id-ID', optionsTanggal).format(dateObj);
+  const tanggal = new Intl.DateTimeFormat('id-ID', optionsTanggal).format(
+    dateObj
+  );
   const waktu = new Intl.DateTimeFormat('id-ID', optionsWaktu).format(dateObj);
 
   return `${tanggal}, ${waktu} WIB`;
+};
+
+export const parseDateOfBirth = (
+  dob: string | undefined,
+  locale: string = 'en-US'
+) => {
+  if (!dob) {
+    return { day: '', month: '', year: '' };
+  }
+
+  const [day, month, year] = dob.split('/');
+
+  // Buat Date object (tambah "20" untuk tahun 2 digit)
+  const date = new Date(`20${year}-${month}-${day}`);
+
+  return {
+    day,
+    month: date.toLocaleString(locale, { month: 'long' }),
+    year: `20${year}`,
+  };
 };
 
 /**
@@ -99,7 +125,9 @@ export const getStatusStyle = (status: string): string => {
  * @param orders An array of order objects, each with a `createdAt` property.
  * @returns An object where keys are "Month Year" strings and values are arrays of sorted orders.
  */
-export const groupOrdersByMonth = (orders: { createdAt: string }[]): { [key: string]: { createdAt: string }[] } => {
+export const groupOrdersByMonth = (
+  orders: { createdAt: string }[]
+): { [key: string]: { createdAt: string }[] } => {
   if (!Array.isArray(orders) || orders.length === 0) {
     return {};
   }

@@ -10,19 +10,20 @@ import React, {
 } from 'react';
 import { logout } from '@/actions/auth'; // Assuming you want to include logout functionality
 import { useRouter } from 'next/navigation'; // For redirection after logout
+import { IUser } from '@/types/User';
 
 // Define the type for your user object stored in the cookie
-interface User {
-  id: string; // Assuming user has an ID
-  email: string;
-  name: string;
-  role: string;
-  // Add any other user properties you store
-}
+// interface User {
+//   id: string; // Assuming user has an ID
+//   email: string;
+//   name: string;
+//   role: string;
+//   // Add any other user properties you store
+// }
 
 // Define the shape of the context value
 interface AuthUserContextType {
-  authUser: User | null;
+  authUser: IUser | null;
   getUser: () => void;
   logoutUser: () => Promise<void>; // Added logout function
   loading: boolean;
@@ -34,14 +35,14 @@ export const AuthUserContext = createContext<AuthUserContextType | undefined>(
 );
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authUser, setAuthUser] = useState<IUser | null>(null);
   const router = useRouter(); // Initialize useRouter
   const [loading, setLoading] = useState(true);
 
   // Use useCallback to memoize getUser to prevent unnecessary re-renders
   const getUser = useCallback(() => {
     // getCookie already returns the parsed object, or null
-    const user = getCookie<User>('user'); // <--- Specify the expected type for getCookie
+    const user = getCookie<IUser>('user'); // <--- Specify the expected type for getCookie
 
     if (user) {
       // No need for JSON.parse here, as getCookie already did it
