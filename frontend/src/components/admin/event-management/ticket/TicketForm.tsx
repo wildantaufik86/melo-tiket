@@ -94,21 +94,37 @@ export default function TicketForm({ categories, templates, onSave, editingTicke
             {/* DIUBAH: Judul dinamis */}
             <h2 className="text-lg font-bold mb-4">{isEditMode ? `Edit Ticket: ${editingTicket.name}` : 'Add New Ticket Type'}</h2>
             <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label>Ticket Name</label>
                 <input name="name" value={formData.name} onChange={handleChange} placeholder="Ticket Name (e.g., Presale 1)" className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required />
-
-                {/* DIUBAH: name dan value ke 'category' */}
-                <select name="category" value={formData.category} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required>
+              </div>
+              <div>
+                <label>Category</label>
+                <select name="category" value={formData.category} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1.5 rounded-sm w-full" required>
                     <option value="">Select Category</option>
                     {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
                 </select>
 
+              </div>
+              <div>
+                <label>Price</label>
                 <input name="price" type="number" value={formData.price} onChange={handleChange} placeholder="Price" className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required />
+              </div>
+              <div>
+                <label>Stock</label>
                 <input name="stock" type="number" value={formData.stock} onChange={handleChange} placeholder="Stock" className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required />
+              </div>
+              <div>
+                <label>Ticket Template</label>
                 <select value={selectedTemplateId} onChange={handleTemplateChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required>
                     <option value="">Select Template</option>
                     {templates.map(temp => <option key={temp._id} value={temp._id}>{temp.name}</option>)}
                 </select>
-                {formData.templateImage && <img src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/templateImage/${formData.templateImage}`} alt="Template Preview" className="h-16 object-contain border rounded"/>}
+              </div>
+              <div className="w-full">
+                {formData.templateImage &&
+                <img src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/templateImage/${formData.templateImage}`} alt="Template Preview" className="h-16 object-contain border rounded"/>}
+              </div>
 
                 {/* DIUBAH: Tombol dinamis */}
                 <div className="md:col-span-2 flex justify-end gap-2">

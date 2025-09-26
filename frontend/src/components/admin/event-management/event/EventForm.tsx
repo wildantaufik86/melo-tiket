@@ -93,9 +93,6 @@ export default function EventForm({ eventId }: EventFormProps) {
         <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
             {message && <p className="text-center p-2 bg-gray-100 rounded-md">{message}</p>}
             <div>
-              <>
-          {console.log(formData)}
-              </>
                 <label>Event Name</label>
                 <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" />
             </div>

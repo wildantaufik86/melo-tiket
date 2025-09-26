@@ -79,15 +79,15 @@ useEffect(() => {
 
     // DITAMBAHKAN: Fungsi untuk menghapus tiket
     const handleDelete = async (ticketId: string) => {
-        if (!window.confirm("Anda yakin ingin menghapus tiket ini?")) return;
+        // if (!window.confirm("Anda yakin ingin menghapus tiket ini?")) return;
 
-        const result = await deleteTicket(eventId, ticketId);
-        if (result.status === 'success') {
-            alert(result.message);
-            loadInitialData(); // Muat ulang data
-        } else {
-            alert(`Error: ${result.message}`);
-        }
+        // const result = await deleteTicket(eventId, ticketId);
+        // if (result.status === 'success') {
+        //     alert(result.message);
+        //     loadInitialData(); // Muat ulang data
+        // } else {
+        //     alert(`Error: ${result.message}`);
+        // }
     };
 
     // DIUBAH: handleSaveTicket sekarang menangani Create dan Update

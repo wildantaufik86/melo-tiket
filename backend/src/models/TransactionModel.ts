@@ -25,7 +25,7 @@ const TransactionSchema = new Schema<ITransaction>(
       default: "Online",
     },
     expiredAt: { type: Date, required: true },
-    paymentProof: { type: String, required: true },
+    paymentProof: { type: String },
     verifiedBy: { type: Schema.Types.ObjectId, ref: "User" },
     verifiedAt: { type: Date },
     deletedAt: { type: Date, default: null, index: true },
