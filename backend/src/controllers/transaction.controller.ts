@@ -9,7 +9,7 @@ import AppError from "../utils/appError";
 import { processAndGenerateTicket } from "../services/ticket.service";
 import nodeCron from "node-cron";
 
-nodeCron.schedule("*/1 * * * *", async () => {
+nodeCron.schedule("*/10 * * * *", async () => {
   const session = await mongoose.startSession();
   session.startTransaction();
 

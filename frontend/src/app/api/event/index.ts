@@ -17,6 +17,7 @@ export interface ICreateEventPayload {
 export type IUpdateEventPayload = Partial<ICreateEventPayload>;
 
 export interface ITicketPayload {
+  name: string;
   category: string;
   price: number;
   stock: number;

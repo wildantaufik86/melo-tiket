@@ -37,9 +37,12 @@ export default function EventForm({ eventId }: EventFormProps) {
                 const result = await fetchEventById(eventId);
                 if (result.status === 'success' && result.data) {
                     const event = result.data.event;
+                    const cleanTime = event.time.split(' ')[0];
+
                     setFormData({
                         ...event,
-                        date: new Date(event.date).toISOString().split('T')[0], // Format tanggal untuk input type="date"
+                        time: cleanTime,
+                        date: new Date(event.date).toISOString().split('T')[0],
                     });
                 } else {
                     setMessage(`Error loading event: ${result.message}`);
@@ -77,7 +80,7 @@ export default function EventForm({ eventId }: EventFormProps) {
 
         if (result.status === 'success') {
             setMessage(`Event berhasil ${isEditMode ? 'diperbarui' : 'dibuat'}.`);
-            setTimeout(() => router.push('/admin/events'), 1500);
+            setTimeout(() => router.push('/admin/event-management/event'), 1500);
         } else {
             setMessage(`Error: ${result.message}`);
         }
@@ -87,37 +90,40 @@ export default function EventForm({ eventId }: EventFormProps) {
     if (loading) return <div>Loading form...</div>;
 
     return (
-        <form onSubmit={(e) => e.preventDefault()} className="space-y-6">
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
             {message && <p className="text-center p-2 bg-gray-100 rounded-md">{message}</p>}
             <div>
+              <>
+          {console.log(formData)}
+              </>
                 <label>Event Name</label>
-                <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} className="w-full border p-2 rounded-md" />
+                <input type="text" name="eventName" value={formData.eventName} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label>Date</label>
-                    <input type="date" name="date" value={formData.date} onChange={handleChange} className="w-full border p-2 rounded-md" />
+                    <input type="date" name="date" value={formData.date} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" />
                 </div>
                 <div>
                     <label>Time</label>
-                    <input type="time" name="time" value={formData.time} onChange={handleChange} className="w-full border p-2 rounded-md" />
+                    <input type="time" name="time" value={formData.time} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" />
                 </div>
             </div>
             <div>
                 <label>Address</label>
-                <textarea name="address" value={formData.address} onChange={handleChange} className="w-full border p-2 rounded-md" rows={2}></textarea>
+                <textarea name="address" value={formData.address} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" rows={2}></textarea>
             </div>
             <div>
                 <label>Description</label>
-                <textarea name="description" value={formData.description} onChange={handleChange} className="w-full border p-2 rounded-md" rows={4}></textarea>
+                <textarea name="description" value={formData.description} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" rows={4}></textarea>
             </div>
             <div>
                 <label>Event Description</label>
-                <textarea name="eventDesc" value={formData.eventDesc} onChange={handleChange} className="w-full border p-2 rounded-md" rows={4}></textarea>
+                <textarea name="eventDesc" value={formData.eventDesc} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" rows={4}></textarea>
             </div>
             <div>
                 <label>Ticket Description</label>
-                <textarea name="ticketDesc" value={formData.ticketDesc} onChange={handleChange} className="w-full border p-2 rounded-md" rows={4}></textarea>
+                <textarea name="ticketDesc" value={formData.ticketDesc} onChange={handleChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" rows={4}></textarea>
             </div>
 
             <div className="flex items-center gap-4">

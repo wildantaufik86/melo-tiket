@@ -5,6 +5,8 @@ import TicketTemplate from '../models/TemplateModel';
 import path from 'path';
 import fs from 'fs';
 
+const getBaseUrl = (req: Request): string => `${req.protocol}://${req.get('host')}`;
+
 export const createTemplate = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, description } = req.body;
@@ -12,8 +14,8 @@ export const createTemplate = async (req: Request, res: Response, next: NextFunc
     if (!req.file) {
       return next(new AppError(BAD_REQUEST, 'Gambar template wajib diunggah.'));
     }
-
-    const templateImagePath = `/uploads/template/${req.file.filename}`;
+    const baseUrl = getBaseUrl(req);
+    const templateImagePath = `${baseUrl}/uploads/templateImage/${req.file.filename}`;
 
     const newTemplate = await TicketTemplate.create({
       name,

@@ -16,6 +16,8 @@ import transactionRoutes from "./routes/transaction.routes";
 import categoryRoutes from "./routes/category.routes";
 import path from "path";
 import templateRoutes from "./routes/template.route";
+import validateRole from "./middleware/validateRole";
+import authenticate from "./middleware/authenticate";
 
 
 const allowedOrigins = [
@@ -51,7 +53,7 @@ app.use(cors({
       callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
 app.use(cookieParser());
@@ -71,6 +73,7 @@ app.use("/auth", express.json(), express.urlencoded({ extended: true }), authRou
 app.use("/user", express.json(), express.urlencoded({ extended: true }), userRoutes);
 app.use("/template", express.json(), express.urlencoded({ extended: true }), templateRoutes);
 app.use("/public", express.static(path.resolve("./public")));
+app.use("/uploads", authenticate, validateRole("admin", "superadmin"), express.static(path.resolve("./uploads")));
 
 app.use(errorHandler);
 

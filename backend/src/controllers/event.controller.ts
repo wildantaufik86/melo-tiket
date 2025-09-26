@@ -39,8 +39,7 @@ export const createEventHandler: RequestHandler = async (req, res, next) => {
 
 export const getAllEventsHandler: RequestHandler = async (req, res, next) => {
   try {
-    // Query HANYA event yang sudah siap ditampilkan ke publik
-    const events = await EventModel.find({ isPublished: true }).sort({ date: 1 }); // Urutkan berdasarkan tanggal terdekat
+    const events = await EventModel.find();
 
     res.status(OK).json({
       count: events.length,
@@ -55,7 +54,7 @@ export const getEventByIdHandler: RequestHandler = async (req, res, next) => {
   try {
     const { eventId } = req.params;
     const event = await EventModel.findById(eventId);
-    appAssert(event && event.isPublished, NOT_FOUND, "Event not found");
+    appAssert(event, NOT_FOUND, "Event not found");
 
     const availableTickets = await TicketModel.find({
       eventId: eventId,
