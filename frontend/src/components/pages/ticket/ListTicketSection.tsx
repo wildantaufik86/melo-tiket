@@ -94,7 +94,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
         />
       </div>
       <div className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold">Ticket</h3>
+        <h3 className="text-lg font-black lg:text-3xl">Ticket</h3>
         <div className="flex flex-col gap-4">
           {availableTickets.map((data) => (
             <TickedAccordion
@@ -108,14 +108,16 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
         </div>
       </div>
       <div className="flex items-stretch bg-white rounded-sm mt-4">
-        <p className="flex flex-col font-semibold text-black py-2 px-4">
+        <p className="flex flex-col font-bold lg:text-xl text-black py-2 px-4">
           TOTAL
-          <span>{formattedPrice(totalPrice)}</span>
+          <span className="font-normal lg:text-base">
+            {formattedPrice(totalPrice)}
+          </span>
         </p>
         <Link
           onClick={createTemporaryOrder}
           href={`/checkout/event/${eventId}`}
-          className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white"
+          className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white font-semibold lg:text-xl"
         >
           Lanjutkan
         </Link>
@@ -134,7 +136,7 @@ const TickedAccordion = ({
     <div className="flex flex-col rounded-sm p-4 bg-secondary">
       <p
         onClick={ticket.status === 'Available' ? toggleOpen : undefined}
-        className={`font-semibold flex justify-between items-center ${
+        className={`font-black lg:text-xl flex justify-between items-center ${
           ticket.status === 'Available'
             ? 'cursor-pointer'
             : 'cursor-not-allowed'
@@ -154,9 +156,11 @@ const TickedAccordion = ({
           ticket.isOpen ? 'scale-y-100 flex ' : 'scale-y-0 hidden'
         }`}
       >
-        <p className="flex flex-col font-semibold">
+        <p className="flex flex-col font-bold lg:text-xl">
           {ticket.category.name}{' '}
-          <span className="font-light">{formattedPrice(ticket.price)}</span>
+          <span className="font-light lg:text-base">
+            {formattedPrice(ticket.price)}
+          </span>
         </p>
         <div className="flex items-center">
           <div
@@ -165,7 +169,9 @@ const TickedAccordion = ({
           >
             -
           </div>
-          <span className="px-4">{ticket.quantity}</span>
+          <span className="px-4 font-semibold lg:text-xl">
+            {ticket.quantity}
+          </span>
           <div
             onClick={incrementQty}
             className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"

@@ -64,7 +64,7 @@ export default function AboutSection({ eventDetail }: EventDetailProps) {
         <div className="flex justify-start">
           <Label text="TENTANG MELOFEST" />
         </div>
-        <div className="bg-secondary rounded-md p-4 text-justify flex flex-col gap-4 text-xs">
+        <div className="bg-secondary rounded-md p-4 text-justify flex flex-col gap-4 text-xs font-medium lg:text-base">
           <p>{eventDetail?.description || ''}</p>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function AboutSection({ eventDetail }: EventDetailProps) {
           <Label text="TENTANG TIKET" />
         </div>
         <div className="bg-secondary rounded-md p-4 text-xs">
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col gap-4 font-medium lg:text-base">
             {listText.map((item, index) => (
               <li key={index}>{item.text}</li>
             ))}
