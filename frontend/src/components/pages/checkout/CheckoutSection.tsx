@@ -8,6 +8,7 @@ import {
   ToastError,
   ToastSuccess,
 } from '@/lib/validations/toast/ToastNofication';
+import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Link from 'next/link';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -39,9 +40,18 @@ export default function CheckoutSection({ listOrder, payload }: Props) {
     setIsConfirmed(target.checked);
   };
 
+  const clearOrderData = () => {
+    return deleteLocalStorage('order');
+  };
+
   const handleCreateTransaction = async () => {
     try {
       if (!payload) {
+        ToastError('Please orders ticket first');
+        return;
+      }
+
+      if (payload && !payload?.paymentProof) {
         ToastError('Please upload proof of payment');
         return;
       }
@@ -49,6 +59,7 @@ export default function CheckoutSection({ listOrder, payload }: Props) {
       const response = await createTransaction(payload);
       if (response.status == 'success' && response.data) {
         ToastSuccess(response.message);
+        clearOrderData();
       } else {
         ToastError(response.message);
       }

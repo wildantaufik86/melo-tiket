@@ -27,7 +27,7 @@ export default function TicketPage() {
 
   const getOrder = () => {
     const data: any = getLocalStorage('order');
-    if (data.length > 0) {
+    if (data?.length > 0) {
       setOrdersTicket(data);
     }
   };
