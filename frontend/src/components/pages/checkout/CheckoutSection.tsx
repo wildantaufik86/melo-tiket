@@ -1,8 +1,17 @@
 'use client';
 
+import {
+  createTransaction,
+  ICreateTransactionPayload,
+} from '@/app/api/transcation';
+import {
+  ToastError,
+  ToastSuccess,
+} from '@/lib/validations/toast/ToastNofication';
+import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Link from 'next/link';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 interface IOrderItem {
   id?: number;
@@ -13,10 +22,12 @@ interface IOrderItem {
 
 type Props = {
   listOrder: IOrderItem[];
+  payload: ICreateTransactionPayload;
 };
 
-export default function CheckoutSection({ listOrder }: Props) {
+export default function CheckoutSection({ listOrder, payload }: Props) {
   const [isConfirmed, setIsConfirmed] = useState(false);
+
   const subTotal = listOrder?.reduce(
     (acc, data) => acc + data.price * data.quantity,
     0
@@ -27,6 +38,34 @@ export default function CheckoutSection({ listOrder }: Props) {
   const toggleConfirm = (e: ChangeEvent) => {
     const target = e.target as HTMLInputElement;
     setIsConfirmed(target.checked);
+  };
+
+  const clearOrderData = () => {
+    return deleteLocalStorage('order');
+  };
+
+  const handleCreateTransaction = async () => {
+    try {
+      if (payload && payload?.tickets.length === 0) {
+        ToastError('Please orders ticket first');
+        return;
+      }
+
+      if (payload && !payload?.paymentProof) {
+        ToastError('Please upload proof of payment');
+        return;
+      }
+
+      const response = await createTransaction(payload);
+      if (response.status == 'success' && response.data) {
+        ToastSuccess(response.message);
+        clearOrderData();
+      } else {
+        ToastError(response.message);
+      }
+    } catch (err: any) {
+      ToastError(err.message);
+    }
   };
 
   return (
@@ -82,6 +121,7 @@ export default function CheckoutSection({ listOrder }: Props) {
       </div>
 
       <div
+        onClick={handleCreateTransaction}
         className={`w-full py-2 mt-4 bg-secondary rounded-full flex justify-center items-center ${
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
         }`}

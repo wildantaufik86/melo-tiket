@@ -5,7 +5,7 @@ import { FaFacebook, FaInstagram, FaSpotify, FaTiktok } from 'react-icons/fa';
 export default function Footer() {
   return (
     <footer className="bg-[url(/images/footer-bg.jpg)] bg-cover bg-top bg-no-repeat pd-full">
-      <div className='flex justify-between items-center'>
+      <div className="flex justify-between items-center">
         <div className="flex flex-col items-center">
           <div className="relative  w-12 sm:w-full sm:max-w-[50px] lg:max-w-[100px] aspect-square">
             <Image
@@ -31,45 +31,58 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex flex-col items-center justify-center gap-2">
-          <div className="flex items-center gap-2 text-xs lg:text-sm">
+          <div className="flex items-center gap-2 text-xs lg:text-2xl text-white font-black">
             <Link
               href="/terms"
-              className=" font-semibold hover:text-primary transition-colors"
+              className="hover:text-primary transition-colors"
             >
               TERM AND CONDITION
             </Link>
             <span>|</span>
-            <Link
-              href="/faq"
-              className=" font-semibold hover:text-primary transition-colors"
-            >
+            <Link href="/faq" className="hover:text-primary transition-colors">
               FAQ
             </Link>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 mt-4">
             <Link
               href="/tiktok"
               className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
             >
-              <FaTiktok size={16} color="black" />
+              <FaTiktok
+                size={16}
+                color="black"
+                className="lg:w-[30px] lg:h-[30px]"
+              />
             </Link>
             <Link
               href="/instagram"
               className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
             >
-              <FaInstagram size={16} color="black" />
+              <FaInstagram
+                size={16}
+                color="black"
+                className="lg:w-[30px] lg:h-[30px]"
+              />
             </Link>
             <Link
               href="/facebook"
               className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
             >
-              <FaFacebook size={16} color="black" />
+              <FaFacebook
+                size={16}
+                color="black"
+                className="lg:w-[30px] lg:h-[30px]"
+              />
             </Link>
             <Link
               href="/spotify"
               className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
             >
-              <FaSpotify size={16} color="black" />
+              <FaSpotify
+                size={16}
+                color="black"
+                className="lg:w-[30px] lg:h-[30px]"
+              />
             </Link>
           </div>
         </div>
