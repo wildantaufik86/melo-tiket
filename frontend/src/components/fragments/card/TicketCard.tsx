@@ -1,3 +1,4 @@
+import { Orders } from '@/context/ordersContext';
 import { formattedPrice } from '@/utils/universalUtils';
 import localFont from 'next/font/local';
 import Link from 'next/link';
@@ -6,23 +7,16 @@ const brotherFont = localFont({
   src: '../../../../public/fonts/BROTHER-Bold.otf',
 });
 
-type TicketCard = {
-  id?: number;
-  name?: string;
-  title?: string;
-  price: number;
-};
-
 type TicketCardProps = {
-  idTicket?: string;
-  ticket: TicketCard;
+  ticket: Orders;
   idEvent?: string;
+  handleOrder: (params: string) => void;
 };
 
 export default function TicketCard({
   ticket,
   idEvent,
-  idTicket,
+  handleOrder,
 }: TicketCardProps) {
   return (
     <div className="bg-[url(/images/bg-ticket.webp)] bg-contain bg-center bg-no-repeat aspect-2/3 flex justify-center items-center w-full max-w-[180px] sm:max-w-[180px] lg:max-w-[200px] hover:scale-110 duration-200 ease-in-out">
@@ -39,6 +33,7 @@ export default function TicketCard({
           </span>
         </p>
         <Link
+          onClick={() => handleOrder(ticket._id!)}
           href={`/checkout/event/${idEvent}`}
           className="p-[1px] rounded-sm bg-gradient-to-r from-blue-500 via-purple-500 to-red-500"
         >

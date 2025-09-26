@@ -8,11 +8,13 @@ import { IEvent } from '@/types/Event';
 import { ITicket } from '@/types/Ticket';
 import { useCallback, useEffect, useState } from 'react';
 import localFont from 'next/font/local';
+import { Orders, useOrder } from '@/context/ordersContext';
 
 export default function TicketSection() {
   const [event, setEvent] = useState<IEvent | null>(null);
   const [loading, setLoading] = useState(true);
-  const [availableTickets, setAvailableTickets] = useState<ITicket[]>([]);
+  const [availableTickets, setAvailableTickets] = useState<Orders[]>([]);
+  const { saveOrders } = useOrder();
 
   const getEvent = useCallback(async () => {
     setLoading(true);
@@ -34,15 +36,22 @@ export default function TicketSection() {
     }
   }, []);
 
+  const handleOrder = (idTicket: string) => {
+    const filtered = availableTickets
+      .filter((tc) => tc._id === idTicket)
+      .map((tc) => ({ ...tc, quantity: 1, isOpen: true }));
+    saveOrders(filtered);
+  };
+
   useEffect(() => {
     getEvent();
   }, [getEvent]);
 
   useEffect(() => {
     if (event && event.tickets) {
-      const filteredTicket = event.tickets.filter(
-        (tc: ITicket) => tc.status === 'Available'
-      );
+      const filteredTicket: Orders[] = event.tickets
+        .filter((tc) => tc.status === 'Available')
+        .map((tc) => ({ ...tc, quantity: 0, isOpen: false }));
       setAvailableTickets(filteredTicket);
     }
   }, [event]);
@@ -64,7 +73,7 @@ export default function TicketSection() {
                 <TicketCard
                   key={tc._id}
                   ticket={tc}
-                  idTicket={tc._id}
+                  handleOrder={handleOrder}
                   idEvent={event?._id}
                 />
               ))}
