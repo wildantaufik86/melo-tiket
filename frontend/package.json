@@ -11,6 +11,7 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@phosphor-icons/react": "^2.1.10",
+    "framer-motion": "^12.23.22",
     "gsap": "^3.13.0",
     "joi": "^18.0.1",
     "js-cookie": "^3.0.5",

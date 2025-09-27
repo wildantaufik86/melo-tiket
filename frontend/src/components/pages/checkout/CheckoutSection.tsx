@@ -5,6 +5,7 @@ import {
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
 import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
+import SuccessModal from '@/components/fragments/modal/SuccessModal';
 import { Orders, useOrder } from '@/context/ordersContext';
 import {
   ToastError,
@@ -13,6 +14,7 @@ import {
 import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice } from '@/utils/universalUtils';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
@@ -32,6 +34,8 @@ export default function CheckoutSection({
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [availableTickets, setAvailableTickets] = useState<Orders[] | []>([]);
   const { saveOrders } = useOrder();
+  const router = useRouter();
+  const [openModalSuccess, setOpenModalSuccess] = useState(false);
 
   const subTotal = listOrder?.reduce(
     (acc, data) => acc + data.price * data.quantity,
@@ -50,6 +54,7 @@ export default function CheckoutSection({
   };
 
   const handleCreateTransaction = async () => {
+    // remove comment when want use it
     try {
       if (payload && payload?.tickets.length === 0) {
         ToastError('Please orders ticket first');
@@ -65,6 +70,8 @@ export default function CheckoutSection({
       if (response.status == 'success' && response.data) {
         ToastSuccess(response.message);
         clearOrderData();
+        setOpenModalSuccess(true);
+        router.push('/user/profile');
       } else {
         ToastError(response.message);
       }
@@ -203,6 +210,12 @@ export default function CheckoutSection({
           Konfirmasi Pembelian
         </span>
       </div>
+
+      {/* success modal */}
+      <SuccessModal
+        isOpen={openModalSuccess}
+        onClose={() => setOpenModalSuccess(false)}
+      />
     </section>
   );
 }
