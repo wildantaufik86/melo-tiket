@@ -1,9 +1,46 @@
+'use client';
+
+import { useRef } from 'react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import Label from '@/components/fragments/label/Label';
 import ProfileSection from '@/components/pages/user/profile/ProfileSection';
 import RiwayatPembelian from '@/components/pages/user/profile/RiwayatPembelianSection';
 import Image from 'next/image';
 
 export default function ProfilePage() {
+  const ticketRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!ticketRef.current) return;
+
+    // capture elemen tiket jadi canvas
+    const canvas = await html2canvas(ticketRef.current, {
+      scale: 2, // biar hasil lebih tajam
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+
+    // buat dokumen PDF
+    const pdf = new jsPDF('landscape', 'pt', 'a4'); // landscape biar lebih pas
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // hitung skala agar gambar muat di halaman
+    const ratio = Math.min(
+      pageWidth / canvas.width,
+      pageHeight / canvas.height
+    );
+    const imgWidth = canvas.width * ratio;
+    const imgHeight = canvas.height * ratio;
+
+    const x = (pageWidth - imgWidth) / 2;
+    const y = (pageHeight - imgHeight) / 2;
+
+    pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+    pdf.save('e-ticket.pdf');
+  };
+
   return (
     <div className="flex flex-col pt-24 pd-full">
       <div className="flex flex-col gap-4 md:flex-row">
@@ -14,8 +51,11 @@ export default function ProfilePage() {
         <div className="w-full md:w-1/2">
           <Label text="E TIKET" />
         </div>
-        <div className="flex flex-col bg-secondary p-4 mt-4 lg:p-8">
-          <div className="relative w-full aspect-4/2 ">
+        <div
+          ref={ticketRef}
+          className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
+        >
+          <div className="relative w-full aspect-4/2">
             <Image
               src="/images/example-ticket.jpg"
               alt="E ticket"
@@ -23,7 +63,7 @@ export default function ProfilePage() {
               className="object-contain"
             />
           </div>
-          <div className="flex items-center gap-8 ">
+          <div className="flex items-center gap-8">
             <p className="text-xs font-normal md:text-sm lg:text-lg">
               E-Ticket
             </p>
@@ -32,7 +72,10 @@ export default function ProfilePage() {
                 view
               </button>
               <span> | </span>
-              <button className="cursor-pointer hover:underline duration-200">
+              <button
+                onClick={handleDownload}
+                className="cursor-pointer hover:underline duration-200"
+              >
                 download
               </button>
             </div>
