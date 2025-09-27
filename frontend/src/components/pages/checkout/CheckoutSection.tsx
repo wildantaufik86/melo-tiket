@@ -12,7 +12,7 @@ import {
   ToastSuccess,
 } from '@/lib/validations/toast/ToastNofication';
 import { deleteLocalStorage } from '@/utils/clientUtils';
-import { formattedPrice } from '@/utils/universalUtils';
+import { formattedPrice, generate3Digit } from '@/utils/universalUtils';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -41,8 +41,9 @@ export default function CheckoutSection({
     (acc, data) => acc + data.price * data.quantity,
     0
   );
-  const platformFee = 0;
-  const total = subTotal + platformFee;
+  const platformFee: number = 5000;
+  const [codeUnique, setCodeUnique] = useState<number>(0);
+  const total = subTotal + platformFee + codeUnique;
 
   const toggleConfirm = (e: ChangeEvent) => {
     const target = e.target as HTMLInputElement;
@@ -85,6 +86,10 @@ export default function CheckoutSection({
       setAvailableTickets(listOrder);
     }
   }, [listOrder]);
+
+  useEffect(() => {
+    setCodeUnique(Number(generate3Digit()));
+  }, []);
 
   useEffect(() => {
     // handle qty ticket change

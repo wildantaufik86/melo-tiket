@@ -3,6 +3,7 @@
 // or client-specific (localStorage, document) APIs.
 
 import type { Schema } from 'joi'; // Type import for Joi Schema
+import { getSessionStorage, setSessionStorage } from './clientUtils';
 
 /**
  * Formats a date into a localized string (id-ID).
@@ -178,3 +179,19 @@ export const groupOrdersByMonth = (
 
   return sortedGroupedOrders;
 };
+
+export function generate3Digit(): string {
+  const codeUnique = getSessionStorage('code-unique'); // konsisten penamaan key
+
+  if (!codeUnique) {
+    // Random 0..999 lalu pad depan dengan 0 sampai panjang 3
+    const num = Math.floor(Math.random() * 1000); // 0..999
+    const code = String(num).padStart(3, '0');
+
+    setSessionStorage('code-unique', code); // simpan dalam bentuk string
+    return code;
+  }
+
+  // kalau sudah ada di sessionStorage → kembalikan existing value
+  return String(codeUnique);
+}
