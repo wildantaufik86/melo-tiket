@@ -7,6 +7,7 @@ import Label from '@/components/fragments/label/Label';
 import ProfileSection from '@/components/pages/user/profile/ProfileSection';
 import RiwayatPembelian from '@/components/pages/user/profile/RiwayatPembelianSection';
 import Image from 'next/image';
+import { FaCircleInfo } from 'react-icons/fa6';
 
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
@@ -43,7 +44,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col pt-24 pd-full">
-      <div className="flex flex-col gap-4 md:flex-row">
+      <div className="flex flex-col gap-4 md:flex-row md:gap-8">
         <ProfileSection />
         <RiwayatPembelian />
       </div>
@@ -51,7 +52,13 @@ export default function ProfilePage() {
         <div className="w-full md:w-1/2">
           <Label text="E TIKET" />
         </div>
-        <div
+        <div className="border border-white mt-4 p-4">
+          <p className="text-xs flex items-center gap-2 md:text-sm lg:text-base">
+            <FaCircleInfo />
+            Kamu tidak memiliki ticket online
+          </p>
+        </div>
+        {/* <div
           ref={ticketRef}
           className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
         >
@@ -80,7 +87,7 @@ export default function ProfilePage() {
               </button>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
