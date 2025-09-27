@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import Label from '@/components/fragments/label/Label';
@@ -8,9 +8,21 @@ import ProfileSection from '@/components/pages/user/profile/ProfileSection';
 import RiwayatPembelian from '@/components/pages/user/profile/RiwayatPembelianSection';
 import Image from 'next/image';
 import { FaCircleInfo } from 'react-icons/fa6';
+import { getMyProfile } from '@/app/api/profile';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
+import { ITransaction } from '@/types/Transaction';
+
+export interface IHistoryByEvent {
+  _id: string;
+  eventName: string;
+  date: string;
+  address: string;
+  transactions: ITransaction[];
+}
 
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
+  const [historyEvent, setHistoryEvent] = useState<IHistoryByEvent[]>([]);
 
   const handleDownload = async () => {
     if (!ticketRef.current) return;
@@ -42,11 +54,32 @@ export default function ProfilePage() {
     pdf.save('e-ticket.pdf');
   };
 
+  console.log('history event', historyEvent);
+
+  const fetchProfil = async () => {
+    try {
+      const response = await getMyProfile();
+      if (response.data) {
+        setHistoryEvent(response.data.historyByEvent);
+      }
+    } catch (error: any) {
+      ToastError(error.message || '');
+    }
+  };
+
+  useEffect(() => {
+    fetchProfil();
+  }, []);
+
+  console.log(historyEvent);
+
   return (
     <div className="flex flex-col pt-24 pd-full">
       <div className="flex flex-col gap-4 md:flex-row md:gap-8">
         <ProfileSection />
-        <RiwayatPembelian />
+        <RiwayatPembelian
+          historyTransactions={historyEvent.at(-1)?.transactions ?? []}
+        />
       </div>
       <div className="flex flex-col mt-4">
         <div className="w-full md:w-1/2">
