@@ -14,11 +14,11 @@ type Image = {
 };
 
 const dummyImages: Image[] = [
-  {
-    id: 1,
-    url: '/images/slide-1.jpg',
-    alt: 'Slide 1',
-  },
+  // {
+  //   id: 1,
+  //   url: '/images/slide-1.jpg',
+  //   alt: 'Slide 1',
+  // },
   {
     id: 2,
     url: '/images/hero-image.jpg',

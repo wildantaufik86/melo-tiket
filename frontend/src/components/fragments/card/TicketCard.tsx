@@ -20,13 +20,13 @@ export default function TicketCard({
 }: TicketCardProps) {
   return (
     <div
-      className={`bg-[url(/images/bg-ticket.webp)] bg-contain bg-center bg-no-repeat aspect-2/3 flex justify-center items-center w-full max-w-[180px] sm:max-w-[180px] lg:max-w-[200px] hover:scale-110 duration-200 ease-in-out ${
+      className={`bg-[url(/images/bg-ticket.webp)] bg-contain bg-center bg-no-repeat aspect-2/3 flex justify-center items-center w-full max-w-[180px] sm:max-w-[180px] lg:max-w-[250px] xl:max-w-[300px] hover:scale-110 duration-200 ease-in-out ${
         ticket.status === 'Available' ? 'opacity-100' : 'opacity-90'
       }`}
     >
       <div className="flex flex-col items-center gap-4">
         <h3
-          className={`font-black text-xl text-wrap w-[70%] text-center sm:text-4xl lg:text-5xl ${brotherFont.className}`}
+          className={`font-black text-xl text-wrap w-full text-center sm:text-4xl lg:text-5xl ${brotherFont.className}`}
         >
           {ticket.name || ''}
         </h3>

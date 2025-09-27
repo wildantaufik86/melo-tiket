@@ -41,15 +41,17 @@ export default function CheckoutSection({
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
   const [openModalAlert, setOpenModalAlert] = useState(false);
 
-  console.log(authUser);
-
+  const totalTicket = availableTickets.reduce(
+    (acc, tc) => acc + tc.quantity,
+    0
+  );
   const subTotal = listOrder?.reduce(
     (acc, data) => acc + data.price * data.quantity,
     0
   );
   const platformFee: number = 5000;
   const [codeUnique, setCodeUnique] = useState<number>(0);
-  const total = subTotal + platformFee + codeUnique;
+  const total = subTotal + platformFee * totalTicket + codeUnique;
 
   const toggleConfirm = (e: ChangeEvent) => {
     const target = e.target as HTMLInputElement;
@@ -68,12 +70,12 @@ export default function CheckoutSection({
       }
 
       if (payload && payload?.tickets.length === 0) {
-        ToastError('Please orders ticket first');
+        ToastError('Silahkan pesan tiket terlebih dahulu');
         return;
       }
 
       if (payload && !payload?.paymentProof) {
-        ToastError('Please upload proof of payment');
+        ToastError('Tolong unggah bukti pembayaran');
         return;
       }
 
@@ -98,8 +100,12 @@ export default function CheckoutSection({
   }, [listOrder]);
 
   useEffect(() => {
-    setCodeUnique(Number(generate3Digit()));
-  }, []);
+    if (totalTicket > 0) {
+      setCodeUnique(Number(generate3Digit()));
+    } else {
+      setCodeUnique(0);
+    }
+  }, [availableTickets]);
 
   useEffect(() => {
     // handle qty ticket change
@@ -125,7 +131,9 @@ export default function CheckoutSection({
             </span>
           </p>
           <p className="text-sm lg:text-xl font-medium">
-            {platformFee === 0 ? 'Gratis' : platformFee}
+            {platformFee === 0
+              ? 'Gratis'
+              : `${platformFee} x ${totalTicket} Tickets`}
           </p>
         </div>
 
