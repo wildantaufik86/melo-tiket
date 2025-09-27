@@ -11,6 +11,11 @@ import { useCallback, useEffect, useState } from 'react';
 // import swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import localFont from 'next/font/local';
+
+const brotherFont = localFont({
+  src: '../../../../public/fonts/BROTHER-Bold.otf',
+});
 
 export default function TicketSection() {
   const [event, setEvent] = useState<IEvent | null>(null);
@@ -64,19 +69,21 @@ export default function TicketSection() {
 
   return (
     <section className="relative flex flex-col items-center py-[28%]">
-      <h2 className="z-10 text-xl font-bold text-center w-[50%] font-brother md:text-3xl lg:text-6xl">
+      <h2
+        className={`z-10 text-2xl mb-2 font-bold text-center w-[40%] text-wrap font-brother sm:text-4xl  md:text-5xl lg:text-7xl ${brotherFont.className}`}
+      >
         {event?.eventName || 'Melophile Festival Vol 2'}
       </h2>
 
       <Label text="GET YOUR TICKET NOW" />
-
       <div className="absolute inset-0 top-15 mt-32">
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
-          <div className="w-full px-4 lg:px-12 mt-[25%] lg:mt-0">
+          <div className="w-full px-4 lg:px-12 lg:mt-12">
             <Swiper
               spaceBetween={20}
               breakpoints={{
                 320: { slidesPerView: 3 }, // mobile: 3
+                768: { slidesPerView: 4 }, // tablet: 4
                 1024: { slidesPerView: 5 }, // laptop: 5
               }}
             >
