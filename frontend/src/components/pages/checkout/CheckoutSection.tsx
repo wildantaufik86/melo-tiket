@@ -5,7 +5,9 @@ import {
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
 import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
+import AlertModal from '@/components/fragments/modal/AlertModal';
 import SuccessModal from '@/components/fragments/modal/SuccessModal';
+import { useAuth } from '@/context/authUserContext';
 import { Orders, useOrder } from '@/context/ordersContext';
 import {
   ToastError,
@@ -34,8 +36,12 @@ export default function CheckoutSection({
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [availableTickets, setAvailableTickets] = useState<Orders[] | []>([]);
   const { saveOrders } = useOrder();
+  const { authUser } = useAuth();
   const router = useRouter();
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
+  const [openModalAlert, setOpenModalAlert] = useState(false);
+
+  console.log(authUser);
 
   const subTotal = listOrder?.reduce(
     (acc, data) => acc + data.price * data.quantity,
@@ -55,8 +61,12 @@ export default function CheckoutSection({
   };
 
   const handleCreateTransaction = async () => {
-    // remove comment when want use it
     try {
+      if (authUser?.idNumber === null) {
+        setOpenModalAlert(true);
+        return;
+      }
+
       if (payload && payload?.tickets.length === 0) {
         ToastError('Please orders ticket first');
         return;
@@ -158,9 +168,7 @@ export default function CheckoutSection({
               </span>
             </p>
             <div
-              className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all ${
-                ticket.isOpen ? 'scale-y-100 flex ' : 'scale-y-0 hidden'
-              }`}
+              className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all scale-y-100 flex`}
             >
               <p className="flex flex-col font-bold lg:text-xl">
                 {ticket.category.name}{' '}
@@ -206,7 +214,7 @@ export default function CheckoutSection({
       </div>
 
       <div
-        onClick={handleCreateTransaction}
+        onClick={isConfirmed ? handleCreateTransaction : undefined}
         className={`w-full py-2 mt-4 bg-secondary rounded-full flex justify-center items-center ${
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
         } hover:bg-primary transition-colors`}
@@ -220,6 +228,12 @@ export default function CheckoutSection({
       <SuccessModal
         isOpen={openModalSuccess}
         onClose={() => setOpenModalSuccess(false)}
+      />
+
+      <AlertModal
+        isOpen={openModalAlert}
+        onClose={() => setOpenModalAlert(false)}
+        text="anda belum mengisi NIK, silahkan lengkapi data di profil"
       />
     </section>
   );
