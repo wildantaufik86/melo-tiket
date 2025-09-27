@@ -9,7 +9,7 @@
  * @param value The value to store (will be JSON.stringify-ed).
  * @param options Cookie options (maxAge, path, secure, etc.).
  */
- export const setCookie = (
+export const setCookie = (
   name: string,
   value: unknown,
   options?: {
@@ -143,4 +143,44 @@ export const getDataCart = () => {
   // If 'cartList' should be httpOnly, you'd need a server action to get it.
   const data = getCookie('cartList'); // Now uses client-side getCookie
   return data;
+};
+
+export const setSessionStorage = (key: string, value: unknown): void => {
+  try {
+    if (typeof sessionStorage === 'undefined') return; // Only run in browser environment
+    const jsonValue = JSON.stringify(value);
+    sessionStorage.setItem(key, jsonValue);
+  } catch (error) {
+    console.error('Failed to save to sessionStorage:', error);
+  }
+};
+
+/**
+ * Retrieves an item from sessionStorage.
+ * @param key The key of the item to retrieve.
+ * @returns The parsed value or null if not found/parse error.
+ */
+export const getSessionStorage = <T = unknown>(key: string): T | null => {
+  try {
+    if (typeof sessionStorage === 'undefined') return null; // Only run in browser environment
+    const data = sessionStorage.getItem(key);
+    const parsedData = data ? (JSON.parse(data) as T) : null;
+    return parsedData;
+  } catch (error) {
+    console.error('Failed to retrieve data from sessionStorage:', error);
+    return null;
+  }
+};
+
+/**
+ * Deletes an item from sessionStorage.
+ * @param key The key of the item to delete.
+ */
+export const deleteSessionStorage = (key: string): void => {
+  try {
+    if (typeof sessionStorage === 'undefined') return; // Only run in browser environment
+    sessionStorage.removeItem(key);
+  } catch (error) {
+    console.error('Failed to delete from sessionStorage:', error);
+  }
 };

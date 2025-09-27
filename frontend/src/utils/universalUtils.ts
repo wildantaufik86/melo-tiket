@@ -3,6 +3,7 @@
 // or client-specific (localStorage, document) APIs.
 
 import type { Schema } from 'joi'; // Type import for Joi Schema
+import { getSessionStorage, setSessionStorage } from './clientUtils';
 
 /**
  * Formats a date into a localized string (id-ID).
@@ -25,7 +26,11 @@ export const formattedDate = (date: string | Date): string => {
 export const formatTanggalWIB = (date: string | Date): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
-  const optionsTanggal: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+  const optionsTanggal: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  };
   const optionsWaktu: Intl.DateTimeFormatOptions = {
     hour: '2-digit',
     minute: '2-digit',
@@ -33,10 +38,32 @@ export const formatTanggalWIB = (date: string | Date): string => {
     timeZone: 'Asia/Jakarta', // Explicitly set timezone for WIB
   };
 
-  const tanggal = new Intl.DateTimeFormat('id-ID', optionsTanggal).format(dateObj);
+  const tanggal = new Intl.DateTimeFormat('id-ID', optionsTanggal).format(
+    dateObj
+  );
   const waktu = new Intl.DateTimeFormat('id-ID', optionsWaktu).format(dateObj);
 
   return `${tanggal}, ${waktu} WIB`;
+};
+
+export const parseDateOfBirth = (
+  dob: string | undefined,
+  locale: string = 'en-US'
+) => {
+  if (!dob) {
+    return { day: '', month: '', year: '' };
+  }
+
+  const [year, month, day] = dob.split('-');
+
+  // Buat Date object (tambah "20" untuk tahun 2 digit)
+  const date = new Date(`${year}-${month}-${day}`);
+
+  return {
+    day,
+    month: date.toLocaleString(locale, { month: 'long' }),
+    year: `${year}`,
+  };
 };
 
 /**
@@ -99,7 +126,9 @@ export const getStatusStyle = (status: string): string => {
  * @param orders An array of order objects, each with a `createdAt` property.
  * @returns An object where keys are "Month Year" strings and values are arrays of sorted orders.
  */
-export const groupOrdersByMonth = (orders: { createdAt: string }[]): { [key: string]: { createdAt: string }[] } => {
+export const groupOrdersByMonth = (
+  orders: { createdAt: string }[]
+): { [key: string]: { createdAt: string }[] } => {
   if (!Array.isArray(orders) || orders.length === 0) {
     return {};
   }
@@ -150,3 +179,19 @@ export const groupOrdersByMonth = (orders: { createdAt: string }[]): { [key: str
 
   return sortedGroupedOrders;
 };
+
+export function generate3Digit(): string {
+  const codeUnique = getSessionStorage('code-unique'); // konsisten penamaan key
+
+  if (!codeUnique) {
+    // Random 0..999 lalu pad depan dengan 0 sampai panjang 3
+    const num = Math.floor(Math.random() * 1000); // 0..999
+    const code = String(num).padStart(3, '0');
+
+    setSessionStorage('code-unique', code); // simpan dalam bentuk string
+    return code;
+  }
+
+  // kalau sudah ada di sessionStorage → kembalikan existing value
+  return String(codeUnique);
+}

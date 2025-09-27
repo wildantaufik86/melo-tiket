@@ -19,3 +19,20 @@ export interface ITicket {
   templateImage: string;
   templateLayout: string;
 }
+
+export interface TicketProps {
+  tickets: ITicket[];
+  eventId: string;
+}
+
+export interface TicketWithState extends ITicket {
+  quantity: number;
+  isOpen: boolean;
+}
+
+export interface TicketCardProps {
+  ticket: ITicket & TicketWithState;
+  toggleOpen?: () => void;
+  incrementQty?: () => void;
+  decrementQty?: () => void;
+}
