@@ -11,7 +11,7 @@ interface TicketListProps {
 
 export default function TicketList({ tickets, onEdit, onDelete }: TicketListProps) { // DITAMBAHKAN props
     return (
-        <div className="p-6 rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6 rounded-lg border border-gray-200 shadow-2xl">
             <h2 className="text-lg font-bold mb-4">Existing Tickets</h2>
             {tickets.length === 0 ? (
                 <p>No tickets found for this event.</p>
@@ -29,7 +29,7 @@ export default function TicketList({ tickets, onEdit, onDelete }: TicketListProp
                         </thead>
                         <tbody>
                             {tickets.map(ticket => (
-                                <tr key={ticket._id} className="border-b">
+                                <tr key={ticket._id} className="border-b border-gray-200 duration-500 hover:bg-gray-50">
                                     <td className="p-2">{ticket.name}</td>
                                     <td className="p-2">{ticket.category.name}</td>
                                     <td className="p-2 text-right">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(ticket.price)}</td>

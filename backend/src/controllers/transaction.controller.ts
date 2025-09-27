@@ -108,7 +108,7 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
     }
 
     // ✅ Validate payment proof only for pending transactions
-    const requiresPaymentProof = transactionMethod !== 'On The Site';
+    const requiresPaymentProof = transactionMethod !== 'OnSite';
     if (requiresPaymentProof) {
       appAssert(req.file, BAD_REQUEST, "You have to upload payment proof for this payment method");
     }
@@ -130,8 +130,8 @@ export const createTransactionHandler: RequestHandler = async (req, res, next) =
       tickets: formattedTickets,
       totalTicket,
       totalPrice,
-      paymentProof: paymentProofPath, // Will be null for 'On The Site' transactions
-      status: transactionMethod === 'On The Site' ? 'paid' : 'pending',
+      paymentProof: paymentProofPath,
+      status: transactionMethod === 'Onsite' ? 'paid' : 'pending',
       transactionMethod,
       expiredAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     });

@@ -298,3 +298,24 @@ export const softDeleteUserHandler: RequestHandler = async (req, res, next) => {
     session.endSession();
   }
 };
+
+export const searchUsersHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const query = req.query.q as string || '';
+
+    const users = await UserModel.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },
+        { email: { $regex: query, $options: 'i' } }
+      ],
+      deletedAt: null
+    }).select('_id name email').limit(10);
+
+    res.status(OK).json({
+      message: "Users found successfully",
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

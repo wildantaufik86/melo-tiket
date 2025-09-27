@@ -18,6 +18,7 @@ import path from "path";
 import templateRoutes from "./routes/template.route";
 import validateRole from "./middleware/validateRole";
 import authenticate from "./middleware/authenticate";
+import summaryRoutes from "./routes/summary.routes";
 
 
 const allowedOrigins = [
@@ -71,9 +72,10 @@ app.use("/profile", express.json(), express.urlencoded({ extended: true }), prof
 app.use("/categories", express.json(), express.urlencoded({ extended: true }), categoryRoutes);
 app.use("/auth", express.json(), express.urlencoded({ extended: true }), authRoutes);
 app.use("/user", express.json(), express.urlencoded({ extended: true }), userRoutes);
+app.use("/dashboard", express.json(), express.urlencoded({ extended: true }), summaryRoutes);
 app.use("/template", express.json(), express.urlencoded({ extended: true }), templateRoutes);
 app.use("/public", express.static(path.resolve("./public")));
-app.use("/uploads", authenticate, validateRole("admin", "superadmin", "user"), express.static(path.resolve("./uploads")));
+app.use("/uploads", authenticate, validateRole("admin", "superadmin"), express.static(path.resolve("./uploads")));
 
 app.use(errorHandler);
 

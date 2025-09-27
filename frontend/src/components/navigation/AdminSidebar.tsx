@@ -2,7 +2,7 @@
 
 import { logout } from '@/app/actions/auth';
 import { useAuth } from '@/context/authUserContext';
-import { CallBellIcon, ChalkboardTeacher, Folders, Gauge, House, HouseIcon, TicketIcon, VideoConferenceIcon } from '@phosphor-icons/react/dist/ssr';
+import { CallBellIcon, ChalkboardTeacher, Folders, Gauge, House, HouseIcon, TicketIcon, UserIcon, VideoConferenceIcon } from '@phosphor-icons/react/dist/ssr';
 import { ChevronDown, ChevronUp, LogOut, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ export default function AdminSidebar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [productsManagementOpen, setProductManagementOpen] = useState(false);
   const [eventsManagementOpen, setEventManagementOpen] = useState(false);
+  const [transactionOpen, setTransactionOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const authUser = useAuth();
@@ -141,7 +142,43 @@ export default function AdminSidebar() {
               </Link>
             </div>
 
+            <li
+              onClick={() => setTransactionOpen(!transactionOpen)}
+              className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between">
+              <div className='flex items-center'>
+                  <TicketIcon size={24} className='text-black/75 mr-2' weight="light" />
+                  <span>Transaction Managements{' '}</span>
+              </div>
+              <span className="duration-200">
+                {transactionOpen ? <ChevronUp /> : <ChevronDown />}
+              </span>
+            </li>
+            <div className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${transactionOpen ? 'max-h-96' : 'max-h-0'}`}>
+              <Link href={'/admin/transactions'} className={`${ pathname.startsWith('/admin/transactions') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+                Transaction
+              </Link>
+              <Link href={'/admin/transactions/new'} className={`${ pathname.startsWith('/admin/transaction/new') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+                Create Transaction
+              </Link>
+            </div>
+
             <li>
+              <Link
+                href={'/admin/user-management'} className={`${
+                  pathname.startsWith('/admin/user-management')
+                    ? 'bg-bg-secondary'
+                    : 'bg-white'
+                } block text-sm font-semibold py-2 px-4 rounded text-primary
+                    hover:bg-[#EFF6FF] hover:text-black/75`}
+              >
+                <div className='flex items-center'>
+                  <UserIcon size={24} className='text-black/75 mr-2' weight="light" />
+                  <span>User</span>
+                </div>
+              </Link>
+            </li>
+
+            {/* <li>
               <Link
                 href={'/admin/about'}
                 className={`${
@@ -188,7 +225,7 @@ export default function AdminSidebar() {
                   <span>Services</span>
                 </div>
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
 
