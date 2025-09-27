@@ -21,7 +21,9 @@ export default function TicketPage() {
 
   const incrementQty = (id?: string) => {
     setOrdersTicket((prev) =>
-      prev.map((t) => (t._id === id ? { ...t, quantity: t.quantity + 1 } : t))
+      prev.map((t) =>
+        t._id === id && t.quantity < 4 ? { ...t, quantity: t.quantity + 1 } : t
+      )
     );
   };
 
