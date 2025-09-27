@@ -168,9 +168,7 @@ export default function CheckoutSection({
               </span>
             </p>
             <div
-              className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all ${
-                ticket.isOpen ? 'scale-y-100 flex ' : 'scale-y-0 hidden'
-              }`}
+              className={`mt-4 bg-white text-black justify-between items-center py-2 px-4 rounded-sm  transition-all scale-y-100 flex`}
             >
               <p className="flex flex-col font-bold lg:text-xl">
                 {ticket.category.name}{' '}
