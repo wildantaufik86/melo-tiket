@@ -52,7 +52,7 @@ export default function AlertModal({ isOpen, onClose, text }: AlertModalProps) {
                 Cancel
               </button>
               <button
-                onClick={() => router.push('/user/profile')}
+                onClick={() => router.replace('/user/profile')}
                 className="px-4 py-2 rounded-lg bg-primary text-white hover:bg-hover cursor-pointer transition"
               >
                 Profile
