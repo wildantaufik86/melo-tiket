@@ -51,9 +51,11 @@ export default function TicketSection() {
 
   useEffect(() => {
     if (event && event.tickets) {
-      const filteredTicket: Orders[] = event.tickets
-        .filter((tc) => tc.status === 'Available')
-        .map((tc) => ({ ...tc, quantity: 0, isOpen: false }));
+      const filteredTicket: Orders[] = event.tickets.map((tc) => ({
+        ...tc,
+        quantity: 0,
+        isOpen: false,
+      }));
       setAvailableTickets(filteredTicket);
     }
   }, [event]);
