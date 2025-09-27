@@ -120,7 +120,7 @@ export default function MainNavbar() {
                 LOG OUT
               </button>
               <Link
-                href="/auth/login"
+                href="/user/profile"
                 className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
                 PROFILE

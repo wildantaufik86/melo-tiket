@@ -1,4 +1,4 @@
-import { IUser } from "./User";
+import { IUser } from './User';
 
 export interface IPurchasedTicket {
   _id?: string;
@@ -14,8 +14,8 @@ export interface ITransaction extends Document {
   tickets: IPurchasedTicket[];
   totalTicket: number;
   totalPrice: number;
-  status: "expired" | "reject" | "pending" | "paid";
-  transactionMethod: "Online" | "Onsite";
+  status: 'expired' | 'reject' | 'pending' | 'paid';
+  transactionMethod: 'Online' | 'Onsite';
   expiredAt: string;
   paymentProof?: string;
   verifiedBy?: string;
@@ -25,8 +25,8 @@ export interface ITransaction extends Document {
 }
 
 export interface IPaginationInfo {
-    currentPage: number;
-    totalPages: number;
-    totalTransactions: number;
-    limit: number;
+  currentPage: number;
+  totalPages: number;
+  totalTransactions: number;
+  limit: number;
 }
