@@ -5,10 +5,12 @@ import TicketCard from '@/components/fragments/card/TicketCard';
 import Label from '@/components/fragments/label/Label';
 import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { IEvent } from '@/types/Event';
-import { ITicket } from '@/types/Ticket';
-import { useCallback, useEffect, useState } from 'react';
-import localFont from 'next/font/local';
 import { Orders, useOrder } from '@/context/ordersContext';
+import { useCallback, useEffect, useState } from 'react';
+
+// import swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
 
 export default function TicketSection() {
   const [event, setEvent] = useState<IEvent | null>(null);
@@ -65,18 +67,28 @@ export default function TicketSection() {
       </h2>
 
       <Label text="GET YOUR TICKET NOW" />
+
       <div className="absolute inset-0 top-15 mt-32">
         <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
-          <div className="grid grid-cols-2 gap-4 w-full pd-lr mt-[25%] place-items-center md:gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 lg:gap-8  lg:mt-0">
-            {availableTickets.length > 0 &&
-              availableTickets.map((tc) => (
-                <TicketCard
-                  key={tc._id}
-                  ticket={tc}
-                  handleOrder={handleOrder}
-                  idEvent={event?._id}
-                />
-              ))}
+          <div className="w-full px-4 lg:px-12 mt-[25%] lg:mt-0">
+            <Swiper
+              spaceBetween={20}
+              breakpoints={{
+                320: { slidesPerView: 3 }, // mobile: 3
+                1024: { slidesPerView: 5 }, // laptop: 5
+              }}
+            >
+              {availableTickets.length > 0 &&
+                availableTickets.map((tc) => (
+                  <SwiperSlide key={tc._id}>
+                    <TicketCard
+                      ticket={tc}
+                      handleOrder={handleOrder}
+                      idEvent={event?._id}
+                    />
+                  </SwiperSlide>
+                ))}
+            </Swiper>
           </div>
         </div>
       </div>
