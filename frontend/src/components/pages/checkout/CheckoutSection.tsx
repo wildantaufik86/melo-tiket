@@ -5,7 +5,9 @@ import {
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
 import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
+import AlertModal from '@/components/fragments/modal/AlertModal';
 import SuccessModal from '@/components/fragments/modal/SuccessModal';
+import { useAuth } from '@/context/authUserContext';
 import { Orders, useOrder } from '@/context/ordersContext';
 import {
   ToastError,
@@ -34,8 +36,12 @@ export default function CheckoutSection({
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [availableTickets, setAvailableTickets] = useState<Orders[] | []>([]);
   const { saveOrders } = useOrder();
+  const { authUser } = useAuth();
   const router = useRouter();
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
+  const [openModalAlert, setOpenModalAlert] = useState(false);
+
+  console.log(authUser);
 
   const subTotal = listOrder?.reduce(
     (acc, data) => acc + data.price * data.quantity,
@@ -55,8 +61,12 @@ export default function CheckoutSection({
   };
 
   const handleCreateTransaction = async () => {
-    // remove comment when want use it
     try {
+      if (authUser?.idNumber === null) {
+        setOpenModalAlert(true);
+        return;
+      }
+
       if (payload && payload?.tickets.length === 0) {
         ToastError('Please orders ticket first');
         return;
@@ -220,6 +230,12 @@ export default function CheckoutSection({
       <SuccessModal
         isOpen={openModalSuccess}
         onClose={() => setOpenModalSuccess(false)}
+      />
+
+      <AlertModal
+        isOpen={openModalAlert}
+        onClose={() => setOpenModalAlert(false)}
+        text="anda belum mengisi NIK, silahkan lengkapi data di profil"
       />
     </section>
   );
