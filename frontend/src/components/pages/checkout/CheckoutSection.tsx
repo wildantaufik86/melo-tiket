@@ -62,8 +62,6 @@ export default function CheckoutSection({
     return deleteLocalStorage('order');
   };
 
-  console.log('payload', payload);
-
   const handleCreateTransaction = async () => {
     try {
       if (authUser?.idNumber === null) {
@@ -72,12 +70,12 @@ export default function CheckoutSection({
       }
 
       if (payload && payload?.tickets.length === 0) {
-        ToastError('Please orders ticket first');
+        ToastError('Silahkan pesan tiket terlebih dahulu');
         return;
       }
 
       if (payload && !payload?.paymentProof) {
-        ToastError('Please upload proof of payment');
+        ToastError('Tolong unggah bukti pembayaran');
         return;
       }
 
