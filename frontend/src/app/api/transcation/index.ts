@@ -9,6 +9,7 @@ export interface ICreateTransactionPayload {
   transactionMethod: 'Online' | 'Onsite';
   userId?: string;
   paymentProof: File | null;
+  totalPrice: number;
 }
 
 export interface IVerifyTransactionPayload {
