@@ -57,8 +57,7 @@ export const getEventByIdHandler: RequestHandler = async (req, res, next) => {
     appAssert(event, NOT_FOUND, "Event not found");
 
     const availableTickets = await TicketModel.find({
-      eventId: eventId,
-      status: TicketStatus.AVAILABLE,
+      eventId: eventId
     }).populate('category', 'name slug');
 
     res.status(OK).json({

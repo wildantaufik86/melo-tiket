@@ -2,6 +2,7 @@ import { ICategory } from "@/types/Category";
 import { PlusIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { useEffect, useState } from "react";
 import InputContainer from "@/components/fragments/inputContainer/InputContainer"; // Pastikan path ini benar
+import { ToastError } from "@/lib/validations/toast/ToastNofication";
 
 interface CategoryFormProps {
   editingCategory: ICategory | null;
@@ -30,7 +31,7 @@ export default function CategoryForm({ editingCategory, onSave, onCancel, isSavi
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !slug) {
-        alert("Nama Kategori dan Slug tidak boleh kosong.");
+        ToastError("Nama Kategori dan Slug tidak boleh kosong.");
         return;
     }
     onSave({ name, slug, description });

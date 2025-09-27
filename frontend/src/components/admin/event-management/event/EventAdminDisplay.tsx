@@ -58,7 +58,7 @@ export default function AdminEventDisplay() {
     <section>
       <BreadCrumb items={breadcrumbItems} />
       <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200 flex justify-center items-center">
-        <div className="w-full max-w-2xl">
+        <div className="w-full">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-xl font-extrabold text-gray-900">Event Management</h1>
             <Link href="/admin/event-management/event/new" className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 flex items-center gap-2">

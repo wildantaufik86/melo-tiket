@@ -58,7 +58,7 @@ export default function TicketAdminDisplay() {
     <section>
       <BreadCrumb items={breadcrumbItems} />
       <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200 flex justify-center items-center">
-        <div className="w-full max-w-2xl">
+        <div className="w-full">
           {message && <p className="mb-4 text-center p-2 bg-gray-100 rounded-md">{message}</p>}
 
           <div className="overflow-x-auto">

@@ -14,6 +14,7 @@ import TicketList from '@/components/admin/event-management/ticket/TicketList';
 import { TicketIcon } from '@phosphor-icons/react';
 import BreadCrumb, { BreadCrumbItem } from '@/components/navigation/BreadCrumb';
 import { fetchAllTicket } from '@/app/api/ticket';
+import { ToastError, ToastSuccess } from '@/lib/validations/toast/ToastNofication';
 
 
 interface TicketsForEventPageProps {
@@ -102,11 +103,11 @@ useEffect(() => {
         }
 
         if (result.status === 'success') {
-            alert('Data tiket berhasil disimpan!');
+            ToastSuccess('Data tiket berhasil disimpan!');
             loadInitialData(); // Muat ulang data
             setEditingTicket(null); // Keluar dari mode edit
         } else {
-            alert(`Error: ${result.message}`);
+            ToastError(`Error: ${result.message}`);
         }
     };
 

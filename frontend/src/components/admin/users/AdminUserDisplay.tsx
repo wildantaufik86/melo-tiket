@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import UserList from './UserList';
 import Pagination from '@/components/fragments/Pagination';
 import UserFormModal from './UserFormModal';
+import { ToastError, ToastSuccess } from '@/lib/validations/toast/ToastNofication';
 
 export default function AdminUserDisplay() {
     const [users, setUsers] = useState<IUser[]>([]);
@@ -62,11 +63,11 @@ export default function AdminUserDisplay() {
         }
 
         if (result.status === 'success') {
-            alert(`User successfully ${editingUser ? 'updated' : 'created'}!`);
+            ToastSuccess(`User successfully ${editingUser ? 'updated' : 'created'}!`);
             handleCloseModal();
             loadUsers(); // Refresh data
         } else {
-            alert(`Error: ${result.message}`);
+            ToastError(`Error: ${result.message}`);
         }
     };
 
@@ -75,10 +76,10 @@ export default function AdminUserDisplay() {
 
         const result = await softDeleteUser(userId);
         if (result.status === 'success') {
-            alert(result.message);
+            ToastSuccess(result.message);
             loadUsers(); // Refresh data
         } else {
-            alert(`Error: ${result.message}`);
+            ToastError(`Error: ${result.message}`);
         }
     };
 

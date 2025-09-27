@@ -2,7 +2,7 @@
 
 import { createTemplate, fetchAllTemplates } from "@/app/api/template";
 import BreadCrumb, { BreadCrumbItem } from "@/components/navigation/BreadCrumb";
-import { ToastAlert, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
+import { ToastAlert, ToastError, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 import { ITicketTemplate } from "@/types/Template";
 import { TicketIcon } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ export default function TemplateAdminPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!name || !imageFile) {
-            alert('Template name and image are required.');
+            ToastError('Template name and image are required.');
             return;
         }
 
@@ -49,7 +49,7 @@ export default function TemplateAdminPage() {
             setImageFile(null);
             loadTemplates(); // Refresh list
         } else {
-            alert(`Error: ${result.message}`);
+            ToastError(`Error: ${result.message}`);
         }
     };
 

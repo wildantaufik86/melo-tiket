@@ -6,6 +6,7 @@ import { ITicketPayload } from "@/app/api/event";
 import { TicketStatus } from "@/types/Ticket";
 import { ITicketTemplate } from "@/types/Template";
 import { ITicket } from "@/types/Ticket"; // DITAMBAHKAN
+import { ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 
 interface TicketFormProps {
     categories: ICategory[];
@@ -74,7 +75,7 @@ export default function TicketForm({ categories, templates, onSave, editingTicke
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!formData.category || !formData.templateImage) {
-            alert('Harap pilih kategori dan template.');
+            ToastSuccess('Harap pilih kategori dan template.');
             return;
         }
         // Kirim ID tiket jika dalam mode edit
@@ -114,6 +115,21 @@ export default function TicketForm({ categories, templates, onSave, editingTicke
                 <label>Stock</label>
                 <input name="stock" type="number" value={formData.stock} onChange={handleChange} placeholder="Stock" className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required />
               </div>
+              <div>
+              <label>Status</label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1.5 rounded-sm w-full"
+                required
+              >
+                <option value={TicketStatus.AVAILABLE}>Available</option>
+                <option value={TicketStatus.UNAVAILABLE}>Unavailable</option>
+                <option value={TicketStatus.SOLD_OUT}>Sold Out</option>
+              </select>
+            </div>
+
               <div>
                 <label>Ticket Template</label>
                 <select value={selectedTemplateId} onChange={handleTemplateChange} className="focus:outline-none text-sm bg-gray-50 border border-black/30 px-2 py-1 rounded-sm w-full" required>

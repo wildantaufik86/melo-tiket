@@ -1,6 +1,6 @@
 'use client'
 
-import { ITicket } from "@/types/Ticket";
+import { ITicket, TicketStatus } from "@/types/Ticket";
 import { PencilIcon, TrashIcon } from "@phosphor-icons/react";
 
 interface TicketListProps {
@@ -24,6 +24,7 @@ export default function TicketList({ tickets, onEdit, onDelete }: TicketListProp
                                 <th className="p-2 text-left">Category</th>
                                 <th className="p-2 text-right">Price</th>
                                 <th className="p-2 text-right">Stock</th>
+                                <th className="p-2 text-center">Status</th>
                                 <th className="p-2 text-center">Actions</th>
                             </tr>
                         </thead>
@@ -34,6 +35,15 @@ export default function TicketList({ tickets, onEdit, onDelete }: TicketListProp
                                     <td className="p-2">{ticket.category.name}</td>
                                     <td className="p-2 text-right">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(ticket.price)}</td>
                                     <td className="p-2 text-right">{ticket.stock}</td>
+                                    <td className="p-2 text-center">
+                                      <span className={`px-2 py-1 text-xs rounded-full
+                                        ${ticket.status === TicketStatus.AVAILABLE ? 'bg-green-200 text-green-800' :
+                                          ticket.status === TicketStatus.UNAVAILABLE ? 'bg-yellow-200 text-yellow-800' :
+                                          'bg-red-200 text-red-800'}
+                                      `}>
+                                        {ticket.status}
+                                      </span>
+                                    </td>
                                     <td className="p-2">
                                         <div className="flex justify-center gap-2">
                                             {/* DIUBAH: Tambahkan onClick untuk memanggil props */}
