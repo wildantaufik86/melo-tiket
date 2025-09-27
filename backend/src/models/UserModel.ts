@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema(
       enum: ["user", "admin", "superadmin"],
       default: "user",
     },
-    idNumber: { type: Number, required: true },
+    idNumber: { type: Number },
     profile: {
       picture: { type: String, default: "" },
       phoneNumber: { type: String, default: "" },

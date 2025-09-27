@@ -8,13 +8,20 @@ const objectIdRegex = /^[0-9a-fA-F]{24}$/;
 const emailSchema = z.string().email().min(1).max(255);
 const nameSchema = z.string().min(4).max(255);
 const passwordSchema = z.string().min(6).max(255);
+const idNumberSchema = z.preprocess(
+  (arg) => arg ? Number(arg) : undefined,
+  z.number()
+    .int("ID Number must be an integer")
+    .min(1000000000000000, "ID Number must be exactly 16 digits") // 16 digit minimum
+    .max(9999999999999999, "ID Number must be exactly 16 digits") // 16 digit maximum
+    .optional()
+);
 const profileSchema = z.object({
   picture: z.string(),
   fullname: z.string(),
   phoneNumber: z.string().regex(phoneRegex, "Invalid phone number"),
   gender: z.string(),
   dateOfBirth: z.string(),
-  idNumber: z.number(),
   address: z.object({
     street: z.string().optional(),
     village: z.string().optional(),
@@ -55,8 +62,8 @@ export const registerSchema = loginSchema
   .extend({
     confirmPassword: z.string().min(6).max(255),
     name: nameSchema,
+    idNumber: idNumberSchema,
     profile: profileSchema.omit({ fullname: true }),
-    idNumber: z.number().min(16).max(16),
     role: roleSchema,
     historyTransaction: z.array(transactionSchema).optional()
   })
@@ -67,6 +74,7 @@ export const registerSchema = loginSchema
   .transform((data) => ({
     ...data,
     name: data.name || "",
+    idNumber: data.idNumber || undefined,
     profile: {
       ...data.profile,
       fullname: data.name
