@@ -54,8 +54,6 @@ export default function ProfilePage() {
     pdf.save('e-ticket.pdf');
   };
 
-  console.log('history event', historyEvent);
-
   const fetchProfil = async () => {
     try {
       const response = await getMyProfile();
@@ -70,8 +68,6 @@ export default function ProfilePage() {
   useEffect(() => {
     fetchProfil();
   }, []);
-
-  console.log(historyEvent);
 
   return (
     <div className="flex flex-col pt-24 pd-full">
