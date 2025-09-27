@@ -23,7 +23,7 @@ export interface IHistoryByEvent {
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [historyEvent, setHistoryEvent] = useState<IHistoryByEvent[]>([]);
-
+  const lastHistory = historyEvent[historyEvent.length - 1];
   const handleDownload = async () => {
     if (!ticketRef.current) return;
 
@@ -85,42 +85,48 @@ export default function ProfilePage() {
         <div className="w-full md:w-1/2">
           <Label text="E TIKET" />
         </div>
-        <div className="border border-white mt-4 p-4">
-          <p className="text-xs flex items-center gap-2 md:text-sm lg:text-base">
-            <FaCircleInfo />
-            Kamu tidak memiliki ticket online
-          </p>
-        </div>
-        {/* <div
-          ref={ticketRef}
-          className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
-        >
-          <div className="relative w-full aspect-4/2">
-            <Image
-              src="/images/example-ticket.jpg"
-              alt="E ticket"
-              fill
-              className="object-contain"
-            />
-          </div>
-          <div className="flex items-center gap-8">
-            <p className="text-xs font-normal md:text-sm lg:text-lg">
-              E-Ticket
+
+        {lastHistory?.transactions.length <= 0 && (
+          <div className="border border-white mt-4 p-4">
+            <p className="text-xs flex items-center gap-2 md:text-sm lg:text-base">
+              <FaCircleInfo />
+              Kamu tidak memiliki ticket online
             </p>
-            <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
-              <button className="text-primary cursor-pointer hover:underline duration-200">
-                view
-              </button>
-              <span> | </span>
-              <button
-                onClick={handleDownload}
-                className="cursor-pointer hover:underline duration-200"
-              >
-                download
-              </button>
+          </div>
+        )}
+
+        {lastHistory?.transactions.length > 0 && (
+          <div
+            ref={ticketRef}
+            className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
+          >
+            <div className="relative w-full aspect-4/2">
+              <Image
+                src="/images/example-ticket.jpg"
+                alt="E ticket"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="flex items-center gap-8">
+              <p className="text-xs font-normal md:text-sm lg:text-lg">
+                E-Ticket
+              </p>
+              <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
+                <button className="text-primary cursor-pointer hover:underline duration-200">
+                  view
+                </button>
+                <span> | </span>
+                <button
+                  onClick={handleDownload}
+                  className="cursor-pointer hover:underline duration-200"
+                >
+                  download
+                </button>
+              </div>
             </div>
           </div>
-        </div> */}
+        )}
       </div>
     </div>
   );
