@@ -53,15 +53,15 @@ export const parseDateOfBirth = (
     return { day: '', month: '', year: '' };
   }
 
-  const [day, month, year] = dob.split('/');
+  const [year, month, day] = dob.split('-');
 
   // Buat Date object (tambah "20" untuk tahun 2 digit)
-  const date = new Date(`20${year}-${month}-${day}`);
+  const date = new Date(`${year}-${month}-${day}`);
 
   return {
     day,
     month: date.toLocaleString(locale, { month: 'long' }),
-    year: `20${year}`,
+    year: `${year}`,
   };
 };
 
