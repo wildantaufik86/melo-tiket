@@ -4,6 +4,7 @@ export interface UserDocument extends mongoose.Document {
   email: string;
   name: string;
   idNumber: number;
+  idNumberChangeCount: number,
   profile?: {
     picture: string;
     phoneNumber: string;

@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
     idNumber: { type: Number },
+    idNumberChangeCount: { type: Number, default: 0 },
     profile: {
       picture: { type: String, default: "" },
       phoneNumber: { type: String, default: "" },

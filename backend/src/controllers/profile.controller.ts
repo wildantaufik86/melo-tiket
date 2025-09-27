@@ -7,18 +7,58 @@ export const getMyProfileHandler: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?._id;
     if (!userId) {
-      return res.status(401).json({ message: "Authentication required" });
+      return res.status(UNAUTHORIZED).json({ message: "Authentication required" });
     }
 
-    const user = await UserModel.findById(userId).populate('historyTransaction');
+    const user = await UserModel.findById(userId).populate({
+      path: "historyTransaction",
+      options: { sort: { createdAt: -1 } },
+      populate: {
+        path: "tickets.ticketId",
+        model: "Ticket",
+        select: "category price eventId",
+        populate: {
+          path: "eventId",
+          model: "Event",
+          select: "eventName date address headlineImage",
+        },
+      },
+    });
 
     if (!user) {
       return res.status(NOT_FOUND).json({ message: "User not found" });
     }
 
-    res.status(OK).json({
+    const eventsMap = new Map<string, any>();
+
+    user.historyTransaction?.forEach((transaction) => {
+      const populatedTransaction = transaction as any;
+      const event = populatedTransaction.tickets[0]?.ticketId?.eventId;
+
+      if (!event) return;
+      const eventId = event._id.toString();
+
+      if (!eventsMap.has(eventId)) {
+        eventsMap.set(eventId, {
+          ...(event as any).toObject(),
+          transactions: [],
+        });
+      }
+
+      eventsMap.get(eventId)?.transactions.push(populatedTransaction);
+    });
+
+    const historyByEvent = Array.from(eventsMap.values());
+
+    const userData = user.omitPassword();
+    const { historyTransaction, ...finalUserData } = userData;
+
+    return res.status(OK).json({
       message: "User profile retrieved successfully",
-      data: user.omitPassword(),
+      data: {
+        user: finalUserData,
+        historyByEvent,
+      },
     });
   } catch (error) {
     next(error);
@@ -28,23 +68,41 @@ export const getMyProfileHandler: RequestHandler = async (req, res, next) => {
 export const updateMyProfileHandler: RequestHandler = async (req, res, next) => {
   try {
     const userId = req.user?._id;
-    const { name, profile} = req.body;
+    const { idNumber } = req.body;
 
-    const allowedUpdate = { name, profile };
-
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      userId,
-      { $set: allowedUpdate }, // '$set' hanya akan update field yang ada di 'updateData'
-      { new: true, runValidators: true } // 'new: true' mengembalikan dokumen setelah di-update
-    );
-
-    if (!updatedUser) {
-      return res.status(NOT_FOUND).json({ message: "User profile not found" });
+    if (!userId) {
+      return res.status(UNAUTHORIZED).json({ message: "Authentication required" });
     }
 
-    res.status(OK).json({
-      message: "Profile updated successfully",
-      data: updatedUser.omitPassword(),
+    const user = await UserModel.findById(userId);
+    if (!user) {
+      return res.status(NOT_FOUND).json({ message: "User not found" });
+    }
+
+    // Pastikan field counter ada di schema user
+    if (!user.idNumberChangeCount) {
+      user.idNumberChangeCount = 0;
+    }
+
+    if (user.idNumberChangeCount >= 2) {
+      return res.status(BAD_REQUEST).json({
+        message: "You have reached the maximum of 2 changes for ID Number",
+      });
+    }
+
+    if (!idNumber) {
+      return res.status(BAD_REQUEST).json({
+        message: "idNumber is required",
+      });
+    }
+
+    user.idNumber = idNumber;
+    user.idNumberChangeCount += 1;
+    await user.save();
+
+    return res.status(OK).json({
+      message: "ID Number updated successfully",
+      data: user.omitPassword(),
     });
   } catch (error) {
     res.status(INTERNAL_SERVER_ERROR).json({
@@ -54,44 +112,48 @@ export const updateMyProfileHandler: RequestHandler = async (req, res, next) => 
   }
 };
 
-export const changeMyPasswordHandler: RequestHandler = async (req, res, next) => {
+export const forgotPasswordHandler: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user?.email;
-    const { email, currentPassword, newPassword, newPasswordConfirmation } = req.body;
+    const { email, idNumber, newPassword, newPasswordConfirmation } = req.body || {};
+    const parsedIdNumber = idNumber ? Number(idNumber): undefined;
 
-    if(!email || !currentPassword || !newPassword || !newPasswordConfirmation) {
+    if (!email || !newPassword || !newPasswordConfirmation) {
       return res.status(BAD_REQUEST).json({
-        message: "All fields are required",
-      })
+        message: "Email, new password and confirmation are required",
+      });
     }
-    if(newPassword !== newPasswordConfirmation) {
+
+    if (newPassword !== newPasswordConfirmation) {
       return res.status(BAD_REQUEST).json({
         message: "New Password and confirmation do not match",
-      })
-    }
-    // if(newPassword.length > 6) {
-    //   return res.status(BAD_REQUEST).json({
-    //     message: "Password must be at least 8 characters",
-    //   })
-    // }
-
-    const user = await UserModel.findById(userId);
-    if(!user) {
-     return res.status(NOT_FOUND).json({
-        message: "User not found"
-      })
+      });
     }
 
-    const isPasswordCorrect = await user?.comparePassword(currentPassword);
-    if (!isPasswordCorrect) {
-     return res.status(UNAUTHORIZED).json({ message: "Incorrect current password" });
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(NOT_FOUND).json({ message: "User not found" });
     }
 
+    // Kalau user punya idNumber → wajib cocok
+    if (user.idNumber && user.idNumber !== parsedIdNumber) {
+      return res.status(UNAUTHORIZED).json({
+        message: "ID Number does not match our records",
+      });
+    }
+
+    // Kalau user.idNumber ada tapi request kosong
+    if (user.idNumber && !idNumber) {
+      return res.status(BAD_REQUEST).json({
+        message: "ID Number is required for this account",
+      });
+    }
+
+    // Update password
     user.password = newPassword;
     await user.save();
 
-   return res.status(OK).json({ message: "Password changed successfully" });
+    return res.status(OK).json({ message: "Password reset successfully" });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
