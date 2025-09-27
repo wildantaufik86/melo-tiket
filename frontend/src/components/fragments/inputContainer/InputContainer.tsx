@@ -3,7 +3,7 @@ import React from "react";
 interface InputContainerProps {
   type: string;
   name: string;
-  value?: string;
+  value?: string | number;
   placeholder?: string;
   setValue?: (value: string) => void;
   setFile?: (file: File | null) => void;

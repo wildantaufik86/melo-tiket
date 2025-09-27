@@ -60,18 +60,7 @@ export default function AuthForm({
                 Click Here
               </Link>
             </p>
-          ) : (
-            <p className="text-xs">
-              Already have an account?
-              <Link
-                href="/auth/login"
-                className="font-bold cursor-pointer hover:underline hover:decoration-solid"
-              >
-                {' '}
-                Sign In
-              </Link>
-            </p>
-          )}
+          ) : (<></>)}
         </div>
 
         {isSuccess && !error && (

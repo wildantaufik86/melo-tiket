@@ -123,3 +123,32 @@ export async function logout(): Promise<ServerActionResponse> {
     return { error: true, status: 'error', message: error.message || 'An unexpected error occurred during logout' };
   }
 }
+
+
+
+export async function changePassword(data: {
+  email: string;
+  idNumber: number;
+  currentPassword?: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+}) {
+  try {
+    const res = await fetch(`${BASE_URL}/profile/forgot-password`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await res.json();
+    if (!res.ok) {
+      return { error: true, message: result.message || 'Failed to update password' };
+    }
+
+    return { error: false, data: result };
+  } catch (err: any) {
+    return { error: true, message: err.message || 'Unexpected error occurred' };
+  }
+}
