@@ -26,7 +26,7 @@ export default function TicketCard({
     >
       <div className="flex flex-col items-center gap-4">
         <h3
-          className={`font-black text-xl text-wrap w-full text-center sm:text-4xl lg:text-5xl ${brotherFont.className}`}
+          className={`font-black text-2xl text-wrap w-[90%] text-center sm:text-4xl lg:text-5xl ${brotherFont.className}`}
         >
           {ticket.name || ''}
         </h3>
