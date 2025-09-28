@@ -27,6 +27,8 @@ const allowedOrigins = [
   "http://localhost:4173",
   "http://localhost:5000",
   "http://localhost:3000",
+  "http://145.79.10.209:5000",
+  "http://145.79.10.209",
 
   // Production - sesuai dengan server_name di Nginx
   "http://melophilefestival.com",
