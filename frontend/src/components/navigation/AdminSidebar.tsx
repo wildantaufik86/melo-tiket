@@ -113,6 +113,7 @@ export default function AdminSidebar() {
 
           {/* Sidebar Navigation Links */}
           <ul className="space-y-2 mt-6">
+            {authUser?.authUser?.role === 'superadmin' && (
             <li>
               <Link
                 href={'/admin'}
@@ -131,6 +132,7 @@ export default function AdminSidebar() {
                 </div>
               </Link>
             </li>
+            )}
             {authUser?.authUser?.role === 'superadmin' && (
               <li
                 onClick={() => setEventManagementOpen(!eventsManagementOpen)}
