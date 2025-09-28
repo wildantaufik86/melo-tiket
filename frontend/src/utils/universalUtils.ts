@@ -200,14 +200,68 @@ export function generate3Digit(): string {
   return String(codeUnique);
 }
 
+// Helper function untuk preload image dengan authentication
+const preloadImageWithAuth = async (src: string): Promise<string> => {
+  try {
+    const response = await fetch(src, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch image: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  } catch (error) {
+    console.error('Error preloading image:', error);
+    // Return placeholder image sebagai fallback
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0PC90ZXh0Pjwvc3ZnPg==';
+  }
+};
+
 export const handleFallbackDownload = async (
   ticketRef: RefObject<HTMLDivElement | null>
 ): Promise<void> => {
   if (!ticketRef.current) return;
 
+  let blobUrls: string[] = []; // Untuk cleanup nanti
+
   try {
     // Clone element dan bersihkan style yang bermasalah
     const clone = ticketRef.current.cloneNode(true) as HTMLElement;
+
+    // Preload semua images dengan authentication SEBELUM membuat DOM
+    const images = clone.querySelectorAll('img');
+    const imagePreloadPromises: Promise<void>[] = [];
+
+    images.forEach((img) => {
+      if (
+        img.src &&
+        (img.src.includes('localhost:5000') || img.src.includes('uploads'))
+      ) {
+        const promise = preloadImageWithAuth(img.src)
+          .then((blobUrl) => {
+            blobUrls.push(blobUrl); // Store untuk cleanup
+            img.src = blobUrl; // Replace dengan authenticated blob URL
+            img.crossOrigin = 'anonymous'; // Set crossOrigin
+          })
+          .catch((error) => {
+            console.error('Failed to preload image:', error);
+            // Set placeholder jika gagal load
+            img.src =
+              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0IEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+          });
+        imagePreloadPromises.push(promise);
+      }
+    });
+
+    // Wait untuk semua images selesai diload
+    await Promise.allSettled(imagePreloadPromises);
+
+    // Tambahkan delay kecil untuk memastikan images fully loaded
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Buat container sementara dengan ukuran yang lebih optimal
     const tempContainer = document.createElement('div');
@@ -215,8 +269,8 @@ export const handleFallbackDownload = async (
     tempContainer.style.left = '-9999px';
     tempContainer.style.top = '0';
     tempContainer.style.width = '800px';
-    tempContainer.style.padding = '40px'; // Lebih banyak padding untuk card effect
-    tempContainer.style.backgroundColor = '#f8fafc'; // Background abu-abu terang
+    tempContainer.style.padding = '40px';
+    tempContainer.style.backgroundColor = '#f8fafc';
     tempContainer.appendChild(clone);
     document.body.appendChild(tempContainer);
 
@@ -227,11 +281,11 @@ export const handleFallbackDownload = async (
     clone.style.color = '#000000';
     clone.style.fontSize = '14px';
     clone.style.lineHeight = '1.5';
-    clone.style.borderRadius = '16px'; // Rounded corners untuk card
+    clone.style.borderRadius = '16px';
     clone.style.boxShadow =
-      '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'; // Card shadow
+      '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)';
     clone.style.border = '1px solid #e2e8f0';
-    clone.style.padding = '32px'; // Padding internal card
+    clone.style.padding = '32px';
     clone.style.margin = '0 auto';
     clone.style.fontFamily = 'system-ui, -apple-system, sans-serif';
 
@@ -333,7 +387,7 @@ export const handleFallbackDownload = async (
 
       // Button styling (jika ada)
       if (htmlElement.tagName === 'BUTTON') {
-        htmlElement.style.display = 'none'; // Hide buttons dalam PDF
+        htmlElement.style.display = 'none';
       }
 
       // E-Ticket section styling
@@ -362,6 +416,7 @@ export const handleFallbackDownload = async (
           img.style.maxHeight = '280px';
           img.style.objectFit = 'contain';
           img.style.borderRadius = '8px';
+          img.crossOrigin = 'anonymous'; // Pastikan crossOrigin set
         }
       }
 
@@ -374,7 +429,6 @@ export const handleFallbackDownload = async (
         htmlElement.style.position = 'relative';
         htmlElement.style.paddingTop = '24px';
 
-        // Tambahkan divider line jika bukan section pertama
         if (htmlElement.previousElementSibling) {
           htmlElement.style.borderTop = '1px solid #e2e8f0';
           htmlElement.style.marginTop = '24px';
@@ -422,24 +476,42 @@ export const handleFallbackDownload = async (
     `;
     clone.appendChild(cardFooter);
 
-    // Generate canvas dengan kualitas tinggi
+    // Generate canvas dengan kualitas tinggi dan options untuk handle auth images
     const canvas = await html2canvas(clone, {
-      scale: 2, // Reduced scale untuk performa lebih baik
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#f8fafc', // Background abu-abu untuk card effect
+      scale: 2,
+      useCORS: false, // Disable CORS karena kita sudah handle auth
+      allowTaint: true, // Allow tainted canvas dari blob URLs
+      backgroundColor: '#f8fafc',
       width: 800,
       height: clone.scrollHeight + 80,
       x: 0,
       y: 0,
       scrollX: 0,
       scrollY: 0,
+      logging: false, // Disable logging untuk produksi
+      onclone: (clonedDoc) => {
+        // Last check untuk memastikan images ready
+        const clonedImages = clonedDoc.querySelectorAll('img');
+        clonedImages.forEach((img) => {
+          img.crossOrigin = 'anonymous';
+          // Ensure images are loaded
+          if (!img.complete || img.naturalHeight === 0) {
+            img.src =
+              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0PC90ZXh0Pjwvc3ZnPg==';
+          }
+        });
+      },
     });
 
     // Bersihkan DOM
     document.body.removeChild(tempContainer);
 
-    const imgData = canvas.toDataURL('image/png', 0.95); // Sedikit kompres untuk ukuran file
+    // Cleanup blob URLs
+    blobUrls.forEach((url) => {
+      URL.revokeObjectURL(url);
+    });
+
+    const imgData = canvas.toDataURL('image/png', 0.95);
 
     // Buat PDF dengan orientasi portrait
     const pdf = new jsPDF('portrait', 'pt', 'a4');
@@ -454,7 +526,7 @@ export const handleFallbackDownload = async (
     // Hitung rasio untuk fit ke halaman
     const widthRatio = availableWidth / canvas.width;
     const heightRatio = availableHeight / canvas.height;
-    const ratio = Math.min(widthRatio, heightRatio, 0.9); // Slightly smaller untuk margin
+    const ratio = Math.min(widthRatio, heightRatio, 0.9);
 
     const imgWidth = canvas.width * ratio;
     const imgHeight = canvas.height * ratio;
@@ -512,12 +584,23 @@ export const handleFallbackDownload = async (
     }
 
     pdf.save('e-ticket-card.pdf');
-
     console.log('PDF card berhasil diunduh!');
   } catch (error) {
     console.error('Card download failed:', error);
+
+    // Cleanup blob URLs jika ada error
+    blobUrls.forEach((url) => {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (cleanupError) {
+        console.error('Error cleaning up blob URL:', cleanupError);
+      }
+    });
+
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     alert(
-      'Gagal mengunduh PDF. Silakan coba lagi atau gunakan screenshot manual.'
+      `Gagal mengunduh PDF: ${errorMessage}. Pastikan Anda sudah login dan coba lagi.`
     );
   }
 };

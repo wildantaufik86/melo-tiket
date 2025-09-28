@@ -1,20 +1,21 @@
 'use client';
 
-import { ITicket } from '@/types/Ticket';
 import { IUser } from '@/types/User';
 import Image from 'next/image';
 import { forwardRef } from 'react';
 
 type TicketDataProps = {
   profile?: IUser | null;
-  ticket?: ITicket;
+  ticketUrl: string;
   onClose: () => void;
   onDownload: () => void;
 };
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 // forwardRef supaya parent bisa akses ref ke bg-white div
 const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
-  ({ profile, ticket, onClose, onDownload }, ref) => {
+  ({ profile, ticketUrl, onClose, onDownload }, ref) => {
     return (
       <div className="fixed bg-black/30 inset-0 flex justify-center items-center z-50">
         <div
@@ -91,12 +92,11 @@ const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
             <h4 className="font-black text-lg" style={{ color: '#000000' }}>
               E-Ticket
             </h4>
-            <div className="relative w-full aspect-5/2">
-              <Image
-                src="/images/example-ticket.jpg"
+            <div className="relative w-full">
+              <img
+                src={BASE_URL + ticketUrl}
                 alt="E ticket"
-                fill
-                className="object-contain"
+                className="object-contain w-[500px] h-[200px]"
               />
             </div>
           </div>

@@ -20,15 +20,19 @@ export interface IHistoryByEvent {
   transactions: ITransaction[];
 }
 
+type TransactionSummary = Pick<ITransaction, '_id' | 'tickets'>;
+
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [historyEvent, setHistoryEvent] = useState<IHistoryByEvent[]>([]);
   const [isViewTicket, setIsViewTicket] = useState(false);
   const { authUser } = useAuth();
+  const [paidTransactions, setPaidTransactions] = useState<
+    TransactionSummary[]
+  >([]);
+  const [selectedTicket, setSelectedTicket] = useState<string>('');
 
   const lastHistory = historyEvent[historyEvent.length - 1];
-
-  // Solusi 2: Fungsi fallback jika html2canvas gagal
 
   const fetchProfil = async () => {
     try {
@@ -45,6 +49,20 @@ export default function ProfilePage() {
     fetchProfil();
   }, []);
 
+  useEffect(() => {
+    if (lastHistory && lastHistory?.transactions?.length > 0) {
+      const filtered = lastHistory.transactions
+        .filter((data) => data.status === 'paid')
+        .map((ts) => ({
+          _id: ts._id,
+          tickets: ts.tickets,
+        }));
+      setPaidTransactions(filtered);
+    }
+  }, [lastHistory]);
+
+  console.log(paidTransactions);
+
   return (
     <div className="flex flex-col pt-24 pd-full">
       <div className="flex flex-col gap-4 md:flex-row md:gap-8">
@@ -59,7 +77,7 @@ export default function ProfilePage() {
           <Label text="E TIKET" />
         </div>
 
-        {lastHistory?.transactions.length === 0 && (
+        {paidTransactions.length === 0 && (
           <div className="border border-white mt-4 p-4">
             <p className="text-xs flex items-center gap-2 md:text-sm lg:text-base">
               <FaCircleInfo />
@@ -68,28 +86,38 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {lastHistory?.transactions.length > 0 && (
-          <div className="flex flex-col bg-secondary p-4 mt-4 lg:p-8">
-            <div className="flex items-center gap-8">
-              <p className="text-xs font-normal md:text-sm lg:text-lg">
-                E-Ticket
-              </p>
-              <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
-                <button
-                  onClick={() => setIsViewTicket(true)}
-                  className="text-primary cursor-pointer hover:underline duration-200"
-                >
-                  view
-                </button>
+        {paidTransactions.length > 0 &&
+          paidTransactions.map((data) =>
+            data.tickets.map((tc) => (
+              <div
+                key={tc._id}
+                className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
+              >
+                <div className="flex items-center gap-8">
+                  <p className="text-xs font-normal md:text-sm lg:text-lg">
+                    E-Ticket
+                  </p>
+                  <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
+                    <button
+                      onClick={() => {
+                        setIsViewTicket(true);
+                        setSelectedTicket(tc.ticketImage);
+                      }}
+                      className="text-primary cursor-pointer hover:underline duration-200"
+                    >
+                      view
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            ))
+          )}
 
         {isViewTicket && (
           <ViewTicketModal
             ref={ticketRef}
             profile={authUser}
+            ticketUrl={selectedTicket}
             onClose={() => setIsViewTicket(false)}
             onDownload={() => handleFallbackDownload(ticketRef)}
           />
