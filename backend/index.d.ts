@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 interface UserPayload {
   _id: mongoose.Types.ObjectId | string;
   email: string;
-  role: 'user' | 'admin' | 'superadmin';
+  role: 'user' | 'operator' | 'admin' | 'superadmin';
 }
 
 declare global {

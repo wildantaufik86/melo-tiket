@@ -30,7 +30,7 @@ export function middleware(req: NextRequest) {
       }
     }
 
-    const allowedRoles = ['superadmin', 'admin']
+    const allowedRoles = ['superadmin', 'admin', 'operator']
 
     // If user data is not available or role is not 'admin', redirect away from admin paths
     if (!userData || !userData.role || !allowedRoles.includes(userData.role) ) {
