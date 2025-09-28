@@ -4,9 +4,9 @@ import {
   createTransaction,
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
-import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
 import AlertModal from '@/components/fragments/modal/AlertModal';
 import SuccessModal from '@/components/fragments/modal/SuccessModal';
+import TermsModal from '@/components/fragments/modal/TermsModal';
 import { useAuth } from '@/context/authUserContext';
 import { Orders, useOrder } from '@/context/ordersContext';
 import {
@@ -15,9 +15,8 @@ import {
 } from '@/lib/validations/toast/ToastNofication';
 import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice, generate3Digit } from '@/utils/universalUtils';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 type Props = {
@@ -41,6 +40,7 @@ export default function CheckoutSection({
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
   const [openModalAlert, setOpenModalAlert] = useState(false);
   const [isPdfRead, setIsPdfRead] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const totalTicket = availableTickets.reduce(
     (acc, tc) => acc + tc.quantity,
@@ -54,16 +54,9 @@ export default function CheckoutSection({
   const [codeUnique, setCodeUnique] = useState<number>(0);
   const total = subTotal + platformFee * totalTicket + codeUnique;
 
-  const toggleConfirm = (e: ChangeEvent) => {
-    const target = e.target as HTMLInputElement;
-    setIsConfirmed(target.checked);
-  };
-
   const clearOrderData = () => {
-    return deleteLocalStorage('order');
+    return deleteLocalStorage('orders');
   };
-
-  console.log(authUser);
 
   const handleCreateTransaction = async () => {
     try {
@@ -218,14 +211,15 @@ export default function CheckoutSection({
         <h1 className="font-bold text-lg mb-2">Syarat & Ketentuan</h1>
         <p className="text-sm">
           Silahkan baca{' '}
-          <a
-            onClick={() => setIsPdfRead(true)}
-            href="/syarat_dan_ketentuan.pdf"
+          <span
+            onClick={() => {
+              setIsPdfRead(true);
+              setIsTermsModalOpen(true);
+            }}
             className="text-primary font-bold italic cursor-pointer"
-            target="_blank"
           >
             syarat & ketentuan
-          </a>{' '}
+          </span>{' '}
           kami terlebih dahulu sebelum melakukan pembelian
         </p>
 
@@ -242,7 +236,9 @@ export default function CheckoutSection({
           />
           <label
             htmlFor="isConfirmed"
-            className={`${isPdfRead ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+            className={`${
+              isPdfRead ? 'cursor-pointer' : 'cursor-not-allowed'
+            } font-semibold`}
           >
             Saya telah membaca dan menyetujui syarat & ketentuan
           </label>
@@ -270,6 +266,12 @@ export default function CheckoutSection({
         isOpen={openModalAlert}
         onClose={() => setOpenModalAlert(false)}
         text="anda belum mengisi NIK, silahkan lengkapi data di profil"
+      />
+
+      {/* terms modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
       />
     </section>
   );
