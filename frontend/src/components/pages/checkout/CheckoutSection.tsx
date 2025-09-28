@@ -40,6 +40,7 @@ export default function CheckoutSection({
   const router = useRouter();
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
   const [openModalAlert, setOpenModalAlert] = useState(false);
+  const [isPdfRead, setIsPdfRead] = useState(false);
 
   const totalTicket = availableTickets.reduce(
     (acc, tc) => acc + tc.quantity,
@@ -213,23 +214,43 @@ export default function CheckoutSection({
         ))}
       </div>
 
-      {/* konfirm input */}
-      <div className="flex items-center gap-2 px-4 mt-4 cursor-pointer">
-        <input type="checkbox" id="confirm" onChange={toggleConfirm} />
-        <label htmlFor="confirm" className="text-xs lg:text-sm font-bold">
-          Dengan ini saya setuju dengan{' '}
-          <Link
-            href="/terms"
-            className="text-red-500 hover:underline duration-100"
+      <div className="p-4">
+        <h1 className="font-bold text-lg mb-2">Syarat & Ketentuan</h1>
+        <p className="text-sm">
+          Silahkan baca{' '}
+          <a
+            onClick={() => setIsPdfRead(true)}
+            href="/syarat_dan_ketentuan.pdf"
+            className="text-primary font-bold italic cursor-pointer"
+            target="_blank"
           >
-            Syarat & Ketentuan
-          </Link>{' '}
-          yang berlaku
-        </label>
+            syarat & ketentuan
+          </a>{' '}
+          kami terlebih dahulu sebelum melakukan pembelian
+        </p>
+
+        <div
+          className={`mt-4 flex items-center gap-2 ${
+            isPdfRead ? 'opacity-100' : 'opacity-30'
+          }`}
+        >
+          <input
+            type="checkbox"
+            id="isConfirmed"
+            disabled={!isPdfRead}
+            onChange={(e) => setIsConfirmed(e.target.checked)}
+          />
+          <label
+            htmlFor="isConfirmed"
+            className={`${isPdfRead ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+          >
+            Saya telah membaca dan menyetujui syarat & ketentuan
+          </label>
+        </div>
       </div>
 
       <div
-        onClick={isConfirmed ? handleCreateTransaction : undefined}
+        onClick={isConfirmed && isPdfRead ? handleCreateTransaction : undefined}
         className={`w-full py-2 mt-4 bg-secondary rounded-full flex justify-center items-center ${
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
         } hover:bg-primary transition-colors`}
