@@ -1,10 +1,11 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { ICreateTransactionPayload } from '@/app/api/transcation';
 import CheckoutSection from '@/components/pages/checkout/CheckoutSection';
 import DetailOrderSection from '@/components/pages/checkout/DetailOrderSection';
 import { Orders, useOrder } from '@/context/ordersContext';
-import { useEffect, useState } from 'react';
+import { generate3Digit } from '@/utils/universalUtils';
 
 export default function TicketPage() {
   const [ordersTicket, setOrdersTicket] = useState<Orders[]>([]);
@@ -14,6 +15,9 @@ export default function TicketPage() {
   const [payload, setPayload] = useState<ICreateTransactionPayload | null>(
     null
   );
+  const [codeUnique, setCodeUnique] = useState<number>(0);
+
+  const platformFee: number = 5000;
 
   const handlePaymentProof = (fileParam: File) => {
     setPaymentProof(fileParam);
@@ -35,29 +39,48 @@ export default function TicketPage() {
     );
   };
 
+  // Ambil orders dari context saat component mount
   useEffect(() => {
     getOrders();
   }, []);
 
+  // Set orders dari context
   useEffect(() => {
-    if (orders && orders?.length > 0) {
+    if (orders && orders.length > 0) {
       setOrdersTicket(orders);
     }
   }, [orders]);
 
+  // Hitung total + kode unik
   useEffect(() => {
-    if (ordersTicket) {
-      const combineData: ICreateTransactionPayload = {
-        tickets: ordersTicket.map((order) => ({
-          ticketId: order._id!,
-          quantity: order.quantity,
-        })),
-        transactionMethod: 'Online',
-        paymentProof,
-      };
+    const totalTicket = ordersTicket.reduce((acc, t) => acc + t.quantity, 0);
+    const subTotal = ordersTicket.reduce(
+      (acc, t) => acc + t.price * t.quantity,
+      0
+    );
 
-      setPayload(combineData);
+    let newCodeUnique = codeUnique;
+    if (totalTicket > 0 && codeUnique === 0) {
+      newCodeUnique = Number(generate3Digit());
+      setCodeUnique(newCodeUnique);
+    } else if (totalTicket === 0) {
+      newCodeUnique = 0;
+      setCodeUnique(0);
     }
+
+    const newTotal = subTotal + platformFee * totalTicket + newCodeUnique;
+
+    // Update payload otomatis
+    const combineData: ICreateTransactionPayload = {
+      tickets: ordersTicket.map((order) => ({
+        ticketId: order._id!,
+        quantity: order.quantity,
+      })),
+      transactionMethod: 'Online',
+      paymentProof,
+      totalPrice: newTotal,
+    };
+    setPayload(combineData);
   }, [ordersTicket, paymentProof]);
 
   return (
@@ -71,12 +94,14 @@ export default function TicketPage() {
             orders={ordersTicket}
             handlePaymentProof={handlePaymentProof}
           />
-          <CheckoutSection
-            listOrder={ordersTicket}
-            payload={payload!}
-            incrementQty={incrementQty}
-            decrementQty={decrementQty}
-          />
+          {payload && (
+            <CheckoutSection
+              listOrder={ordersTicket}
+              payload={payload}
+              incrementQty={incrementQty}
+              decrementQty={decrementQty}
+            />
+          )}
         </div>
       </div>
     </section>
