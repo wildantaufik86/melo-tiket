@@ -227,18 +227,19 @@ export default function AdminSidebar() {
               >
                 Transaction
               </Link>
-              {authUser?.authUser?.role === 'superadmin' && (
-                <Link
-                  href={'/admin/transactions/new'}
-                  className={`${
-                    pathname.startsWith('/admin/transaction/new')
-                      ? 'bg-bg-secondary'
-                      : 'bg-white'
-                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
-                >
-                  Create Transaction
-                </Link>
-              )}
+              {authUser?.authUser?.role === 'superadmin' ||
+                (authUser?.authUser?.role === 'admin' && (
+                  <Link
+                    href={'/admin/transactions/new'}
+                    className={`${
+                      pathname.startsWith('/admin/transaction/new')
+                        ? 'bg-bg-secondary'
+                        : 'bg-white'
+                    } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                  >
+                    Create Transaction
+                  </Link>
+                ))}
             </div>
 
             {authUser?.authUser?.role === 'superadmin' && (
