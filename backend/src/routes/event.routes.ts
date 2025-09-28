@@ -9,10 +9,10 @@ const eventRoutes = Router();
 
 eventRoutes.get("/", getAllEventsHandler);
 eventRoutes.get("/:eventId", getEventByIdHandler);
-eventRoutes.post("/create", authenticate, createEventHandler);
-eventRoutes.patch("/:eventId", authenticate, updateEventHandler);
-eventRoutes.delete("/:eventId", authenticate, deleteEventHandler);
+eventRoutes.post("/create", authenticate, validateRole("superadmin", "admin"), createEventHandler);
+eventRoutes.patch("/:eventId", authenticate, validateRole("superadmin", "admin"), updateEventHandler);
+eventRoutes.delete("/:eventId", authenticate, validateRole("superadmin"), deleteEventHandler);
 
-eventRoutes.post("/:eventId/tickets", authenticate, addTicketTypeToEventHandler);
-eventRoutes.patch("/:eventId/tickets/:ticketId", authenticate, updateTicketTypeHandler);
+eventRoutes.post("/:eventId/tickets", authenticate, validateRole("superadmin"), addTicketTypeToEventHandler);
+eventRoutes.patch("/:eventId/tickets/:ticketId", authenticate, validateRole("superadmin"), updateTicketTypeHandler);
 export default eventRoutes;

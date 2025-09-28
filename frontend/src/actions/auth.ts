@@ -51,7 +51,7 @@ export async function login({ email, password }: { email: string; password: stri
       value: accessToken,
       httpOnly: true, // Crucial for security: prevents client-side JavaScript access
       sameSite: 'strict', // Protects against CSRF attacks
-      secure: false, // Only send over HTTPS in production
+      secure: CONFIG.NODE_ENV === 'production', // Only send over HTTPS in production
       path: '/', // Available across the entire site
       maxAge: 60 * 60 * 24 * 7, // 7 days (Matches client-side setCookie)
     });
@@ -68,7 +68,7 @@ export async function login({ email, password }: { email: string; password: stri
       value: JSON.stringify(user), // Stringify the user object
       httpOnly: false, // Must be false if client-side JS needs to read it
       sameSite: 'strict',
-      secure: false,
+      secure: CONFIG.NODE_ENV === 'production',
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days (Matches client-side setCookie)
     });

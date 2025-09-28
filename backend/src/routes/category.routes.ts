@@ -9,6 +9,6 @@ categoryRoutes.get('/', getCategories);
 categoryRoutes.get('/:id', getCategoryById);
 categoryRoutes.post('/create', authenticate, createCategory);
 categoryRoutes.put('/update/:id', authenticate, updateCategory);
-categoryRoutes.delete('/:categoryId', authenticate, softDeleteCategoryHandler);
+categoryRoutes.delete('/:categoryId', authenticate, validateRole("admin", "superadmin"), softDeleteCategoryHandler);
 
 export default categoryRoutes;

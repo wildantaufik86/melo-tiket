@@ -5,6 +5,6 @@ import { getDashboardSummaryHandler } from "../controllers/dashboard.controller"
 
 const summaryRoutes = Router();
 
-summaryRoutes.get('/summary', authenticate, getDashboardSummaryHandler)
+summaryRoutes.get('/summary', authenticate, validateRole("admin", "superadmin"), getDashboardSummaryHandler)
 
 export default summaryRoutes
