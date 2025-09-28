@@ -99,6 +99,7 @@ export default function CreateTransactionForm() {
             userId: selectedUserId,
             transactionMethod,
             paymentProof,
+            totalPrice,
             tickets: ticketsInCart.map(([ticketId, quantity]) => ({ ticketId, quantity })),
         };
 
