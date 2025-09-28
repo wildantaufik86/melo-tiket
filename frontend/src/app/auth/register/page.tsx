@@ -136,7 +136,7 @@ export default function LoginPage() {
           />
           <InputContainer
             type="text"
-            name="Nomor ID"
+            name="NIK"
             value={payloadData.idNumber}
             setValue={(value) => {
               if (regexNumber.test(value) && value.length <= 16) {
