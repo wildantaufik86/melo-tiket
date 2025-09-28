@@ -62,8 +62,15 @@ export default function CheckoutSection({
     return deleteLocalStorage('order');
   };
 
+  console.log(authUser);
+
   const handleCreateTransaction = async () => {
     try {
+      if (!authUser) {
+        ToastError('Tolong login terlebih dahulu');
+        return;
+      }
+
       if (authUser?.idNumber === null) {
         setOpenModalAlert(true);
         return;
