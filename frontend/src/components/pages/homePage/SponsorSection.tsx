@@ -105,25 +105,25 @@ export default function SponsorSection() {
         <div className="flex flex-col gap-8">
           <Label text="SPONSOR" />
           <div className="grid grid-cols-3 gap-4 place-items-center mt-8">
-            {dummyData.map((sponsort) => (
+            {/* {dummyData.map((sponsort) => (
               <SponsorCard
                 key={sponsort.id}
                 url={sponsort.url}
                 alt={sponsort.alt}
               />
-            ))}
+            ))} */}
           </div>
         </div>
         <div className="flex flex-col gap-8 mt-12">
           <Label text="MEDIA PARTNER" />
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 place-items-center md:gap-6">
-            {dummyDataMedia.map((sponsort) => (
+            {/* {dummyDataMedia.map((sponsort) => (
               <SponsorCard
                 key={sponsort.id}
                 url={sponsort.url}
                 alt={sponsort.alt}
               />
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
