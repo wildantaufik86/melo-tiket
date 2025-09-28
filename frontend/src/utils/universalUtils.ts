@@ -2,8 +2,12 @@
 // These functions are pure and don't depend on server-specific (next/headers)
 // or client-specific (localStorage, document) APIs.
 
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
 import type { Schema } from 'joi'; // Type import for Joi Schema
 import { getSessionStorage, setSessionStorage } from './clientUtils';
+import { RefObject } from 'react';
 
 /**
  * Formats a date into a localized string (id-ID).
@@ -195,3 +199,325 @@ export function generate3Digit(): string {
   // kalau sudah ada di sessionStorage → kembalikan existing value
   return String(codeUnique);
 }
+
+export const handleFallbackDownload = async (
+  ticketRef: RefObject<HTMLDivElement | null>
+): Promise<void> => {
+  if (!ticketRef.current) return;
+
+  try {
+    // Clone element dan bersihkan style yang bermasalah
+    const clone = ticketRef.current.cloneNode(true) as HTMLElement;
+
+    // Buat container sementara dengan ukuran yang lebih optimal
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0';
+    tempContainer.style.width = '800px';
+    tempContainer.style.padding = '40px'; // Lebih banyak padding untuk card effect
+    tempContainer.style.backgroundColor = '#f8fafc'; // Background abu-abu terang
+    tempContainer.appendChild(clone);
+    document.body.appendChild(tempContainer);
+
+    // Style clone sebagai card
+    clone.style.width = '100%';
+    clone.style.maxWidth = '720px';
+    clone.style.backgroundColor = '#ffffff';
+    clone.style.color = '#000000';
+    clone.style.fontSize = '14px';
+    clone.style.lineHeight = '1.5';
+    clone.style.borderRadius = '16px'; // Rounded corners untuk card
+    clone.style.boxShadow =
+      '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'; // Card shadow
+    clone.style.border = '1px solid #e2e8f0';
+    clone.style.padding = '32px'; // Padding internal card
+    clone.style.margin = '0 auto';
+    clone.style.fontFamily = 'system-ui, -apple-system, sans-serif';
+
+    // Bersihkan semua style yang menggunakan lab()
+    const allElements = clone.querySelectorAll('*');
+    allElements.forEach((element) => {
+      const htmlElement = element as HTMLElement;
+
+      // Reset ke warna standar
+      if (
+        htmlElement.style.backgroundColor &&
+        htmlElement.style.backgroundColor.includes('lab(')
+      ) {
+        htmlElement.style.backgroundColor = '#ffffff';
+      }
+      if (htmlElement.style.color && htmlElement.style.color.includes('lab(')) {
+        htmlElement.style.color = '#000000';
+      }
+
+      // Hapus class yang mungkin menggunakan warna lab
+      htmlElement.classList.remove(
+        'bg-secondary',
+        'text-primary',
+        'bg-black/30',
+        'fixed',
+        'inset-0'
+      );
+
+      // Header styling (card title)
+      if (htmlElement.tagName === 'H4') {
+        htmlElement.style.color = '#1e293b';
+        htmlElement.style.fontSize = '20px';
+        htmlElement.style.fontWeight = '700';
+        htmlElement.style.marginBottom = '20px';
+        htmlElement.style.marginTop = '0';
+        htmlElement.style.paddingBottom = '12px';
+        htmlElement.style.borderBottom = '2px solid #e2e8f0';
+        htmlElement.style.position = 'relative';
+      }
+
+      // Paragraph styling
+      if (htmlElement.tagName === 'P') {
+        htmlElement.style.color = '#475569';
+        htmlElement.style.lineHeight = '1.6';
+        htmlElement.style.margin = '0';
+      }
+
+      // Label styling (font semibold)
+      if (htmlElement.classList.contains('font-semibold')) {
+        htmlElement.style.color = '#374151';
+        htmlElement.style.fontSize = '13px';
+        htmlElement.style.fontWeight = '600';
+        htmlElement.style.marginBottom = '6px';
+        htmlElement.style.textTransform = 'uppercase';
+        htmlElement.style.letterSpacing = '0.05em';
+      }
+
+      // Input field styling
+      if (htmlElement.classList.contains('bg-slate-100')) {
+        htmlElement.style.backgroundColor = '#f8fafc';
+        htmlElement.style.border = '1px solid #e2e8f0';
+        htmlElement.style.borderRadius = '8px';
+        htmlElement.style.padding = '12px';
+        htmlElement.style.fontSize = '14px';
+        htmlElement.style.color = '#1e293b';
+        htmlElement.style.transition = 'all 0.2s ease';
+      }
+
+      // Grid styling
+      if (
+        htmlElement.classList.contains('grid') ||
+        htmlElement.classList.contains('grid-cols-2')
+      ) {
+        htmlElement.style.display = 'grid';
+        htmlElement.style.gridTemplateColumns = '1fr 1fr';
+        htmlElement.style.gap = '20px';
+        htmlElement.style.marginBottom = '24px';
+      }
+
+      // Gap styling untuk flex
+      if (htmlElement.classList.contains('gap-4')) {
+        htmlElement.style.gap = '16px';
+      }
+
+      if (htmlElement.classList.contains('gap-2')) {
+        htmlElement.style.gap = '8px';
+      }
+
+      // Margin top styling
+      if (htmlElement.classList.contains('mt-4')) {
+        htmlElement.style.marginTop = '24px';
+      }
+
+      // Flex column styling
+      if (htmlElement.classList.contains('flex-col')) {
+        htmlElement.style.display = 'flex';
+        htmlElement.style.flexDirection = 'column';
+      }
+
+      // Button styling (jika ada)
+      if (htmlElement.tagName === 'BUTTON') {
+        htmlElement.style.display = 'none'; // Hide buttons dalam PDF
+      }
+
+      // E-Ticket section styling
+      if (
+        htmlElement.querySelector('img') &&
+        htmlElement.classList.contains('relative')
+      ) {
+        htmlElement.style.width = '100%';
+        htmlElement.style.minHeight = '300px';
+        htmlElement.style.display = 'flex';
+        htmlElement.style.alignItems = 'center';
+        htmlElement.style.justifyContent = 'center';
+        htmlElement.style.backgroundColor = '#f1f5f9';
+        htmlElement.style.border = '2px dashed #cbd5e1';
+        htmlElement.style.borderRadius = '12px';
+        htmlElement.style.marginTop = '16px';
+        htmlElement.style.position = 'relative';
+        htmlElement.style.overflow = 'hidden';
+
+        // Style untuk gambar di dalam
+        const img = htmlElement.querySelector('img') as HTMLImageElement;
+        if (img) {
+          img.style.width = 'auto';
+          img.style.height = 'auto';
+          img.style.maxWidth = '100%';
+          img.style.maxHeight = '280px';
+          img.style.objectFit = 'contain';
+          img.style.borderRadius = '8px';
+        }
+      }
+
+      // Divider antara sections
+      if (
+        htmlElement.classList.contains('flex') &&
+        htmlElement.classList.contains('flex-col') &&
+        htmlElement.querySelector('h4')
+      ) {
+        htmlElement.style.position = 'relative';
+        htmlElement.style.paddingTop = '24px';
+
+        // Tambahkan divider line jika bukan section pertama
+        if (htmlElement.previousElementSibling) {
+          htmlElement.style.borderTop = '1px solid #e2e8f0';
+          htmlElement.style.marginTop = '24px';
+        }
+      }
+    });
+
+    // Tambahkan header card di bagian atas
+    const cardHeader = document.createElement('div');
+    cardHeader.style.textAlign = 'center';
+    cardHeader.style.marginBottom = '32px';
+    cardHeader.style.paddingBottom = '20px';
+    cardHeader.style.borderBottom = '2px solid #e2e8f0';
+    cardHeader.innerHTML = `
+      <h2 style="
+        color: #1e293b; 
+        font-size: 24px; 
+        font-weight: 800; 
+        margin: 0 0 8px 0;
+        font-family: system-ui, -apple-system, sans-serif;
+      ">E-TICKET</h2>
+      <p style="
+        color: #64748b; 
+        font-size: 14px; 
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+      ">Tiket Digital - ${new Date().toLocaleDateString('id-ID')}</p>
+    `;
+    clone.insertBefore(cardHeader, clone.firstChild);
+
+    // Tambahkan footer card di bagian bawah
+    const cardFooter = document.createElement('div');
+    cardFooter.style.textAlign = 'center';
+    cardFooter.style.marginTop = '32px';
+    cardFooter.style.paddingTop = '20px';
+    cardFooter.style.borderTop = '1px solid #e2e8f0';
+    cardFooter.style.color = '#9ca3af';
+    cardFooter.style.fontSize = '12px';
+    cardFooter.innerHTML = `
+      <p style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
+        Dokumen ini dibuat secara otomatis pada ${new Date().toLocaleString(
+          'id-ID'
+        )}
+      </p>
+    `;
+    clone.appendChild(cardFooter);
+
+    // Generate canvas dengan kualitas tinggi
+    const canvas = await html2canvas(clone, {
+      scale: 2, // Reduced scale untuk performa lebih baik
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#f8fafc', // Background abu-abu untuk card effect
+      width: 800,
+      height: clone.scrollHeight + 80,
+      x: 0,
+      y: 0,
+      scrollX: 0,
+      scrollY: 0,
+    });
+
+    // Bersihkan DOM
+    document.body.removeChild(tempContainer);
+
+    const imgData = canvas.toDataURL('image/png', 0.95); // Sedikit kompres untuk ukuran file
+
+    // Buat PDF dengan orientasi portrait
+    const pdf = new jsPDF('portrait', 'pt', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    // Hitung dimensi dengan margin yang lebih kecil untuk card
+    const margin = 30;
+    const availableWidth = pageWidth - margin * 2;
+    const availableHeight = pageHeight - margin * 2;
+
+    // Hitung rasio untuk fit ke halaman
+    const widthRatio = availableWidth / canvas.width;
+    const heightRatio = availableHeight / canvas.height;
+    const ratio = Math.min(widthRatio, heightRatio, 0.9); // Slightly smaller untuk margin
+
+    const imgWidth = canvas.width * ratio;
+    const imgHeight = canvas.height * ratio;
+
+    // Center image
+    const x = (pageWidth - imgWidth) / 2;
+    const y = margin;
+
+    // Handle multi-page jika diperlukan
+    if (imgHeight > availableHeight) {
+      let currentY = 0;
+      let pageCount = 0;
+
+      while (currentY < canvas.height) {
+        if (pageCount > 0) {
+          pdf.addPage();
+        }
+
+        const remainingHeight = canvas.height - currentY;
+        const pageCanvasHeight = Math.min(
+          remainingHeight,
+          Math.floor(canvas.height * (availableHeight / imgHeight))
+        );
+
+        // Buat canvas untuk halaman ini
+        const pageCanvas = document.createElement('canvas');
+        const pageCtx = pageCanvas.getContext('2d')!;
+        pageCanvas.width = canvas.width;
+        pageCanvas.height = pageCanvasHeight;
+
+        // Gambar bagian canvas yang sesuai
+        pageCtx.drawImage(
+          canvas,
+          0,
+          currentY,
+          canvas.width,
+          pageCanvasHeight,
+          0,
+          0,
+          canvas.width,
+          pageCanvasHeight
+        );
+
+        const pageImgData = pageCanvas.toDataURL('image/png', 0.95);
+        const pageImgHeight = pageCanvasHeight * ratio;
+
+        pdf.addImage(pageImgData, 'PNG', x, y, imgWidth, pageImgHeight);
+
+        currentY += pageCanvasHeight;
+        pageCount++;
+      }
+    } else {
+      // Single page
+      pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+    }
+
+    pdf.save('e-ticket-card.pdf');
+
+    console.log('PDF card berhasil diunduh!');
+  } catch (error) {
+    console.error('Card download failed:', error);
+    alert(
+      'Gagal mengunduh PDF. Silakan coba lagi atau gunakan screenshot manual.'
+    );
+  }
+};
