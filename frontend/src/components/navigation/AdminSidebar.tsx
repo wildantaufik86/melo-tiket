@@ -2,7 +2,17 @@
 
 import { logout } from '@/app/actions/auth';
 import { useAuth } from '@/context/authUserContext';
-import { CallBellIcon, ChalkboardTeacher, Folders, Gauge, House, HouseIcon, TicketIcon, UserIcon, VideoConferenceIcon } from '@phosphor-icons/react/dist/ssr';
+import {
+  CallBellIcon,
+  ChalkboardTeacher,
+  Folders,
+  Gauge,
+  House,
+  HouseIcon,
+  TicketIcon,
+  UserIcon,
+  VideoConferenceIcon,
+} from '@phosphor-icons/react/dist/ssr';
 import { ChevronDown, ChevronUp, LogOut, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -19,6 +29,8 @@ export default function AdminSidebar() {
   const toggleDrawer = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
+
+  console.log(authUser);
 
   const handleLogout = async () => {
     const response = await logout();
@@ -64,24 +76,23 @@ export default function AdminSidebar() {
 
           {/* Sidebar Header with Logo and Title */}
           <div className="flex items-center justify-between space-x-4 bg-gray-50 border rounded-lg border-black/10 mb-3">
-          <Link href={'/admin'} className="">
-            <div className="p-2 space-x-1 h-full rounded-lg">
+            <Link href={'/admin'} className="">
+              <div className="p-2 space-x-1 h-full rounded-lg">
+                <img
+                  src="/images/melo-logo.png"
+                  alt="Logo_Melotiket"
+                  className="w-[45px] object-cover"
+                />
+              </div>
+            </Link>
+            <div className="space-x-1 w-maxrounded-lg">
               <img
-                src="/images/melo-logo.png"
-                alt="Logo_Melotiket"
-                className="w-[45px] object-cover"
+                src="/logo/snarcbitz_admin.png"
+                alt="Logo_SnarcBitz"
+                className="max-w-[115px] object-cover"
               />
             </div>
-          </Link>
-          <div className="space-x-1 w-maxrounded-lg">
-            <img
-              src="/logo/snarcbitz_admin.png"
-              alt="Logo_SnarcBitz"
-              className="max-w-[115px] object-cover"
-            />
           </div>
-        </div>
-
 
           {/* Profile Section */}
           <div className="flex items-center px-4 space-x-4 bg-gray-50 border rounded-lg border-black/10">
@@ -102,7 +113,7 @@ export default function AdminSidebar() {
 
           {/* Sidebar Navigation Links */}
           <ul className="space-y-2 mt-6">
-            <li >
+            <li>
               <Link
                 href={'/admin'}
                 className={`${
@@ -110,73 +121,149 @@ export default function AdminSidebar() {
                 } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
               >
-                <div className='flex items-center'>
-                  <Gauge size={24} className='text-black/75 mr-2' weight="light" />
+                <div className="flex items-center">
+                  <Gauge
+                    size={24}
+                    className="text-black/75 mr-2"
+                    weight="light"
+                  />
                   <span>Dashboard</span>
                 </div>
               </Link>
             </li>
-            <li
-              onClick={() => setEventManagementOpen(!eventsManagementOpen)}
-              className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between">
-              <div className='flex items-center'>
-                  <TicketIcon size={24} className='text-black/75 mr-2' weight="light" />
-                  <span>Event Managements{' '}</span>
-              </div>
-              <span className="duration-200">
-                {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
-              </span>
-            </li>
-            <div className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${eventsManagementOpen ? 'max-h-96' : 'max-h-0'}`}>
-              <Link href={'/admin/event-management/event'} className={`${ pathname.startsWith('/admin/event-management/event') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+            {authUser?.authUser?.role === 'superadmin' && (
+              <li
+                onClick={() => setEventManagementOpen(!eventsManagementOpen)}
+                className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <TicketIcon
+                    size={24}
+                    className="text-black/75 mr-2"
+                    weight="light"
+                  />
+                  <span>Event Managements </span>
+                </div>
+                <span className="duration-200">
+                  {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
+                </span>
+              </li>
+            )}
+            <div
+              className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+                eventsManagementOpen ? 'max-h-96' : 'max-h-0'
+              }`}
+            >
+              <Link
+                href={'/admin/event-management/event'}
+                className={`${
+                  pathname.startsWith('/admin/event-management/event')
+                    ? 'bg-bg-secondary'
+                    : 'bg-white'
+                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+              >
                 Event
               </Link>
-              <Link href={'/admin/event-management/ticket'} className={`${ pathname.startsWith('/admin/event-management/ticket') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+              <Link
+                href={'/admin/event-management/ticket'}
+                className={`${
+                  pathname.startsWith('/admin/event-management/ticket')
+                    ? 'bg-bg-secondary'
+                    : 'bg-white'
+                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+              >
                 Ticket
               </Link>
-              <Link href={'/admin/event-management/template'} className={`${ pathname.startsWith('/admin/event-management/template') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+              <Link
+                href={'/admin/event-management/template'}
+                className={`${
+                  pathname.startsWith('/admin/event-management/template')
+                    ? 'bg-bg-secondary'
+                    : 'bg-white'
+                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+              >
                 Template
               </Link>
-              <Link href={'/admin/event-management/category'} className={`${ pathname.startsWith('/admin/event-management/category') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+              <Link
+                href={'/admin/event-management/category'}
+                className={`${
+                  pathname.startsWith('/admin/event-management/category')
+                    ? 'bg-bg-secondary'
+                    : 'bg-white'
+                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+              >
                 Category
               </Link>
             </div>
 
             <li
               onClick={() => setTransactionOpen(!transactionOpen)}
-              className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between">
-              <div className='flex items-center'>
-                  <TicketIcon size={24} className='text-black/75 mr-2' weight="light" />
-                  <span>Transaction Managements{' '}</span>
+              className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
+            >
+              <div className="flex items-center">
+                <TicketIcon
+                  size={24}
+                  className="text-black/75 mr-2"
+                  weight="light"
+                />
+                <span>Transaction Managements </span>
               </div>
               <span className="duration-200">
                 {transactionOpen ? <ChevronUp /> : <ChevronDown />}
               </span>
             </li>
-            <div className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${transactionOpen ? 'max-h-96' : 'max-h-0'}`}>
-              <Link href={'/admin/transactions'} className={`${ pathname.startsWith('/admin/transactions') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
-                Transaction
-              </Link>
-              <Link href={'/admin/transactions/new'} className={`${ pathname.startsWith('/admin/transaction/new') ? 'bg-bg-secondary' : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
-                Create Transaction
-              </Link>
-            </div>
-
-            <li>
+            <div
+              className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${
+                transactionOpen ? 'max-h-96' : 'max-h-0'
+              }`}
+            >
               <Link
-                href={'/admin/user-management'} className={`${
-                  pathname.startsWith('/admin/user-management')
+                href={'/admin/transactions'}
+                className={`${
+                  pathname.startsWith('/admin/transactions')
                     ? 'bg-bg-secondary'
                     : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
+                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
               >
-                <div className='flex items-center'>
-                  <UserIcon size={24} className='text-black/75 mr-2' weight="light" />
-                  <span>User</span>
-                </div>
+                Transaction
               </Link>
-            </li>
+              {authUser?.authUser?.role === 'superadmin' && (
+                <Link
+                  href={'/admin/transactions/new'}
+                  className={`${
+                    pathname.startsWith('/admin/transaction/new')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Create Transaction
+                </Link>
+              )}
+            </div>
+
+            {authUser?.authUser?.role === 'superadmin' ||
+              (authUser?.authUser?.role === 'admin' && (
+                <li>
+                  <Link
+                    href={'/admin/user-management'}
+                    className={`${
+                      pathname.startsWith('/admin/user-management')
+                        ? 'bg-bg-secondary'
+                        : 'bg-white'
+                    } block text-sm font-semibold py-2 px-4 rounded text-primary
+                    hover:bg-[#EFF6FF] hover:text-black/75`}
+                  >
+                    <div className="flex items-center">
+                      <UserIcon
+                        size={24}
+                        className="text-black/75 mr-2"
+                        weight="light"
+                      />
+                      <span>User</span>
+                    </div>
+                  </Link>
+                </li>
+              ))}
 
             {/* <li>
               <Link
