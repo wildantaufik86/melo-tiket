@@ -241,29 +241,51 @@ export default function AdminSidebar() {
               )}
             </div>
 
-            {authUser?.authUser?.role === 'superadmin' ||
-              (authUser?.authUser?.role === 'admin' && (
-                <li>
-                  <Link
-                    href={'/admin/user-management'}
-                    className={`${
-                      pathname.startsWith('/admin/user-management')
-                        ? 'bg-bg-secondary'
-                        : 'bg-white'
-                    } block text-sm font-semibold py-2 px-4 rounded text-primary
+            {authUser?.authUser?.role === 'superadmin' && (
+              <li>
+                <Link
+                  href={'/admin/user-management'}
+                  className={`${
+                    pathname.startsWith('/admin/user-management')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
-                  >
-                    <div className="flex items-center">
-                      <UserIcon
-                        size={24}
-                        className="text-black/75 mr-2"
-                        weight="light"
-                      />
-                      <span>User</span>
-                    </div>
-                  </Link>
-                </li>
-              ))}
+                >
+                  <div className="flex items-center">
+                    <UserIcon
+                      size={24}
+                      className="text-black/75 mr-2"
+                      weight="light"
+                    />
+                    <span>User</span>
+                  </div>
+                </Link>
+              </li>
+            )}
+
+            {authUser?.authUser?.role === 'admin' && (
+              <li>
+                <Link
+                  href={'/admin/user-management'}
+                  className={`${
+                    pathname.startsWith('/admin/user-management')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 rounded text-primary
+                    hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  <div className="flex items-center">
+                    <UserIcon
+                      size={24}
+                      className="text-black/75 mr-2"
+                      weight="light"
+                    />
+                    <span>User</span>
+                  </div>
+                </Link>
+              </li>
+            )}
 
             {/* <li>
               <Link
