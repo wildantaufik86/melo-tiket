@@ -11,7 +11,7 @@ const uploadPaymentProof = createUploader("paymentProof");
 transactionRoutes.post("/", authenticate, uploadPaymentProof.single('paymentProof'), validateRole("user", "admin", "superadmin"), createTransactionHandler)
 transactionRoutes.get( "/", authenticate, validateRole("operator", "admin", "superadmin"), getAllTransactionsHandler);
 transactionRoutes.get("/:transactionId", authenticate, validateRole("operator", "admin", "superadmin"), getTransactionByIdHandler);
-transactionRoutes.patch("/:transactionId/verify", validateRole("operator", "admin", "superadmin"),authenticate, verifyTransactionHandler);
+transactionRoutes.patch("/:transactionId/verify", authenticate, validateRole("operator", "admin", "superadmin"), verifyTransactionHandler);
 transactionRoutes.delete("/:transactionId", authenticate, validateRole("superadmin"), softDeleteTransactionHandler);
 
 export default transactionRoutes;
