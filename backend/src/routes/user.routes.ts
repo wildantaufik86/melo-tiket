@@ -7,11 +7,11 @@ import { createUserHandler, deleteUserHandler, getAllUserHandler, getUserByIdHan
 
 const userRoutes = Router();
 
-userRoutes.get("/", authenticate, validateRole("superadmin"), getAllUserHandler)
-userRoutes.get('/search', authenticate, validateRole("admin", "superadmin"), searchUsersHandler);
-userRoutes.get("/:id", authenticate, validateRole("superadmin"), getUserByIdHandler)
-userRoutes.post("/create", authenticate, validateRole("superadmin"), createUserHandler)
-userRoutes.patch("/:id", authenticate, validateRole("superadmin"), updateUserProfileHandler)
-userRoutes.delete("/:id", authenticate, validateRole("superadmin"), softDeleteUserHandler)
+userRoutes.get("/", authenticate, getAllUserHandler)
+userRoutes.get('/search', authenticate, searchUsersHandler);
+userRoutes.get("/:id", authenticate, getUserByIdHandler)
+userRoutes.post("/create", authenticate, createUserHandler)
+userRoutes.patch("/:id", authenticate, updateUserProfileHandler)
+userRoutes.delete("/:id", authenticate, softDeleteUserHandler)
 
 export default userRoutes;

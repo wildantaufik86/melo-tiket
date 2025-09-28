@@ -77,7 +77,7 @@ app.use("/user", express.json(), express.urlencoded({ extended: true }), userRou
 app.use("/dashboard", express.json(), express.urlencoded({ extended: true }), summaryRoutes);
 app.use("/template", express.json(), express.urlencoded({ extended: true }), templateRoutes);
 app.use("/public", express.static(path.resolve("./public")));
-app.use("/uploads", authenticate, validateRole("admin", "superadmin", "user"), express.static(path.resolve("./uploads")));
+app.use("/uploads", authenticate, express.static(path.resolve("./uploads")));
 
 app.use(errorHandler);
 

@@ -8,10 +8,10 @@ const transactionRoutes = Router()
 
 const uploadPaymentProof = createUploader("paymentProof");
 
-transactionRoutes.post("/", authenticate, uploadPaymentProof.single('paymentProof'), validateRole("user", "admin", "superadmin"), createTransactionHandler)
-transactionRoutes.get( "/", authenticate, validateRole("admin", "superadmin"), getAllTransactionsHandler);
+transactionRoutes.post("/", authenticate, uploadPaymentProof.single('paymentProof'), createTransactionHandler)
+transactionRoutes.get( "/", authenticate, getAllTransactionsHandler);
 transactionRoutes.get("/:transactionId", authenticate, getTransactionByIdHandler);
-transactionRoutes.patch("/:transactionId/verify", authenticate, validateRole("admin", "superadmin"), verifyTransactionHandler);
-transactionRoutes.delete("/:transactionId", authenticate, validateRole("superadmin"), softDeleteTransactionHandler);
+transactionRoutes.patch("/:transactionId/verify", authenticate, verifyTransactionHandler);
+transactionRoutes.delete("/:transactionId", authenticate, softDeleteTransactionHandler);
 
 export default transactionRoutes;
