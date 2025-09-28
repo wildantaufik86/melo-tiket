@@ -46,6 +46,7 @@ export async function createTransaction(
     // tickets array stringify
     formData.append('tickets', JSON.stringify(payload.tickets));
     formData.append('transactionMethod', payload.transactionMethod);
+    formData.append('totalPrice', payload.totalPrice.toString());
 
     if (payload.userId) {
       formData.append('userId', payload.userId);

@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { BsPaperclip } from 'react-icons/bs';
 import { FaChevronDown } from 'react-icons/fa';
+import { IoMdAlert } from 'react-icons/io';
 
 interface IOrderItem {
   id?: number;
@@ -151,76 +152,89 @@ export default function DetailOrderSection({
         <h3 className="font-black text-sm md:text-lg lg:text-3xl">
           DETAIL PEMBELI
         </h3>
-        <div className="flex flex-col mt-4">
-          <p className="font-extrabold mb-2 lg:text-xl">Email</p>
-          <div className="bg-white p-2 rounded-t-sm">
-            <p className="text-sm font-bold lg:text-xl text-black">
-              {authUser?.email || 'example@gmail.com'}
-            </p>
-          </div>
-          <p className="text-[9px] p-2 lg:text-base text-black font-light bg-[#FBD300]">
-            Email ini akan digunakan untuk mengirimkan faktur dan e-tiket
+
+        {/* if user not login */}
+        {!authUser && (
+          <p className="mt-4 italic flex items-center gap-2">
+            <IoMdAlert /> Silahkan login terlebih dahulu untuk melakukan
+            pembelian
           </p>
+        )}
 
-          <p className="font-extrabold mb-2 lg:text-xl mt-4">Nama Lengkap</p>
-          <div className="bg-white p-2 rounded-sm">
-            <p className="text-sm font-bold lg:text-xl text-black">
-              {authUser?.name || ''}
+        {authUser && (
+          <div className="flex flex-col mt-4">
+            <p className="font-extrabold mb-2 lg:text-xl">Email</p>
+            <div className="bg-white p-2 rounded-t-sm">
+              <p className="text-sm font-bold lg:text-xl text-black">
+                {authUser?.email || 'example@gmail.com'}
+              </p>
+            </div>
+            <p className="text-[9px] p-2 lg:text-base text-black font-light bg-[#FBD300]">
+              Email ini akan digunakan untuk mengirimkan faktur dan e-tiket
             </p>
-          </div>
 
-          <p className="font-extrabold mb-2 lg:text-xl mt-4">Tanggal Lahir</p>
-          <div className="grid grid-cols-3 gap-2">
+            <p className="font-extrabold mb-2 lg:text-xl mt-4">Nama Lengkap</p>
             <div className="bg-white p-2 rounded-sm">
-              <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
-                {day}{' '}
-                <span>
-                  <FaChevronDown />
-                </span>
+              <p className="text-sm font-bold lg:text-xl text-black">
+                {authUser?.name || ''}
               </p>
             </div>
-            <div className="bg-white p-2 rounded-sm">
-              <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
-                {month}{' '}
-                <span>
-                  <FaChevronDown />
-                </span>
-              </p>
-            </div>
-            <div className="bg-white p-2 rounded-sm">
-              <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
-                {year}{' '}
-                <span>
-                  <FaChevronDown />
-                </span>
-              </p>
-            </div>
-          </div>
 
-          <p className="font-extrabold mb-2 lg:text-xl mt-4">Jenis Kelamin</p>
-          <div className="flex gap-2">
-            <div className="flex-1 bg-white p-2 rounded-sm">
-              <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full border ${
-                    authUser?.profile?.gender === 'Pria' ? 'bg-blue-700' : ''
-                  }`}
-                ></div>
-                Laki-Laki
+            <p className="font-extrabold mb-2 lg:text-xl mt-4">Tanggal Lahir</p>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-white p-2 rounded-sm">
+                <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
+                  {day}{' '}
+                  <span>
+                    <FaChevronDown />
+                  </span>
+                </p>
+              </div>
+              <div className="bg-white p-2 rounded-sm">
+                <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
+                  {month}{' '}
+                  <span>
+                    <FaChevronDown />
+                  </span>
+                </p>
+              </div>
+              <div className="bg-white p-2 rounded-sm">
+                <p className="flex justify-between items-center text-sm font-medium lg:text-xl text-black">
+                  {year}{' '}
+                  <span>
+                    <FaChevronDown />
+                  </span>
+                </p>
               </div>
             </div>
-            <div className="flex-1 bg-white p-2 rounded-sm">
-              <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full border ${
-                    authUser?.profile?.gender === 'Wanita' ? 'bg-blue-700' : ''
-                  }`}
-                ></div>
-                Perempuan
+
+            <p className="font-extrabold mb-2 lg:text-xl mt-4">Jenis Kelamin</p>
+            <div className="flex gap-2">
+              <div className="flex-1 bg-white p-2 rounded-sm">
+                <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full border ${
+                      authUser?.profile?.gender === 'Pria' ? 'bg-blue-700' : ''
+                    }`}
+                  ></div>
+                  Laki-Laki
+                </div>
+              </div>
+              <div className="flex-1 bg-white p-2 rounded-sm">
+                <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full border ${
+                      authUser?.profile?.gender === 'Wanita'
+                        ? 'bg-blue-700'
+                        : ''
+                    }`}
+                  ></div>
+                  Perempuan
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* upload file  */}

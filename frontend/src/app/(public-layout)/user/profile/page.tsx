@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { useRef, useState, useEffect } from 'react';
 import Label from '@/components/fragments/label/Label';
 import ProfileSection from '@/components/pages/user/profile/ProfileSection';
 import RiwayatPembelian from '@/components/pages/user/profile/RiwayatPembelianSection';
-import Image from 'next/image';
 import { FaCircleInfo } from 'react-icons/fa6';
 import { getMyProfile } from '@/app/api/profile';
 import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITransaction } from '@/types/Transaction';
+import ViewTicketModal from '@/components/fragments/modal/ViewTicketModal';
+import { useAuth } from '@/context/authUserContext';
+import { handleFallbackDownload } from '@/utils/universalUtils';
 
 export interface IHistoryByEvent {
   _id: string;
@@ -20,39 +20,19 @@ export interface IHistoryByEvent {
   transactions: ITransaction[];
 }
 
+type TransactionSummary = Pick<ITransaction, '_id' | 'tickets'>;
+
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [historyEvent, setHistoryEvent] = useState<IHistoryByEvent[]>([]);
+  const [isViewTicket, setIsViewTicket] = useState(false);
+  const { authUser } = useAuth();
+  const [paidTransactions, setPaidTransactions] = useState<
+    TransactionSummary[]
+  >([]);
+  const [selectedTicket, setSelectedTicket] = useState<string>('');
+
   const lastHistory = historyEvent[historyEvent.length - 1];
-  const handleDownload = async () => {
-    if (!ticketRef.current) return;
-
-    // capture elemen tiket jadi canvas
-    const canvas = await html2canvas(ticketRef.current, {
-      scale: 2, // biar hasil lebih tajam
-    });
-
-    const imgData = canvas.toDataURL('image/png');
-
-    // buat dokumen PDF
-    const pdf = new jsPDF('landscape', 'pt', 'a4'); // landscape biar lebih pas
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    // hitung skala agar gambar muat di halaman
-    const ratio = Math.min(
-      pageWidth / canvas.width,
-      pageHeight / canvas.height
-    );
-    const imgWidth = canvas.width * ratio;
-    const imgHeight = canvas.height * ratio;
-
-    const x = (pageWidth - imgWidth) / 2;
-    const y = (pageHeight - imgHeight) / 2;
-
-    pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
-    pdf.save('e-ticket.pdf');
-  };
 
   const fetchProfil = async () => {
     try {
@@ -69,20 +49,35 @@ export default function ProfilePage() {
     fetchProfil();
   }, []);
 
+  useEffect(() => {
+    if (lastHistory && lastHistory?.transactions?.length > 0) {
+      const filtered = lastHistory.transactions
+        .filter((data) => data.status === 'paid')
+        .map((ts) => ({
+          _id: ts._id,
+          tickets: ts.tickets,
+        }));
+      setPaidTransactions(filtered);
+    }
+  }, [lastHistory]);
+
+  console.log(paidTransactions);
+
   return (
     <div className="flex flex-col pt-24 pd-full">
       <div className="flex flex-col gap-4 md:flex-row md:gap-8">
         <ProfileSection />
         <RiwayatPembelian
-          historyTransactions={historyEvent.at(-1)?.transactions ?? []}
+          historyTransactions={lastHistory?.transactions ?? []}
         />
       </div>
-      <div className="flex flex-col mt-4">
+
+      <section className="flex flex-col mt-4">
         <div className="w-full md:w-1/2">
           <Label text="E TIKET" />
         </div>
 
-        {lastHistory?.transactions.length <= 0 && (
+        {paidTransactions.length === 0 && (
           <div className="border border-white mt-4 p-4">
             <p className="text-xs flex items-center gap-2 md:text-sm lg:text-base">
               <FaCircleInfo />
@@ -91,39 +86,43 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {lastHistory?.transactions.length > 0 && (
-          <div
-            ref={ticketRef}
-            className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
-          >
-            <div className="relative w-full aspect-4/2">
-              <Image
-                src="/images/example-ticket.jpg"
-                alt="E ticket"
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div className="flex items-center gap-8">
-              <p className="text-xs font-normal md:text-sm lg:text-lg">
-                E-Ticket
-              </p>
-              <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
-                <button className="text-primary cursor-pointer hover:underline duration-200">
-                  view
-                </button>
-                <span> | </span>
-                <button
-                  onClick={handleDownload}
-                  className="cursor-pointer hover:underline duration-200"
-                >
-                  download
-                </button>
+        {paidTransactions.length > 0 &&
+          paidTransactions.map((data) =>
+            data.tickets.map((tc) => (
+              <div
+                key={tc._id}
+                className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
+              >
+                <div className="flex items-center gap-8">
+                  <p className="text-xs font-normal md:text-sm lg:text-lg">
+                    E-Ticket
+                  </p>
+                  <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
+                    <button
+                      onClick={() => {
+                        setIsViewTicket(true);
+                        setSelectedTicket(tc.ticketImage);
+                      }}
+                      className="text-primary cursor-pointer hover:underline duration-200"
+                    >
+                      view
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            ))
+          )}
+
+        {isViewTicket && (
+          <ViewTicketModal
+            ref={ticketRef}
+            profile={authUser}
+            ticketUrl={selectedTicket}
+            onClose={() => setIsViewTicket(false)}
+            onDownload={() => handleFallbackDownload(ticketRef)}
+          />
         )}
-      </div>
+      </section>
     </div>
   );
 }
