@@ -66,7 +66,7 @@ export async function login({ email, password }: LoginProps): Promise<ServerActi
       value: accessToken,
       httpOnly: true,
       sameSite: 'strict',
-      secure: CONFIG.NODE_ENV === 'production',
+      secure: false,
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     });
@@ -76,7 +76,7 @@ export async function login({ email, password }: LoginProps): Promise<ServerActi
       value: JSON.stringify(user),
       httpOnly: false,
       sameSite: 'strict',
-      secure: CONFIG.NODE_ENV === 'production',
+      secure: false,
       path: '/',
       maxAge: 60 * 60 * 24 * 7,
     });

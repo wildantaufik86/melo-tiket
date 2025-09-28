@@ -51,7 +51,7 @@ export async function login({ email, password }: { email: string; password: stri
       value: accessToken,
       httpOnly: true, // Crucial for security: prevents client-side JavaScript access
       sameSite: 'strict', // Protects against CSRF attacks
-      secure: CONFIG.NODE_ENV === 'production', // Only send over HTTPS in production
+      secure: false, // Only send over HTTPS in production
       path: '/', // Available across the entire site
       maxAge: 60 * 60 * 24 * 7, // 7 days (Matches client-side setCookie)
     });
@@ -68,7 +68,7 @@ export async function login({ email, password }: { email: string; password: stri
       value: JSON.stringify(user), // Stringify the user object
       httpOnly: false, // Must be false if client-side JS needs to read it
       sameSite: 'strict',
-      secure: CONFIG.NODE_ENV === 'production',
+      secure: false,
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days (Matches client-side setCookie)
     });
@@ -123,8 +123,6 @@ export async function logout(): Promise<ServerActionResponse> {
     return { error: true, status: 'error', message: error.message || 'An unexpected error occurred during logout' };
   }
 }
-
-
 
 export async function changePassword(data: {
   email: string;
