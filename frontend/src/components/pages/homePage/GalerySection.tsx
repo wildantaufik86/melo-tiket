@@ -28,7 +28,7 @@ const dummyImages: Image[] = [
 
 export default function GalerySection() {
   return (
-    <section className="w-full mt-[70%] sm:mt-[40%] lg:mt-0">
+    <section className="w-full mt-20">
       <Swiper
         modules={[Pagination, Autoplay]}
         spaceBetween={30}
@@ -38,7 +38,7 @@ export default function GalerySection() {
         className="aspect-video"
       >
         {dummyImages.map((image) => (
-          <SwiperSlide key={image.id} className="relative lg:mt-40">
+          <SwiperSlide key={image.id} className="relative">
             <Image
               src={image.url}
               alt={image.alt}

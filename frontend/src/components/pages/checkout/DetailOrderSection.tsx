@@ -136,13 +136,15 @@ export default function DetailOrderSection({
             <p className="text-[10px] md:text-sm lg:text-lg font-bold">
               Nama Rekening
             </p>
-            <p className="text-[10px] md:text-sm lg:text-lg">
+            {/* <p className="text-[10px] md:text-sm lg:text-lg">
               : M. MAULANA RIDWAN
-            </p>
+            </p> */}
+            <p className="text-[10px] md:text-sm lg:text-lg"></p>
             <p className="text-[10px] md:text-sm lg:text-lg font-bold">
               Nomor Rekening
             </p>
-            <p className="text-[10px] md:text-sm lg:text-lg">: 1707071717</p>
+            {/* <p className="text-[10px] md:text-sm lg:text-lg">: 1707071717</p> */}
+            <p className="text-[10px] md:text-sm lg:text-lg"></p>
           </div>
         </div>
       </div>

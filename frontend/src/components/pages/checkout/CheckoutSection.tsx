@@ -4,9 +4,9 @@ import {
   createTransaction,
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
-import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
 import AlertModal from '@/components/fragments/modal/AlertModal';
 import SuccessModal from '@/components/fragments/modal/SuccessModal';
+import TermsModal from '@/components/fragments/modal/TermsModal';
 import { useAuth } from '@/context/authUserContext';
 import { Orders, useOrder } from '@/context/ordersContext';
 import {
@@ -15,9 +15,8 @@ import {
 } from '@/lib/validations/toast/ToastNofication';
 import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice, generate3Digit } from '@/utils/universalUtils';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 type Props = {
@@ -40,6 +39,8 @@ export default function CheckoutSection({
   const router = useRouter();
   const [openModalSuccess, setOpenModalSuccess] = useState(false);
   const [openModalAlert, setOpenModalAlert] = useState(false);
+  const [isPdfRead, setIsPdfRead] = useState(false);
+  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
 
   const totalTicket = availableTickets.reduce(
     (acc, tc) => acc + tc.quantity,
@@ -53,16 +54,9 @@ export default function CheckoutSection({
   const [codeUnique, setCodeUnique] = useState<number>(0);
   const total = subTotal + platformFee * totalTicket + codeUnique;
 
-  const toggleConfirm = (e: ChangeEvent) => {
-    const target = e.target as HTMLInputElement;
-    setIsConfirmed(target.checked);
-  };
-
   const clearOrderData = () => {
-    return deleteLocalStorage('order');
+    return deleteLocalStorage('orders');
   };
-
-  console.log(authUser);
 
   const handleCreateTransaction = async () => {
     try {
@@ -213,23 +207,46 @@ export default function CheckoutSection({
         ))}
       </div>
 
-      {/* konfirm input */}
-      <div className="flex items-center gap-2 px-4 mt-4 cursor-pointer">
-        <input type="checkbox" id="confirm" onChange={toggleConfirm} />
-        <label htmlFor="confirm" className="text-xs lg:text-sm font-bold">
-          Dengan ini saya setuju dengan{' '}
-          <Link
-            href="/terms"
-            className="text-red-500 hover:underline duration-100"
+      <div className="p-4">
+        <h1 className="font-bold text-lg mb-2">Syarat & Ketentuan</h1>
+        <p className="text-sm">
+          Silahkan baca{' '}
+          <span
+            onClick={() => {
+              setIsPdfRead(true);
+              setIsTermsModalOpen(true);
+            }}
+            className="text-primary font-bold italic cursor-pointer"
           >
-            Syarat & Ketentuan
-          </Link>{' '}
-          yang berlaku
-        </label>
+            syarat & ketentuan
+          </span>{' '}
+          kami terlebih dahulu sebelum melakukan pembelian
+        </p>
+
+        <div
+          className={`mt-4 flex items-center gap-2 ${
+            isPdfRead ? 'opacity-100' : 'opacity-30'
+          }`}
+        >
+          <input
+            type="checkbox"
+            id="isConfirmed"
+            disabled={!isPdfRead}
+            onChange={(e) => setIsConfirmed(e.target.checked)}
+          />
+          <label
+            htmlFor="isConfirmed"
+            className={`${
+              isPdfRead ? 'cursor-pointer' : 'cursor-not-allowed'
+            } font-semibold`}
+          >
+            Saya telah membaca dan menyetujui syarat & ketentuan
+          </label>
+        </div>
       </div>
 
       <div
-        onClick={isConfirmed ? handleCreateTransaction : undefined}
+        onClick={isConfirmed && isPdfRead ? handleCreateTransaction : undefined}
         className={`w-full py-2 mt-4 bg-secondary rounded-full flex justify-center items-center ${
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
         } hover:bg-primary transition-colors`}
@@ -249,6 +266,12 @@ export default function CheckoutSection({
         isOpen={openModalAlert}
         onClose={() => setOpenModalAlert(false)}
         text="anda belum mengisi NIK, silahkan lengkapi data di profil"
+      />
+
+      {/* terms modal */}
+      <TermsModal
+        isOpen={isTermsModalOpen}
+        onClose={() => setIsTermsModalOpen(false)}
       />
     </section>
   );

@@ -90,10 +90,10 @@ export default function TicketPage() {
           RINCIAN PESANAN
         </h3>
         <div className="flex flex-col mt-8 md:flex-row md:gap-6">
-          {/* <DetailOrderSection
+          <DetailOrderSection
             orders={ordersTicket}
             handlePaymentProof={handlePaymentProof}
-          /> */}
+          />
           {payload && (
             <CheckoutSection
               listOrder={ordersTicket}
