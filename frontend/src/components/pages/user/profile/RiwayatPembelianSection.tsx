@@ -29,7 +29,7 @@ export default function RiwayatPembelian({
             Nomor Rekening
           </p>
           <p className="bg-white font-normal text-sm lg:text-base py-2 px-4 flex items-center">
-            8205353324 Bank Central Asia / IDR
+            -
           </p>
 
           <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
