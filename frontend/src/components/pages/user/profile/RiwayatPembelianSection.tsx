@@ -1,14 +1,9 @@
 'use client';
 
-import { fetchTransactionById } from '@/app/api/transcation';
 import HistoryTransactionAccordion from '@/components/fragments/accordion/HistoryTransactionAccordion';
 import Label from '@/components/fragments/label/Label';
 import { useAuth } from '@/context/authUserContext';
-import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITransaction } from '@/types/Transaction';
-import { formattedDate } from '@/utils/universalUtils';
-import { useEffect, useState } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
 import { FaCircleInfo } from 'react-icons/fa6';
 
 type PropsRiwayatPembelian = {
@@ -20,7 +15,7 @@ export default function RiwayatPembelian({
 }: PropsRiwayatPembelian) {
   const dataOwnerMelo = {
     name: 'M MAULANA RIDWAN',
-    accountNumber: '1707071717',
+    accountNumber: '0722171717',
   };
 
   const { authUser } = useAuth();
