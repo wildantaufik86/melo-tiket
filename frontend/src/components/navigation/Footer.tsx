@@ -17,7 +17,7 @@ export default function Footer() {
             />
           </div>
 
-          <p className="text-xs font-semibold mt-5 sm:text-sm lg:text-lg">
+          <p className="text-xs font-semibold text-white mt-5 sm:text-sm lg:text-lg">
             Managed By :
           </p>
           <div className="relative w-12 mt-2 sm:w-full sm:max-w-[50px] lg:max-w-[100px] aspect-square">
@@ -34,19 +34,22 @@ export default function Footer() {
           <div className="flex items-center gap-2 text-xs lg:text-2xl text-white font-black">
             <Link
               href="/terms"
-              className="hover:text-primary transition-colors"
+              className="hover:text-bg-primary transition-colors"
             >
               TERM AND CONDITION
             </Link>
             <span>|</span>
-            <Link href="/faq" className="hover:text-primary transition-colors">
+            <Link
+              href="/faq"
+              className="hover:text-bg-primary transition-colors"
+            >
               FAQ
             </Link>
           </div>
           <div className="flex items-center gap-4 mt-4">
             <Link
               href="/tiktok"
-              className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
+              className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaTiktok
                 size={16}
@@ -56,7 +59,7 @@ export default function Footer() {
             </Link>
             <Link
               href="/instagram"
-              className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
+              className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaInstagram
                 size={16}
@@ -66,7 +69,7 @@ export default function Footer() {
             </Link>
             <Link
               href="/facebook"
-              className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
+              className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaFacebook
                 size={16}
@@ -76,7 +79,7 @@ export default function Footer() {
             </Link>
             <Link
               href="/spotify"
-              className="bg-white p-1 rounded-sm hover:bg-primary transition-colors"
+              className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaSpotify
                 size={16}

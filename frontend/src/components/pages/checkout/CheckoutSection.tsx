@@ -117,7 +117,7 @@ export default function CheckoutSection({
 
   return (
     <section className="flex flex-col mt-8 md:flex-1 md:mt-0 md:max-h-[200px]">
-      <div className="flex-1 flex flex-col gap-2 bg-secondary p-4 rounded-sm">
+      <div className="flex-1 flex flex-col gap-2 bg-bg-secondary p-4 rounded-sm">
         <div className="flex items-center justify-between">
           <p className="text-sm lg:text-xl font-medium">Subtotal</p>
           <p className="text-sm lg:text-xl font-medium">
@@ -158,7 +158,7 @@ export default function CheckoutSection({
         {listOrder.map((ticket) => (
           <div
             key={ticket._id}
-            className="flex flex-col rounded-sm p-4 bg-secondary"
+            className="flex flex-col rounded-sm p-4 bg-bg-secondary"
           >
             <p
               className={`font-black lg:text-xl flex justify-between items-center ${
@@ -216,7 +216,7 @@ export default function CheckoutSection({
               setIsPdfRead(true);
               setIsTermsModalOpen(true);
             }}
-            className="text-primary font-bold italic cursor-pointer"
+            className="text-bg-primary font-bold italic cursor-pointer"
           >
             syarat & ketentuan
           </span>{' '}
@@ -247,9 +247,9 @@ export default function CheckoutSection({
 
       <div
         onClick={isConfirmed && isPdfRead ? handleCreateTransaction : undefined}
-        className={`w-full py-2 mt-4 bg-secondary rounded-full flex justify-center items-center ${
+        className={`w-full py-2 mt-4 bg-bg-secondary rounded-full flex justify-center items-center ${
           isConfirmed ? 'cursor-pointer' : 'cursor-not-allowed'
-        } hover:bg-primary transition-colors`}
+        } hover:bg-bg-primary transition-colors`}
       >
         <span className="text-sm lg:text-xl font-bold">
           Konfirmasi Pembelian

@@ -38,7 +38,7 @@ export default function ProfileSection() {
   return (
     <section className="flex flex-col gap-4 md:flex-1">
       <Label text="PROFILE AKUN" />
-      <div className="w-full bg-secondary rounded-lg p-4 flex flex-col">
+      <div className="w-full bg-bg-secondary rounded-lg p-4 flex flex-col">
         <p className="font-extrabold mb-2 lg:text-sm">NIK</p>
         <div className="bg-white p-2 rounded-t-sm">
           <p className="text-sm font-bold lg:text-base text-black">
@@ -122,7 +122,7 @@ export default function ProfileSection() {
               <button
                 onClick={handleEdit}
                 type="button"
-                className="bg-secondary text-white font-semibold text-xs rounded-sm py-2 px-4 mt-4 cursor-pointer hover:bg-slate-800 transition-colors"
+                className="bg-bg-secondary text-white font-semibold text-xs rounded-sm py-2 px-4 mt-4 cursor-pointer hover:bg-slate-800 transition-colors"
               >
                 Edit
               </button>
