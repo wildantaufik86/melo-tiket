@@ -1,4 +1,4 @@
-import { formattedDate } from '@/utils/universalUtils';
+import { formattedDate, formattedPrice } from '@/utils/universalUtils';
 import { FaChevronDown } from 'react-icons/fa';
 
 type PropsHistoryAccordion = {
@@ -24,7 +24,7 @@ export default function HistoryTransactionAccordion({
           Jumlah Transfer
         </p>
         <p className="bg-white font-normal text-sm lg:text-base py-2 px-4 flex items-center">
-          {totalPrice || 0}
+          {formattedPrice(totalPrice) || 0}
         </p>
 
         <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
