@@ -39,6 +39,7 @@ export default function DetailOrderSection({
     event: IEvent;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [previewImg, setPreviewImg] = useState<string | null>(null);
 
   const getDetailEvent = useCallback(async () => {
     setLoading(true);
@@ -214,7 +215,7 @@ export default function DetailOrderSection({
                 <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
                   <div
                     className={`w-3 h-3 rounded-full border ${
-                      authUser?.profile?.gender === 'Pria' ? 'bg-blue-700' : ''
+                      authUser?.profile?.gender === 'male' ? 'bg-blue-700' : ''
                     }`}
                   ></div>
                   Laki-Laki
@@ -224,7 +225,7 @@ export default function DetailOrderSection({
                 <div className="text-sm font-medium lg:text-xl text-black flex items-center gap-2">
                   <div
                     className={`w-3 h-3 rounded-full border ${
-                      authUser?.profile?.gender === 'Wanita'
+                      authUser?.profile?.gender === 'female'
                         ? 'bg-blue-700'
                         : ''
                     }`}
@@ -256,6 +257,8 @@ export default function DetailOrderSection({
               const file = e.target.files?.[0] || null;
               if (file) {
                 handlePaymentProof(file);
+                const url = URL.createObjectURL(file);
+                setPreviewImg(url);
               }
             }}
           />
@@ -264,6 +267,12 @@ export default function DetailOrderSection({
       <p className="text-xs px-4 mt-2 italic font-medium lg:text-xl">
         Pastikan untuk mencantumkan bukti transfer*
       </p>
+
+      <div className="mt-4">
+        {previewImg && (
+          <img src={previewImg} alt="bukti-transfer" className="aspect-2/1" />
+        )}
+      </div>
     </section>
   );
 }
