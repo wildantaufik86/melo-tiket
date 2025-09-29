@@ -93,14 +93,14 @@ export default function SponsorSection() {
   return (
     <section className="relative pd-full py-30">
       <div className="flex flex-col">
-        <div className="absolute left-0 w-full md:max-w-[80%] lg:max-w-[60%] aspect-square">
+        {/* <div className="absolute left-0 w-full md:max-w-[80%] lg:max-w-[60%] aspect-square">
           <Image
             src="/images/accesoris.png"
             alt="accessoris left"
             fill
             className="object-contain object-center"
           />
-        </div>
+        </div> */}
 
         <div className="flex flex-col gap-8">
           <Label text="SPONSOR" />
