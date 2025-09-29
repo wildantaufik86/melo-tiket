@@ -238,8 +238,25 @@ export default function DetailOrderSection({
         )}
       </div>
 
+      {/* input file */}
+      <div className="mt-8 px-4">
+        <input
+          type="file"
+          id="file"
+          className="text-xl text-white font-semibold"
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            if (file) {
+              handlePaymentProof(file);
+              const url = URL.createObjectURL(file);
+              setPreviewImg(url);
+            }
+          }}
+        />
+      </div>
+
       {/* upload file  */}
-      <div className="flex-1 flex justify-between items-center bg-bg-secondary p-4 rounded-sm mt-8">
+      <div className="flex-1 flex justify-between items-center bg-bg-secondary p-4 rounded-sm mt-2">
         <p className="font-extrabold lg:text-xl">Bukti Transfer</p>
         <div className="flex items-center gap-2">
           <label
@@ -250,23 +267,6 @@ export default function DetailOrderSection({
             Attach File
           </label>
         </div>
-      </div>
-
-      {/* input file */}
-      <div className="mt-2 px-4">
-        <input
-          type="file"
-          id="file"
-          className="text-lg text-bg-primary font-semibold"
-          onChange={(e) => {
-            const file = e.target.files?.[0] || null;
-            if (file) {
-              handlePaymentProof(file);
-              const url = URL.createObjectURL(file);
-              setPreviewImg(url);
-            }
-          }}
-        />
       </div>
 
       <p className="text-xs px-4 mt-4 italic font-medium lg:text-xl">
