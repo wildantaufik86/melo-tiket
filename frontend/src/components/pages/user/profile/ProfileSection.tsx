@@ -83,7 +83,11 @@ export default function ProfileSection() {
         <div className="flex gap-2">
           <div className="w-1/2 bg-white p-2 rounded-sm">
             <div className="text-sm font-medium lg:text-base text-black flex items-center gap-2">
-              {authUser?.profile?.gender === 'male' ? 'Laki-laki' : 'Perempuan'}
+              {authUser?.profile?.gender
+                ? authUser?.profile?.gender === 'male'
+                  ? 'Laki-laki'
+                  : 'Perempuan'
+                : '-'}
             </div>
           </div>
         </div>
