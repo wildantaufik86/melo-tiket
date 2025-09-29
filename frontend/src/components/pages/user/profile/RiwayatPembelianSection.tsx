@@ -26,10 +26,10 @@ export default function RiwayatPembelian({
       <div className="w-full bg-bg-secondary p-4 rounded-lg flex flex-col mt-4">
         <div className="grid grid-cols-2 gap-2 text-black">
           <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
-            Nomor Rekening
+            Nama Bank
           </p>
           <p className="bg-white font-normal text-sm lg:text-base py-2 px-4 flex items-center">
-            -
+            BCA Syariah
           </p>
 
           <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
