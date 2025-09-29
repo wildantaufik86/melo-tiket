@@ -63,8 +63,6 @@ export default function LoginPage() {
 
   const router = useRouter(); // Renamed 'route' to 'router' for consistency with Next.js docs
 
-  console.log('payload data', payloadData);
-
   const handleRegister = async (e: React.FormEvent) => {
     // Type the event for better safety
     e.preventDefault();
