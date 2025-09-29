@@ -91,71 +91,71 @@ const dummyData: Sponsor[] = [
 
 const medpartData: Sponsor[] = [
   {
-    url: '/images/medpart-logo/AAC.PNG',
+    url: '/images/medpart-logo/aac.png',
     alt: 'aac-logo',
   },
   {
-    url: '/images/medpart-logo/AGENDA EVENT.PNG',
+    url: '/images/medpart-logo/agenda-event.png',
     alt: 'agenda-event-logo',
   },
   {
-    url: '/images/medpart-logo/AWAK.PNG',
+    url: '/images/medpart-logo/awak.png',
     alt: 'awak-logo',
   },
   {
-    url: '/images/medpart-logo/DGIGS PROJECT.PNG',
+    url: '/images/medpart-logo/dgigs-project.png',
     alt: 'dgigs-project-logo',
   },
   {
-    url: '/images/medpart-logo/EVENT DAILY.PNG',
+    url: '/images/medpart-logo/event-daily.png',
     alt: 'event-daily-logo',
   },
   {
-    url: '/images/medpart-logo/GAC MSUIC.PNG',
+    url: '/images/medpart-logo/gac-music.png',
     alt: 'gac-msuic-logo',
   },
   {
-    url: '/images/medpart-logo/HOBBY KONSER.PNG',
+    url: '/images/medpart-logo/hobby-konser.png',
     alt: 'hobby-konser-logo',
   },
   {
-    url: '/images/medpart-logo/infomusikita logo.PNG',
+    url: '/images/medpart-logo/infomusikita-logo.png',
     alt: 'infomusikita-logo',
   },
   {
-    url: '/images/medpart-logo/KONSER DAILY.PNG',
+    url: '/images/medpart-logo/konser-daily.png',
     alt: 'konser-daily-logo',
   },
   {
-    url: '/images/medpart-logo/KONSER TERUS.PNG',
+    url: '/images/medpart-logo/konser-terus.png',
     alt: 'konser-terus-logo',
   },
   {
-    url: '/images/medpart-logo/logo event aceh.PNG',
+    url: '/images/medpart-logo/logo-event-aceh.png',
     alt: 'logo-event-aceh',
   },
   {
-    url: '/images/medpart-logo/Logo GAC Music.PNG',
+    url: '/images/medpart-logo/logo-gac-music.png',
     alt: 'logo-gac-music',
   },
   {
-    url: '/images/medpart-logo/NANGGROE MEDIA.PNG',
+    url: '/images/medpart-logo/nanggroe-media.png',
     alt: 'nanggroe-media-logo',
   },
   {
-    url: '/images/medpart-logo/NEWS RB (putih)-1.PNG',
+    url: '/images/medpart-logo/news-rb.png',
     alt: 'news-rb-logo',
   },
   {
-    url: '/images/medpart-logo/PERSIRAJA.PNG',
+    url: '/images/medpart-logo/persiraja.png',
     alt: 'persiraja-logo',
   },
   {
-    url: '/images/medpart-logo/story ngonser.PNG',
+    url: '/images/medpart-logo/story-ngonser.png',
     alt: 'story-ngonser-logo',
   },
   {
-    url: '/images/medpart-logo/SUPPORT KONSER.PNG',
+    url: '/images/medpart-logo/support-konser.png',
     alt: 'support-konser-logo',
   },
 ];
