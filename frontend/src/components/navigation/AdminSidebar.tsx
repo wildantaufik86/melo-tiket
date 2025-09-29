@@ -111,26 +111,29 @@ export default function AdminSidebar() {
 
           {/* Sidebar Navigation Links */}
           <ul className="space-y-2 mt-6">
-            <li>
-              <Link
-                href={'/admin'}
-                className={`${
-                  pathname === '/admin' ? 'bg-bg-secondary' : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                <div className="flex items-center">
-                  <Gauge
-                    size={24}
-                    className="text-black/75 mr-2"
-                    weight="light"
-                  />
-                  <span>Dashboard</span>
-                </div>
-              </Link>
-            </li>
-
             {authUser?.authUser?.role === 'superadmin' && (
+              <li>
+                <Link
+                  href={'/admin'}
+                  className={`${
+                    pathname === '/admin' ? 'bg-bg-secondary' : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 rounded text-primary
+                    hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  <div className="flex items-center">
+                    <Gauge
+                      size={24}
+                      className="text-black/75 mr-2"
+                      weight="light"
+                    />
+                    <span>Dashboard</span>
+                  </div>
+                </Link>
+              </li>
+            )}
+
+            {(authUser?.authUser?.role === 'superadmin' ||
+              authUser?.authUser?.role === 'admin') && (
               <li
                 onClick={() => setEventManagementOpen(!eventsManagementOpen)}
                 className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
@@ -149,39 +152,24 @@ export default function AdminSidebar() {
               </li>
             )}
 
-            {authUser?.authUser?.role === 'admin' && (
-              <li
-                onClick={() => setEventManagementOpen(!eventsManagementOpen)}
-                className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
-              >
-                <div className="flex items-center">
-                  <TicketIcon
-                    size={24}
-                    className="text-black/75 mr-2"
-                    weight="light"
-                  />
-                  <span>Event Managements </span>
-                </div>
-                <span className="duration-200">
-                  {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
-                </span>
-              </li>
-            )}
             <div
               className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${
                 eventsManagementOpen ? 'max-h-96' : 'max-h-0'
               }`}
             >
-              <Link
-                href={'/admin/event-management/event'}
-                className={`${
-                  pathname.startsWith('/admin/event-management/event')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                Event
-              </Link>
+              {authUser?.authUser?.role === 'superadmin' && (
+                <Link
+                  href={'/admin/event-management/event'}
+                  className={`${
+                    pathname.startsWith('/admin/event-management/event')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Event
+                </Link>
+              )}
+              {/* all role can access */}
               <Link
                 href={'/admin/event-management/ticket'}
                 className={`${
@@ -192,26 +180,31 @@ export default function AdminSidebar() {
               >
                 Ticket
               </Link>
-              <Link
-                href={'/admin/event-management/template'}
-                className={`${
-                  pathname.startsWith('/admin/event-management/template')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                Template
-              </Link>
-              <Link
-                href={'/admin/event-management/category'}
-                className={`${
-                  pathname.startsWith('/admin/event-management/category')
-                    ? 'bg-bg-secondary'
-                    : 'bg-white'
-                } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
-              >
-                Category
-              </Link>
+
+              {authUser?.authUser?.role === 'superadmin' && (
+                <Link
+                  href={'/admin/event-management/template'}
+                  className={`${
+                    pathname.startsWith('/admin/event-management/template')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Template
+                </Link>
+              )}
+              {authUser?.authUser?.role === 'superadmin' && (
+                <Link
+                  href={'/admin/event-management/category'}
+                  className={`${
+                    pathname.startsWith('/admin/event-management/category')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Category
+                </Link>
+              )}
             </div>
 
             <li
@@ -245,20 +238,8 @@ export default function AdminSidebar() {
               >
                 Transaction
               </Link>
-              {authUser?.authUser?.role === 'superadmin' && (
-                <Link
-                  href={'/admin/transactions/new'}
-                  className={`${
-                    pathname.startsWith('/admin/transaction/new')
-                      ? 'bg-bg-secondary'
-                      : 'bg-white'
-                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
-                >
-                  Create Transaction
-                </Link>
-              )}
-
-              {authUser?.authUser?.role === 'admin' && (
+              {(authUser?.authUser?.role === 'superadmin' ||
+                authUser?.authUser?.role === 'admin') && (
                 <Link
                   href={'/admin/transactions/new'}
                   className={`${
@@ -272,30 +253,8 @@ export default function AdminSidebar() {
               )}
             </div>
 
-            {authUser?.authUser?.role === 'superadmin' && (
-              <li>
-                <Link
-                  href={'/admin/user-management'}
-                  className={`${
-                    pathname.startsWith('/admin/user-management')
-                      ? 'bg-bg-secondary'
-                      : 'bg-white'
-                  } block text-sm font-semibold py-2 px-4 rounded text-primary
-                    hover:bg-[#EFF6FF] hover:text-black/75`}
-                >
-                  <div className="flex items-center">
-                    <UserIcon
-                      size={24}
-                      className="text-black/75 mr-2"
-                      weight="light"
-                    />
-                    <span>User</span>
-                  </div>
-                </Link>
-              </li>
-            )}
-
-            {authUser?.authUser?.role === 'admin' && (
+            {(authUser?.authUser?.role === 'superadmin' ||
+              authUser?.authUser?.role === 'admin') && (
               <li>
                 <Link
                   href={'/admin/user-management'}
