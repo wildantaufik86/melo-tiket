@@ -124,27 +124,25 @@ export default function DetailOrderSection({
 
         {/* bank information */}
         <div className="flex gap-4 mt-4 p-4">
-          <div className="relative w-[22%]">
+          <div className="relative w-[25%]">
             <Image
-              src="/images/bsi-logo.png"
-              alt="bank-logo"
+              src="/images/bca-syariah.png"
+              alt="Bank_BCA_Syariah_logo"
               fill
               className="object-contain object-left"
             />
           </div>
-          <div className="flex-1 grid grid-cols-[1fr_auto]">
-            <p className="text-[10px] md:text-sm lg:text-lg font-bold">
+          <div className="flex-1 grid grid-cols-[1fr_auto] gap-4">
+            <p className="text-[10px] md:text-sm lg:text-base font-bold">
               Nama Rekening
             </p>
-            {/* <p className="text-[10px] md:text-sm lg:text-lg">
+            <p className="text-[10px] md:text-sm lg:text-base">
               : M. MAULANA RIDWAN
-            </p> */}
-            <p className="text-[10px] md:text-sm lg:text-lg"></p>
-            <p className="text-[10px] md:text-sm lg:text-lg font-bold">
+            </p>
+            <p className="text-[10px] md:text-sm lg:text-base font-bold">
               Nomor Rekening
             </p>
-            {/* <p className="text-[10px] md:text-sm lg:text-lg">: 1707071717</p> */}
-            <p className="text-[10px] md:text-sm lg:text-lg"></p>
+            <p className="text-[10px] md:text-sm lg:text-base">: 0722171717</p>
           </div>
         </div>
       </div>
