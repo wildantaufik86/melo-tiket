@@ -9,7 +9,7 @@ export default function TickedAccordion({
   incrementQty,
 }: TicketCardProps) {
   return (
-    <div className="flex flex-col rounded-sm p-4 bg-secondary">
+    <div className="flex flex-col rounded-sm p-4 bg-bg-secondary">
       <p
         onClick={ticket.status === 'Available' ? toggleOpen : undefined}
         className={`font-black lg:text-xl flex justify-between items-center ${

@@ -32,7 +32,7 @@ export default function MainNavbar() {
   }, []);
 
   return (
-    <nav className="fixed top-0 inset-x-0 py-4 pd-lr flex justify-between bg-secondary text-white items-center z-50">
+    <nav className="fixed top-0 inset-x-0 py-4 pd-lr flex justify-between bg-bg-secondary text-white items-center z-50">
       <div className="">
         <Link href="/">
           <Image
@@ -50,31 +50,31 @@ export default function MainNavbar() {
       <div className=" justify-center items-center gap-6 hidden md:flex">
         <Link
           href="#"
-          className="text-lg font-medium hover:text-primary transition-colors"
+          className="text-lg font-medium hover:text-hover transition-colors"
         >
           About
         </Link>
         <Link
           href="/venue"
-          className="text-lg font-medium hover:text-primary transition-colors"
+          className="text-lg font-medium hover:text-hover transition-colors"
         >
           Venue
         </Link>
         <Link
           href="/ticket"
-          className="text-lg font-medium hover:text-primary transition-colors"
+          className="text-lg font-medium hover:text-hover transition-colors"
         >
           Ticket
         </Link>
         <Link
           href="/line-up"
-          className="text-lg font-medium hover:text-primary transition-colors"
+          className="text-lg font-medium hover:text-hover transition-colors"
         >
           Line-Up
         </Link>
         <Link
           href="/contact"
-          className="text-lg font-medium hover:text-primary transition-colors"
+          className="text-lg font-medium hover:text-hover transition-colors"
         >
           Contact
         </Link>
@@ -90,13 +90,13 @@ export default function MainNavbar() {
             <div className="flex items-center gap-4">
               <Link
                 href="/auth/register"
-                className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+                className="py-2 px-4 text-xs lg:text-sm font-medium border border-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
                 Daftar
               </Link>
               <Link
                 href="/auth/login"
-                className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+                className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
                 Masuk
               </Link>
@@ -115,13 +115,13 @@ export default function MainNavbar() {
               <button
                 onClick={logoutUser}
                 type="button"
-                className="py-2 px-4 text-xs lg:text-sm font-medium border border-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+                className="py-2 px-4 text-xs lg:text-sm font-medium border border-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
                 LOG OUT
               </button>
               <Link
                 href="/user/profile"
-                className="py-2 px-4 text-xs lg:text-sm font-medium bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+                className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
                 PROFILE
               </Link>

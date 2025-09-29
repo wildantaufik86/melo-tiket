@@ -67,7 +67,7 @@ export default function DetailOrderSection({
   return (
     <section className="flex flex-col md:w-[60%] lg:w-[55%]">
       {/* detail order */}
-      <div className="flex-1 flex flex-col bg-secondary p-4 rounded-sm">
+      <div className="flex-1 flex flex-col bg-bg-secondary p-4 rounded-sm">
         {/* header */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative w-full aspect-3/1 md:aspect-3/2 md:w-1/2 lg:h-[140px]">
@@ -148,7 +148,7 @@ export default function DetailOrderSection({
       </div>
 
       {/* detail pembeli */}
-      <div className="flex-1 flex flex-col bg-secondary p-4 rounded-sm mt-8">
+      <div className="flex-1 flex flex-col bg-bg-secondary p-4 rounded-sm mt-8">
         <h3 className="font-black text-sm md:text-lg lg:text-3xl">
           DETAIL PEMBELI
         </h3>
@@ -238,7 +238,7 @@ export default function DetailOrderSection({
       </div>
 
       {/* upload file  */}
-      <div className="flex-1 flex justify-between items-center bg-secondary p-4 rounded-sm mt-8">
+      <div className="flex-1 flex justify-between items-center bg-bg-secondary p-4 rounded-sm mt-8">
         <p className="font-extrabold lg:text-xl">Bukti Transfer</p>
         <div className="flex items-center gap-2">
           <label

@@ -53,7 +53,7 @@ export default function TicketCard({
             : 'cursor-not-allowed'
         } mb-7`}
       >
-        <div className="rounded-sm font-semibold bg-secondary text-center text-[10px] py-2 px-4 sm:text-sm">
+        <div className="rounded-sm font-semibold bg-[#252222] text-center text-[10px] py-2 px-4 sm:text-sm">
           {ticket.status === 'Available' ? 'BUY TICKETS' : ticket.status}
         </div>
       </Link>

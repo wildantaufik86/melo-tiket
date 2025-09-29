@@ -23,7 +23,7 @@ export default function RiwayatPembelian({
   return (
     <section className="flex flex-col md:flex-1">
       <Label text="RIWAYAT PEMBELIAN" />
-      <div className="w-full bg-secondary p-4 rounded-lg flex flex-col mt-4">
+      <div className="w-full bg-bg-secondary p-4 rounded-lg flex flex-col mt-4">
         <div className="grid grid-cols-2 gap-2 text-black">
           <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
             Nomor Rekening
