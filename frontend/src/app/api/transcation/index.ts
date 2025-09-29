@@ -78,7 +78,8 @@ export async function createTransaction(
 export async function fetchAllTransactions(
   page: number = 1,
   limit: number = 10,
-  status?: 'expired' | 'pending' | 'paid' | 'reject'
+  status?: 'expired' | 'pending' | 'paid' | 'reject',
+  q?: string
 ): Promise<{
   status: string;
   message: string;
@@ -89,18 +90,15 @@ export async function fetchAllTransactions(
       page: String(page),
       limit: String(limit),
     });
-    if (status) {
-      params.append('status', status);
-    }
+    if (status) params.append('status', status);
+    if (q) params.append('q', q);
 
     const res = await fetchWithToken(`/transaction?${params.toString()}`, {
       method: 'GET',
     });
     const responseData = await res.json();
     if (!res.ok)
-      throw new Error(
-        responseData.message || 'Gagal mengambil data transaksi.'
-      );
+      throw new Error(responseData.message || 'Gagal mengambil data transaksi.');
 
     return {
       status: 'success',

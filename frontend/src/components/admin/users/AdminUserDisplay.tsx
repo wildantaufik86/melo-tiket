@@ -8,6 +8,7 @@ import UserList from './UserList';
 import Pagination from '@/components/fragments/Pagination';
 import UserFormModal from './UserFormModal';
 import { ToastError, ToastSuccess } from '@/lib/validations/toast/ToastNofication';
+import { searchUsers } from '@/app/api/user';
 
 export default function AdminUserDisplay() {
     const [users, setUsers] = useState<IUser[]>([]);
@@ -15,30 +16,58 @@ export default function AdminUserDisplay() {
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
+    // search
+    const [searchQuery, setSearchQuery] = useState('');
+    const [debouncedQuery, setDebouncedQuery] = useState('');
+
     // State untuk modal form
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<IUser | null>(null);
 
+    // Debounce effect 500ms
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedQuery(searchQuery);
+        }, 2000);
+
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
     const loadUsers = useCallback(async () => {
         setLoading(true);
-        const result = await fetchAllUsers(currentPage, 10);
-        if (result.status === 'success' && result.data) {
-            const extractedUsers = result.data.data.map(item => item.user);
 
-            setUsers(extractedUsers);
-            setPagination(result.data.pagination);
+        if (debouncedQuery) {
+            // Search mode
+            const result = await searchUsers(debouncedQuery);
+            if (result.status === 'success' && result.data) {
+                const extractedUsers = result.data.map(item => item.user);
+                setUsers(extractedUsers);
+                setPagination(null); // Search tidak pakai pagination
+            } else {
+                setUsers([]);
+                console.error(result.message);
+            }
         } else {
-            console.error(result.message);
+            // Normal mode with pagination
+            const result = await fetchAllUsers(currentPage, 10);
+            if (result.status === 'success' && result.data) {
+                const extractedUsers = result.data.data.map(item => item.user);
+                setUsers(extractedUsers);
+                setPagination(result.data.pagination);
+            } else {
+                console.error(result.message);
+            }
         }
+
         setLoading(false);
-    }, [currentPage]);
+    }, [currentPage, debouncedQuery]);
 
     useEffect(() => {
         loadUsers();
     }, [loadUsers]);
 
     const handleOpenCreateModal = () => {
-        setEditingUser(null); // Pastikan null untuk mode 'create'
+        setEditingUser(null);
         setIsModalOpen(true);
     };
 
@@ -55,17 +84,15 @@ export default function AdminUserDisplay() {
     const handleSaveUser = async (formData: ICreateUserPayload | IUpdateUserPayload) => {
         let result;
         if (editingUser) {
-            // Mode Update
             result = await updateUserProfile(editingUser._id!, formData as IUpdateUserPayload);
         } else {
-            // Mode Create
             result = await createUser(formData as ICreateUserPayload);
         }
 
         if (result.status === 'success') {
             ToastSuccess(`User successfully ${editingUser ? 'updated' : 'created'}!`);
             handleCloseModal();
-            loadUsers(); // Refresh data
+            loadUsers();
         } else {
             ToastError(`Error: ${result.message}`);
         }
@@ -77,7 +104,7 @@ export default function AdminUserDisplay() {
         const result = await softDeleteUser(userId);
         if (result.status === 'success') {
             ToastSuccess(result.message);
-            loadUsers(); // Refresh data
+            loadUsers();
         } else {
             ToastError(`Error: ${result.message}`);
         }
@@ -85,14 +112,23 @@ export default function AdminUserDisplay() {
 
     return (
         <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200 mt-4">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                 <h1 className="text-xl font-extrabold text-gray-900">User List</h1>
-                <button
-                    onClick={handleOpenCreateModal}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
-                >
-                    Create New User
-                </button>
+                <div className="flex items-center gap-3">
+                    <input
+                        type="text"
+                        placeholder="Search users by name or email..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                        onClick={handleOpenCreateModal}
+                        className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                    >
+                        Create New User
+                    </button>
+                </div>
             </div>
 
             {loading ? (
@@ -104,7 +140,7 @@ export default function AdminUserDisplay() {
                         onEdit={handleOpenEditModal}
                         onDelete={handleDeleteUser}
                     />
-                    {pagination && pagination.totalPages > 1 && (
+                    {!debouncedQuery && pagination && pagination.totalPages > 1 && (
                         <Pagination
                             currentPage={pagination.currentPage}
                             totalPages={pagination.totalPages}

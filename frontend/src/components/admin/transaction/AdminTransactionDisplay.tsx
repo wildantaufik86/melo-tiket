@@ -9,6 +9,7 @@ import TransactionList from './TransactionList';
 import Pagination from '@/components/fragments/Pagination';
 import TransactionDetailModal from './TransactionDetailModal';
 import { HouseIcon } from '@phosphor-icons/react/dist/ssr';
+import { useDebounce } from 'use-debounce';
 
 type StatusFilter = 'pending' | 'paid' | 'reject' | 'expired' | 'all';
 
@@ -18,6 +19,8 @@ export default function AdminTransactionDisplay() {
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
+
+    const [searchTerm, setSearchTerm] = useState("");
     const [selectedTransaction, setSelectedTransaction] = useState<ITransaction | null>(null);
 
     const breadcrumbItems: BreadCrumbItem[] = [
@@ -25,11 +28,12 @@ export default function AdminTransactionDisplay() {
         { label: "Transaction Management" }
     ];
 
-    // Fungsi untuk memuat transaksi, dibuat reusable dengan useCallback
+    const [debouncedSearch] = useDebounce(searchTerm, 2000);
+
     const loadTransactions = useCallback(async () => {
         setLoading(true);
         const statusToSend = statusFilter === 'all' ? undefined : statusFilter;
-        const result = await fetchAllTransactions(currentPage, 10, statusToSend);
+        const result = await fetchAllTransactions(currentPage, 10, statusToSend, debouncedSearch);
 
         if (result.status === 'success' && result.data) {
             setTransactions(result.data.data || []);
@@ -39,7 +43,7 @@ export default function AdminTransactionDisplay() {
             // Anda bisa menambahkan notifikasi error di sini
         }
         setLoading(false);
-    }, [currentPage, statusFilter]);
+    }, [currentPage, statusFilter, debouncedSearch]);
 
     // useEffect untuk memuat data saat filter atau halaman berubah
     useEffect(() => {
@@ -55,10 +59,22 @@ export default function AdminTransactionDisplay() {
         <section>
             <BreadCrumb items={breadcrumbItems} />
             <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-xl font-extrabold text-gray-900">Transaction Management</h1>
-                    <TransactionFilter currentFilter={statusFilter} onFilterChange={handleFilterChange} />
-                </div>
+<div className="flex justify-between items-center mb-6 gap-4">
+  <h1 className="text-xl font-extrabold text-gray-900">Transaction Management</h1>
+  <div className="flex items-center gap-3">
+    <input
+      type="text"
+      placeholder="Search by user or transaction ID..."
+      value={searchTerm}
+      onChange={(e) => {
+        setCurrentPage(1);
+        setSearchTerm(e.target.value);
+      }}
+      className="border rounded-lg px-3 py-2 text-sm"
+    />
+    <TransactionFilter currentFilter={statusFilter} onFilterChange={handleFilterChange} />
+  </div>
+</div>
 
                 {loading ? (
                     <p className='text-center'>Loading transactions...</p>

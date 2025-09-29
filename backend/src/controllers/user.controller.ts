@@ -309,11 +309,55 @@ export const searchUsersHandler: RequestHandler = async (req, res, next) => {
         { email: { $regex: query, $options: 'i' } }
       ],
       deletedAt: null
-    }).select('_id name email').limit(10);
+    }).select('_id name email role idNumber')
+    .populate({
+      path: "historyTransaction",
+      options: { sort: { createdAt: -1 } },
+      populate: {
+        path: "tickets.ticketId",
+        model: "Ticket",
+        select: "category price eventId",
+        populate: {
+          path: "eventId",
+          model: "Event",
+          select: "eventName date address headlineImage",
+        },
+      },
+    })
+    .limit(10);
+
+      const processedUsers = users.map((user) => {
+      const eventsMap = new Map<string, IEvent & { transactions: PopulatedTransaction[] }>();
+
+      user.historyTransaction?.forEach((transaction) => {
+        const populatedTransaction = transaction as unknown as PopulatedTransaction;
+        const event = populatedTransaction.tickets[0]?.ticketId?.eventId;
+
+        if (!event) return;
+
+        const eventId = event._id.toString();
+
+        if (!eventsMap.has(eventId)) {
+          eventsMap.set(eventId, {
+            ...(event as IEvent).toObject(),
+            transactions: [],
+          });
+        }
+        eventsMap.get(eventId)?.transactions.push(populatedTransaction);
+      });
+      const historyByEvent = Array.from(eventsMap.values());
+      const userData = user.omitPassword();
+      const { historyTransaction, ...finalUserData } = userData;
+
+      return {
+        user: finalUserData,
+        historyByEvent: historyByEvent,
+      };
+    });
 
     res.status(OK).json({
       message: "Users found successfully",
-      data: users,
+      data: processedUsers,
     });
   } catch (error) {
     next(error);

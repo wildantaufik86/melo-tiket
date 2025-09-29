@@ -212,34 +212,90 @@ export const createTransactionHandler: RequestHandler = async (
   }
 };
 
-export const getAllTransactionsHandler: RequestHandler = async (
-  req,
-  res,
-  next
-) => {
+export const getAllTransactionsHandler: RequestHandler = async (req, res, next) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-    const skip = (page - 1) * limit;
 
-    const filter: { status?: string; deletedAt: null } = { deletedAt: null };
-    if (req.query.status) {
-      filter.status = req.query.status as string;
+    const status = req.query.status as string | undefined;
+    const searchQuery = req.query.q as string | undefined;
+
+    const match: any = { deletedAt: null };
+
+    if (status && status !== "all") {
+      match.status = status;
     }
 
-    const [transactions, totalTransactions] = await Promise.all([
-      TransactionModel.find(filter)
-        .populate({ path: 'userId', select: 'name email' })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-      TransactionModel.countDocuments(filter),
-    ]);
+    const pipeline: any[] = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      { $match: match },
+    ];
 
+    if (searchQuery) {
+      const searchConditions: any[] = [
+        { "user.name": { $regex: searchQuery, $options: "i" } },
+        { "user.email": { $regex: searchQuery, $options: "i" } },
+      ];
+
+      if (mongoose.Types.ObjectId.isValid(searchQuery)) {
+        searchConditions.push({ _id: new mongoose.Types.ObjectId(searchQuery) });
+      }
+
+      pipeline.push({ $match: { $or: searchConditions } });
+    }
+
+    pipeline.push({ $sort: { createdAt: -1 } });
+
+    // ✅ project di sini, sebelum facet
+    pipeline.push({
+      $project: {
+        _id: 1,
+        tickets: 1,
+        totalTicket: 1,
+        totalPrice: 1,
+        paymentProof: 1,
+        status: 1,
+        transactionMethod: 1,
+        expiredAt: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        deletedAt: 1,
+        verifiedBy: 1,
+        verifiedAt: 1,
+        userId: {
+          _id: "$user._id",
+          name: "$user.name",
+          email: "$user.email",
+        },
+      },
+    });
+
+    pipeline.push({
+      $facet: {
+        data: [
+          { $skip: (page - 1) * limit },
+          { $limit: limit },
+        ],
+        total: [{ $count: "count" }],
+      },
+    });
+
+    const result = await TransactionModel.aggregate(pipeline);
+
+    const transactions = result[0]?.data || [];
+    const totalTransactions = result[0]?.total[0]?.count || 0;
     const totalPages = Math.ceil(totalTransactions / limit);
 
     res.status(OK).json({
-      message: 'Transactions retrieved successfully',
+      message: "Transactions retrieved successfully",
       data: transactions,
       pagination: {
         currentPage: page,

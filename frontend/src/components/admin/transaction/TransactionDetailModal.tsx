@@ -35,7 +35,7 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4 border-b pb-2">
-                    <h2 className="text-lg font-bold">Transaction Details</h2>
+                    <h2 className="text-lg font-bold">Transaction Details - {transaction._id ?? ''}</h2>
                     <button onClick={onClose} className="text-2xl font-bold">&times;</button>
                 </div>
 
@@ -43,7 +43,7 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
                     <div>
                         <p><strong>User:</strong> {isUserObject(transaction.userId) ? transaction.userId.name : 'N/A'}</p>
                         <p><strong>Email:</strong> {isUserObject(transaction.userId) ? transaction.userId.email : 'N/A'}</p>
-                        <p><strong>cdTicket:</strong> {transaction.tickets.length}</p>
+                        <p><strong>Ticket:</strong> {transaction.tickets.length}</p>
                         <p><strong>Total:</strong> {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(transaction.totalPrice)}</p>
                     </div>
                     <div>
