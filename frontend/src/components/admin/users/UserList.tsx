@@ -14,7 +14,7 @@ export default function UserList({ users, onEdit, onDelete }: UserListProps) {
   const { authUser } = useAuth();
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto mb-5">
       <table className="min-w-full bg-white text-sm">
         <thead>
           <tr className="bg-gray-100 text-left text-gray-700 uppercase">
