@@ -2,18 +2,21 @@
 
 import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
 import { useOrder } from '@/context/ordersContext';
+import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { TicketProps, TicketWithState } from '@/types/Ticket';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   const [availableTickets, setAvailableTickets] = useState<TicketWithState[]>(
     []
   );
-  const { orders, saveOrders } = useOrder();
+  const { saveOrders } = useOrder();
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     if (tickets.length > 0) {
@@ -56,7 +59,12 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   };
 
   const createTemporaryOrder = (): void => {
-    if (selectedTickets.length > 0) saveOrders(selectedTickets);
+    if (selectedTickets.length > 0) {
+      saveOrders(selectedTickets);
+      router.push(`/checkout/event/${eventId}`);
+    } else {
+      ToastError('Silahkan pilih tiket terlebih dahulu');
+    }
   };
 
   useEffect(() => {
@@ -97,13 +105,12 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
             {formattedPrice(totalPrice)}
           </span>
         </p>
-        <Link
+        <button
           onClick={createTemporaryOrder}
-          href={`/checkout/event/${eventId}`}
-          className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white font-semibold lg:text-xl hover:bg-hover transition-colors"
+          className="ml-auto py-2 px-4 flex justify-center items-center bg-red-500 text-white font-semibold lg:text-xl hover:bg-hover transition-colors cursor-pointer"
         >
           Lanjutkan
-        </Link>
+        </button>
       </div>
     </section>
   );
