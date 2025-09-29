@@ -129,25 +129,44 @@ export default function AdminSidebar() {
                 </div>
               </Link>
             </li>
-            {authUser?.authUser?.role === 'superadmin' ||
-              (authUser?.authUser?.role === 'admin' && (
-                <li
-                  onClick={() => setEventManagementOpen(!eventsManagementOpen)}
-                  className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
-                >
-                  <div className="flex items-center">
-                    <TicketIcon
-                      size={24}
-                      className="text-black/75 mr-2"
-                      weight="light"
-                    />
-                    <span>Event Managements </span>
-                  </div>
-                  <span className="duration-200">
-                    {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
-                  </span>
-                </li>
-              ))}
+
+            {authUser?.authUser?.role === 'superadmin' && (
+              <li
+                onClick={() => setEventManagementOpen(!eventsManagementOpen)}
+                className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <TicketIcon
+                    size={24}
+                    className="text-black/75 mr-2"
+                    weight="light"
+                  />
+                  <span>Event Managements </span>
+                </div>
+                <span className="duration-200">
+                  {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
+                </span>
+              </li>
+            )}
+
+            {authUser?.authUser?.role === 'admin' && (
+              <li
+                onClick={() => setEventManagementOpen(!eventsManagementOpen)}
+                className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between"
+              >
+                <div className="flex items-center">
+                  <TicketIcon
+                    size={24}
+                    className="text-black/75 mr-2"
+                    weight="light"
+                  />
+                  <span>Event Managements </span>
+                </div>
+                <span className="duration-200">
+                  {eventsManagementOpen ? <ChevronUp /> : <ChevronDown />}
+                </span>
+              </li>
+            )}
             <div
               className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${
                 eventsManagementOpen ? 'max-h-96' : 'max-h-0'
@@ -226,19 +245,31 @@ export default function AdminSidebar() {
               >
                 Transaction
               </Link>
-              {authUser?.authUser?.role === 'superadmin' ||
-                (authUser?.authUser?.role === 'admin' && (
-                  <Link
-                    href={'/admin/transactions/new'}
-                    className={`${
-                      pathname.startsWith('/admin/transaction/new')
-                        ? 'bg-bg-secondary'
-                        : 'bg-white'
-                    } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
-                  >
-                    Create Transaction
-                  </Link>
-                ))}
+              {authUser?.authUser?.role === 'superadmin' && (
+                <Link
+                  href={'/admin/transactions/new'}
+                  className={`${
+                    pathname.startsWith('/admin/transaction/new')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Create Transaction
+                </Link>
+              )}
+
+              {authUser?.authUser?.role === 'admin' && (
+                <Link
+                  href={'/admin/transactions/new'}
+                  className={`${
+                    pathname.startsWith('/admin/transaction/new')
+                      ? 'bg-bg-secondary'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Create Transaction
+                </Link>
+              )}
             </div>
 
             {authUser?.authUser?.role === 'superadmin' && (
