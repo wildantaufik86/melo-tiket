@@ -83,13 +83,6 @@ export default function AdminSidebar() {
                 />
               </div>
             </Link>
-            <div className="space-x-1 w-maxrounded-lg">
-              <img
-                src="/logo/snarcbitz_admin.png"
-                alt="Logo_SnarcBitz"
-                className="max-w-[115px] object-cover"
-              />
-            </div>
           </div>
 
           {/* Profile Section */}
@@ -116,7 +109,7 @@ export default function AdminSidebar() {
                 <Link
                   href={'/admin'}
                   className={`${
-                    pathname === '/admin' ? 'bg-bg-secondary' : 'bg-white'
+                    pathname === '/admin' ? 'bg-gray-100' : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
                 >
@@ -162,7 +155,7 @@ export default function AdminSidebar() {
                   href={'/admin/event-management/event'}
                   className={`${
                     pathname.startsWith('/admin/event-management/event')
-                      ? 'bg-bg-secondary'
+                      ? 'bg-gray-100'
                       : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
                 >
@@ -174,7 +167,7 @@ export default function AdminSidebar() {
                 href={'/admin/event-management/ticket'}
                 className={`${
                   pathname.startsWith('/admin/event-management/ticket')
-                    ? 'bg-bg-secondary'
+                    ? 'bg-gray-100'
                     : 'bg-white'
                 } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
               >
@@ -186,7 +179,7 @@ export default function AdminSidebar() {
                   href={'/admin/event-management/template'}
                   className={`${
                     pathname.startsWith('/admin/event-management/template')
-                      ? 'bg-bg-secondary'
+                      ? 'bg-gray-100'
                       : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
                 >
@@ -198,7 +191,7 @@ export default function AdminSidebar() {
                   href={'/admin/event-management/category'}
                   className={`${
                     pathname.startsWith('/admin/event-management/category')
-                      ? 'bg-bg-secondary'
+                      ? 'bg-gray-100'
                       : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
                 >
@@ -232,7 +225,7 @@ export default function AdminSidebar() {
                 href={'/admin/transactions'}
                 className={`${
                   pathname.startsWith('/admin/transactions')
-                    ? 'bg-bg-secondary'
+                    ? 'bg-gray-100'
                     : 'bg-white'
                 } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
               >
@@ -244,7 +237,7 @@ export default function AdminSidebar() {
                   href={'/admin/transactions/new'}
                   className={`${
                     pathname.startsWith('/admin/transaction/new')
-                      ? 'bg-bg-secondary'
+                      ? 'bg-gray-100'
                       : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
                 >
@@ -260,7 +253,7 @@ export default function AdminSidebar() {
                   href={'/admin/user-management'}
                   className={`${
                     pathname.startsWith('/admin/user-management')
-                      ? 'bg-bg-secondary'
+                      ? 'bg-gray-100'
                       : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
@@ -282,7 +275,7 @@ export default function AdminSidebar() {
                 href={'/admin/about'}
                 className={`${
                   pathname.startsWith('/admin/about')
-                    ? 'bg-bg-secondary'
+                    ? 'bg-gray-100'
                     : 'bg-white'
                 } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
@@ -298,7 +291,7 @@ export default function AdminSidebar() {
                 href={'/admin/contact-us'}
                 className={`${
                   pathname.startsWith('/admin/contact-us')
-                    ? 'bg-bg-secondary'
+                    ? 'bg-gray-100'
                     : 'bg-white'
                 } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
@@ -314,7 +307,7 @@ export default function AdminSidebar() {
                 href={'/admin/services'}
                 className={`${
                   pathname.startsWith('/admin/services')
-                    ? 'bg-bg-secondary'
+                    ? 'bg-gray-100'
                     : 'bg-white'
                 } block text-sm font-semibold py-2 px-4 rounded text-primary
                     hover:bg-[#EFF6FF] hover:text-black/75`}
@@ -330,7 +323,7 @@ export default function AdminSidebar() {
 
         {/* Profile, Messages, Notifications, Logout */}
         <div className="flex flex-col items-start py-2 space-y-4 mb-10 border-t-2 border-black/10 rounded-t-lg">
-          <div className="w-full flex flex-col justify-between">
+          <div className="w-full flex items-center justify-between bg-gray-50 border rounded-lg border-black/10 p-2">
             {/* Logout Link */}
             <button
               onClick={handleLogout}
@@ -339,6 +332,13 @@ export default function AdminSidebar() {
               <LogOut className="text-lg text-red-600" />
               <span className="text-sm font-semibold">Logout</span>
             </button>
+            <div className="space-x-1 w-maxrounded-lg">
+              <img
+                src="/logo/snarcbitz_admin.png"
+                alt="Logo_SnarcBitz"
+                className="max-w-[115px] object-cover"
+              />
+            </div>
           </div>
         </div>
       </aside>
