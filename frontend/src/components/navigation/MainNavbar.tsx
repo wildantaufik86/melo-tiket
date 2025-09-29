@@ -139,37 +139,37 @@ export default function MainNavbar() {
 
       {/* sidebar on mobile */}
       <aside
-        className={`absolute top-full  w-[200px] h-screen bg-secondary p-4 flex flex-col gap-4 ${
+        className={`absolute top-full  w-[200px] h-screen bg-bg-secondary p-4 flex flex-col gap-4 ${
           isSidebarOpen ? 'right-0' : '-right-full'
         } transition-all lg:hidden`}
       >
         <Link
           href="/about"
-          className="text-sm font-medium hover:bg-primary transition-colors p-2 rounded-sm"
+          className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           About
         </Link>
         <Link
           href="/venue"
-          className="text-sm font-medium hover:bg-primary transition-colors p-2 rounded-sm"
+          className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Venue
         </Link>
         <Link
           href="/ticket"
-          className="text-sm font-medium hover:bg-primary transition-colors p-2 rounded-sm"
+          className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Ticket
         </Link>
         <Link
           href="/line-up"
-          className="text-sm font-medium hover:bg-primary transition-colors p-2 rounded-sm"
+          className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Line-Up
         </Link>
         <Link
           href="/contact"
-          className="text-sm font-medium hover:bg-primary transition-colors p-2 rounded-sm"
+          className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Contact
         </Link>

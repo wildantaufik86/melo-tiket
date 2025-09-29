@@ -7,8 +7,12 @@ type Sponsor = {
 
 export default function SponsorCard({ url, alt }: Sponsor) {
   return (
-    <div className="relative aspect-2/1 bg-white rounded-sm w-full max-w-[250px]">
-    <Image src={url} fill alt={alt} className="object-contain p-2 hover:scale-110 duration-500 ease-in-out" />
+    <div className="flex justify-center items-center rounded-sm w-full max-w-[200px]">
+      <img
+        src={url}
+        alt={alt}
+        className="object-cover p-2 hover:scale-110 duration-500 ease-in-out"
+      />
     </div>
   );
 }
