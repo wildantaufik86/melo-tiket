@@ -249,30 +249,35 @@ export default function DetailOrderSection({
             <BsPaperclip size={24} />
             Attach File
           </label>
-          <input
-            type="file"
-            id="file"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0] || null;
-              if (file) {
-                handlePaymentProof(file);
-                const url = URL.createObjectURL(file);
-                setPreviewImg(url);
-              }
-            }}
-          />
         </div>
       </div>
-      <p className="text-xs px-4 mt-2 italic font-medium lg:text-xl">
+
+      {/* input file */}
+      <div className="mt-2 px-4">
+        <input
+          type="file"
+          id="file"
+          className="text-lg text-bg-primary font-semibold"
+          onChange={(e) => {
+            const file = e.target.files?.[0] || null;
+            if (file) {
+              handlePaymentProof(file);
+              const url = URL.createObjectURL(file);
+              setPreviewImg(url);
+            }
+          }}
+        />
+      </div>
+
+      <p className="text-xs px-4 mt-4 italic font-medium lg:text-xl">
         Pastikan untuk mencantumkan bukti transfer*
       </p>
 
-      <div className="mt-4">
+      {/* <div className="mt-4">
         {previewImg && (
           <img src={previewImg} alt="bukti-transfer" className="aspect-2/1" />
         )}
-      </div>
+      </div> */}
     </section>
   );
 }
