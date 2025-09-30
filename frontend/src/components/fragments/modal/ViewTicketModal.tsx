@@ -102,13 +102,13 @@ const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
           </div>
 
           <div className="flex items-center gap-4">
-            <button
+            {/* <button
               onClick={onDownload}
               className="mt-2 w-32 flex justify-center items-center text-xs font-semibold py-2 px-4 rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
               style={{ backgroundColor: '#1f2937', color: '#ffffff' }}
             >
               Download
-            </button>
+            </button> */}
             <button
               onClick={onClose}
               className="mt-2 w-32 flex justify-center items-center text-xs font-semibold py-2 px-4 rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
