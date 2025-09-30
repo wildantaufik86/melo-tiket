@@ -10,7 +10,7 @@ import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITransaction } from '@/types/Transaction';
 import ViewTicketModal from '@/components/fragments/modal/ViewTicketModal';
 import { useAuth } from '@/context/authUserContext';
-import { handleFallbackDownload } from '@/utils/universalUtils';
+import { formattedDate, handleFallbackDownload } from '@/utils/universalUtils';
 
 export interface IHistoryByEvent {
   _id: string;
@@ -20,7 +20,7 @@ export interface IHistoryByEvent {
   transactions: ITransaction[];
 }
 
-type TransactionSummary = Pick<ITransaction, '_id' | 'tickets'>;
+type TransactionSummary = Pick<ITransaction, '_id' | 'tickets' | 'createdAt'>;
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -51,6 +51,15 @@ export default function ProfilePage() {
     fetchProfil();
   }, []);
 
+  const handleTicketUrls = (index: number) => {
+    if (paidTransactions.length > 0) {
+      const url: string[] = paidTransactions[index].tickets.map((ticket) => {
+        return ticket.ticketImage;
+      });
+      setTicketsUrl(url);
+    }
+  };
+
   useEffect(() => {
     if (lastHistory && lastHistory?.transactions?.length > 0) {
       const filtered = lastHistory.transactions
@@ -58,21 +67,11 @@ export default function ProfilePage() {
         .map((ts) => ({
           _id: ts._id,
           tickets: ts.tickets,
+          createdAt: ts.createdAt,
         }));
       setPaidTransactions(filtered);
     }
   }, [lastHistory]);
-
-  useEffect(() => {
-    if (paidTransactions.length > 0) {
-      const url: string[] = paidTransactions.flatMap((data) => {
-        return data.tickets.map((tc) => tc.ticketImage);
-      });
-      setTicketsUrl(url);
-    }
-  }, [paidTransactions]);
-
-  console.log(ticketsUrl);
 
   return (
     <div className="flex flex-col pt-24 pd-full">
@@ -97,23 +96,35 @@ export default function ProfilePage() {
           </div>
         )}
 
-        <div className="flex flex-col bg-bg-secondary p-4 mt-4 lg:p-8">
-          <div className="flex items-center gap-8">
-            <p className="text-xs font-normal md:text-sm lg:text-lg">
-              E-Ticket
-            </p>
-            <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
-              <button
-                onClick={() => {
-                  setIsViewTicket(true);
-                }}
-                className="text-bg-primary cursor-pointer hover:underline duration-200"
-              >
-                view
-              </button>
+        {paidTransactions.length > 0 &&
+          paidTransactions.map((transaction, index) => (
+            <div
+              key={index}
+              className="flex flex-col bg-bg-secondary p-4 mt-4 lg:p-8"
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-8">
+                  <p className="text-xs font-normal md:text-sm lg:text-lg">
+                    E-Ticket
+                  </p>
+                  <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
+                    <button
+                      onClick={() => {
+                        handleTicketUrls(index);
+                        setIsViewTicket(true);
+                      }}
+                      className="text-bg-primary cursor-pointer hover:underline duration-200"
+                    >
+                      view
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs">
+                  {formattedDate(transaction.createdAt || '')}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+          ))}
 
         {isViewTicket && (
           <ViewTicketModal
