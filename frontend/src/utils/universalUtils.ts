@@ -236,20 +236,19 @@ const normalizeColor = (color: string, fallback: string): string => {
   return isUnsupportedColor(color) ? fallback : color;
 };
 
-// Helper function untuk preload image menjadi Base64
+// Helper: Fetch gambar menjadi Base64 dengan authentication
 const fetchImageAsBase64 = async (src: string): Promise<string> => {
   try {
     const response = await fetch(src, {
       method: 'GET',
-      credentials: 'include', // pakai cookies kalau perlu auth
+      credentials: 'include',
     });
 
-    if (!response.ok) {
+    if (!response.ok)
       throw new Error(`Failed to fetch image: ${response.status}`);
-    }
 
     const blob = await response.blob();
-    return new Promise((resolve) => {
+    return await new Promise((resolve) => {
       const reader = new FileReader();
       reader.onloadend = () => resolve(reader.result as string);
       reader.readAsDataURL(blob);
@@ -261,18 +260,18 @@ const fetchImageAsBase64 = async (src: string): Promise<string> => {
   }
 };
 
-// Helper untuk kompres image
+// Helper: Kompres image
 const compressImage = (canvas: HTMLCanvasElement, quality: number): string => {
   return canvas.toDataURL('image/jpeg', quality);
 };
 
-// Helper untuk estimasi ukuran PDF
+// Helper: Estimasi ukuran PDF
 const estimatePDFSize = (base64String: string): number => {
   const base64Length = base64String.length;
   return (base64Length * 3) / 4 + 50000; // overhead PDF
 };
 
-// Main Function
+// Main function: Download tiket PDF
 export const handleFallbackDownload = async (
   ticketRef: RefObject<HTMLDivElement | null>,
   ticketsUrl: string[],
@@ -287,36 +286,40 @@ export const handleFallbackDownload = async (
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Preload semua tiket jadi Base64 di awal
-    const base64Images: string[] = [];
-    for (let url of ticketsUrl) {
-      const base64 = await fetchImageAsBase64(BASE_URL + url);
-      base64Images.push(base64);
-    }
+    // 1️⃣ Preload semua image jadi Base64
+    const base64Images = await Promise.all(
+      ticketsUrl.map((url) => fetchImageAsBase64(BASE_URL + url))
+    );
 
     for (let i = 0; i < ticketsUrl.length; i++) {
-      // Clone node tiket
+      // 2️⃣ Clone node tiket
       const clone = ticketRef.current.cloneNode(true) as HTMLElement;
 
-      // Replace <img> di clone dengan Base64 tiket ke-i
-      const images = clone.querySelectorAll('img');
-      images.forEach((img) => {
-        if (base64Images[i]) {
-          (img as HTMLImageElement).src = base64Images[i];
-        }
-      });
-
-      // Temp container
+      // Temp container untuk render
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '0';
       tempContainer.style.width = '800px';
       tempContainer.style.backgroundColor = '#ffffff';
-      tempContainer.appendChild(clone);
       document.body.appendChild(tempContainer);
+      tempContainer.appendChild(clone);
 
-      // Render canvas
+      // 3️⃣ Ganti semua <img> dengan Base64 dan tunggu load
+      const imgElements = clone.querySelectorAll('img');
+      await Promise.all(
+        Array.from(imgElements).map(
+          (imgEl, idx) =>
+            new Promise<void>((resolve, reject) => {
+              imgEl.src = base64Images[i]; // Asumsi 1 image per tiket
+              if (imgEl.complete) return resolve();
+              imgEl.onload = () => resolve();
+              imgEl.onerror = () => reject(`Failed to load image ${i}`);
+            })
+        )
+      );
+
+      // 4️⃣ Render ke canvas
       const canvas = await html2canvas(clone, {
         scale: 2,
         useCORS: true,
@@ -326,7 +329,7 @@ export const handleFallbackDownload = async (
 
       document.body.removeChild(tempContainer);
 
-      // Kompres image sampai di bawah MAX_FILE_SIZE
+      // 5️⃣ Kompres image jika terlalu besar
       let quality = 0.9;
       let imgData = compressImage(canvas, quality);
       let estimatedSize = estimatePDFSize(imgData);
@@ -337,7 +340,7 @@ export const handleFallbackDownload = async (
         estimatedSize = estimatePDFSize(imgData);
       }
 
-      // Fit ke PDF
+      // 6️⃣ Fit image ke halaman PDF
       const margin = 30;
       const availableWidth = pageWidth - margin * 2;
       const availableHeight = pageHeight - margin * 2;

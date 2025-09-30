@@ -125,7 +125,7 @@ export default function ProfilePage() {
               handleFallbackDownload(
                 ticketRef,
                 ticketsUrl,
-                BASE_URL ? BASE_URL : 'localhost:5000'
+                BASE_URL ? BASE_URL : ''
               )
             }
           />
