@@ -22,6 +22,8 @@ export interface IHistoryByEvent {
 
 type TransactionSummary = Pick<ITransaction, '_id' | 'tickets'>;
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
   const [historyEvent, setHistoryEvent] = useState<IHistoryByEvent[]>([]);
@@ -30,7 +32,7 @@ export default function ProfilePage() {
   const [paidTransactions, setPaidTransactions] = useState<
     TransactionSummary[]
   >([]);
-  const [selectedTicket, setSelectedTicket] = useState<string>('');
+  const [ticketsUrl, setTicketsUrl] = useState<string[]>([]);
 
   const lastHistory = historyEvent[historyEvent.length - 1];
 
@@ -61,7 +63,16 @@ export default function ProfilePage() {
     }
   }, [lastHistory]);
 
-  console.log(paidTransactions);
+  useEffect(() => {
+    if (paidTransactions.length > 0) {
+      const url: string[] = paidTransactions.flatMap((data) => {
+        return data.tickets.map((tc) => tc.ticketImage);
+      });
+      setTicketsUrl(url);
+    }
+  }, [paidTransactions]);
+
+  console.log(ticketsUrl);
 
   return (
     <div className="flex flex-col pt-24 pd-full">
@@ -86,40 +97,37 @@ export default function ProfilePage() {
           </div>
         )}
 
-        {paidTransactions.length > 0 &&
-          paidTransactions.map((data) =>
-            data.tickets.map((tc) => (
-              <div
-                key={tc._id}
-                className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
+        <div className="flex flex-col bg-bg-secondary p-4 mt-4 lg:p-8">
+          <div className="flex items-center gap-8">
+            <p className="text-xs font-normal md:text-sm lg:text-lg">
+              E-Ticket
+            </p>
+            <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
+              <button
+                onClick={() => {
+                  setIsViewTicket(true);
+                }}
+                className="text-bg-primary cursor-pointer hover:underline duration-200"
               >
-                <div className="flex items-center gap-8">
-                  <p className="text-xs font-normal md:text-sm lg:text-lg">
-                    E-Ticket
-                  </p>
-                  <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
-                    <button
-                      onClick={() => {
-                        setIsViewTicket(true);
-                        setSelectedTicket(tc.ticketImage);
-                      }}
-                      className="text-primary cursor-pointer hover:underline duration-200"
-                    >
-                      view
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+                view
+              </button>
+            </div>
+          </div>
+        </div>
 
         {isViewTicket && (
           <ViewTicketModal
             ref={ticketRef}
             profile={authUser}
-            ticketUrl={selectedTicket}
+            ticketsUrl={ticketsUrl}
             onClose={() => setIsViewTicket(false)}
-            onDownload={() => handleFallbackDownload(ticketRef)}
+            onDownload={() =>
+              handleFallbackDownload(
+                ticketRef,
+                ticketsUrl,
+                BASE_URL ? BASE_URL : 'localhost:5000'
+              )
+            }
           />
         )}
       </section>

@@ -17,6 +17,7 @@
     "framer-motion": "^12.23.22",
     "gsap": "^3.13.0",
     "html2canvas": "^1.4.1",
+    "html2canvas-pro": "^1.5.11",
     "html2pdf.js": "^0.12.1",
     "joi": "^18.0.1",
     "js-cookie": "^3.0.5",

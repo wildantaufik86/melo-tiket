@@ -6,7 +6,7 @@ import { forwardRef } from 'react';
 
 type TicketDataProps = {
   profile?: IUser | null;
-  ticketUrl: string;
+  ticketsUrl: string[];
   onClose: () => void;
   onDownload: () => void;
 };
@@ -15,9 +15,12 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // forwardRef supaya parent bisa akses ref ke bg-white div
 const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
-  ({ profile, ticketUrl, onClose, onDownload }, ref) => {
+  ({ profile, ticketsUrl, onClose, onDownload }, ref) => {
     return (
-      <div className="fixed bg-black/30 inset-0 flex justify-center items-center z-50">
+      <div
+        className="fixed inset-0 flex justify-center items-center z-50"
+        style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }} // ✅ Inline style
+      >
         <div
           ref={ref}
           className="w-[90%] p-4 rounded-sm flex flex-col sm:max-w-[600px] sm:p-6"
@@ -92,12 +95,17 @@ const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
             <h4 className="font-black text-lg" style={{ color: '#000000' }}>
               E-Ticket
             </h4>
-            <div className="relative w-full">
-              <img
-                src={BASE_URL + ticketUrl}
-                alt="E ticket"
-                className="object-contain w-[500px] h-[200px]"
-              />
+            <div className="flex flex-col gap-4 max-h-[200px] overflow-y-auto">
+              {ticketsUrl.length > 0 &&
+                ticketsUrl.map((data, index) => (
+                  <div key={index} className="relative w-full">
+                    <img
+                      src={BASE_URL + data}
+                      alt="E ticket"
+                      className="object-contain w-[500px] h-[200px]"
+                    />
+                  </div>
+                ))}
             </div>
           </div>
 
