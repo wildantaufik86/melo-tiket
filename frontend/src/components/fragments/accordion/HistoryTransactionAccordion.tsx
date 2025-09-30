@@ -3,6 +3,7 @@ import { FaChevronDown } from 'react-icons/fa';
 
 type PropsHistoryAccordion = {
   totalPrice: number;
+  status: string;
   createdAt: string | Date;
   totalTicket: number;
 };
@@ -10,6 +11,7 @@ type PropsHistoryAccordion = {
 export default function HistoryTransactionAccordion({
   totalPrice,
   createdAt,
+  status,
   totalTicket,
 }: PropsHistoryAccordion) {
   return (
@@ -32,6 +34,13 @@ export default function HistoryTransactionAccordion({
         </p>
         <p className="bg-white font-normal text-sm lg:text-base py-2 px-4 flex items-center">
           {formattedDate(createdAt || '')}
+        </p>
+
+        <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
+          Status Transaksi
+        </p>
+        <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">
+          {status.toLocaleUpperCase() || ''}
         </p>
 
         <p className="bg-white font-bold text-sm lg:text-base py-2 px-4 flex items-center">

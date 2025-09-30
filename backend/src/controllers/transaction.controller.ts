@@ -63,6 +63,15 @@ export const createTransactionHandler: RequestHandler = async (
     const initiator = req.user;
     appAssert(initiator, FORBIDDEN, 'Authentication failed, user not found.');
 
+    if (initiator.role === 'user') {
+      const freshUser = await UserModel.findById(initiator._id).lean();
+      appAssert(
+        freshUser?.idNumber,
+        BAD_REQUEST,
+        'Harap isi NIK terlebih dahulu di halaman Profile.'
+      );
+    }
+
     const { transactionMethod, userId: targetUserIdFromAdmin } = req.body;
 
     const totalPriceFromFE = Number(req.body.totalPrice);
