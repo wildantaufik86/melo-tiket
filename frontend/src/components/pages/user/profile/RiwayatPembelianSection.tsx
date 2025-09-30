@@ -53,6 +53,7 @@ export default function RiwayatPembelian({
               <HistoryTransactionAccordion
                 key={data._id}
                 totalPrice={data.totalPrice}
+                status={data.status || ''}
                 createdAt={data.createdAt || ''}
                 totalTicket={data.totalTicket}
               />
