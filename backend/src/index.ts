@@ -67,6 +67,8 @@ app.get("/", ({ req, res }: any) => {
   });
 });
 
+app.set('trust proxy', 1);
+
 app.use("/ticket", express.json(), express.urlencoded({ extended: true }), ticketRoutes);
 app.use("/transaction",express.json(), express.urlencoded({ extended: true }), transactionRoutes);
 app.use("/event", express.json(), express.urlencoded({ extended: true }), eventRoutes);
