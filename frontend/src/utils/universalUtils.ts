@@ -1,9 +1,8 @@
 // @/lib/universalUtils.ts
 // These functions are pure and don't depend on server-specific (next/headers)
 // or client-specific (localStorage, document) APIs.
-
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas-pro'; // ✅ pakai versi pro
 
 import type { Schema } from 'joi'; // Type import for Joi Schema
 import { getSessionStorage, setSessionStorage } from './clientUtils';
@@ -14,6 +13,7 @@ import { RefObject } from 'react';
  * @param date The date string or Date object.
  * @returns Formatted date string.
  */
+
 export const formattedDate = (date: string | Date): string => {
   return new Date(date).toLocaleDateString('id-ID', {
     day: 'numeric',
@@ -220,450 +220,146 @@ const preloadImageWithAuth = async (src: string): Promise<string> => {
   }
 };
 
-// Helper function untuk compress image
-const compressImage = (
-  canvas: HTMLCanvasElement,
-  quality: number
-): string => {
+// Helper function untuk cek unsupported CSS color
+const isUnsupportedColor = (color: string) => {
+  return (
+    color?.includes('lab(') ||
+    color?.includes('oklch(') ||
+    color?.includes('lch(') ||
+    color?.includes('color(')
+  );
+};
+
+// Helper function untuk normalisasi warna
+const normalizeColor = (color: string, fallback: string): string => {
+  if (!color) return fallback;
+  return isUnsupportedColor(color) ? fallback : color;
+};
+
+// Helper: Fetch gambar menjadi Base64 dengan authentication
+const fetchImageAsBase64 = async (src: string): Promise<string> => {
+  try {
+    const response = await fetch(src, {
+      method: 'GET',
+      credentials: 'include',
+    });
+
+    if (!response.ok)
+      throw new Error(`Failed to fetch image: ${response.status}`);
+
+    const blob = await response.blob();
+    return await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error('Error preloading image:', error);
+    // fallback SVG
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0PC90ZXh0Pjwvc3ZnPg==';
+  }
+};
+
+// Helper: Kompres image
+const compressImage = (canvas: HTMLCanvasElement, quality: number): string => {
   return canvas.toDataURL('image/jpeg', quality);
 };
 
-// Helper function untuk estimasi ukuran PDF
+// Helper: Estimasi ukuran PDF
 const estimatePDFSize = (base64String: string): number => {
-  // Estimasi: base64 string length * 0.75 (karena base64 encoding overhead)
-  // Ditambah overhead PDF (~50KB)
   const base64Length = base64String.length;
-  const estimatedBytes = (base64Length * 3) / 4 + 50000;
-  return estimatedBytes;
+  return (base64Length * 3) / 4 + 50000; // overhead PDF
 };
 
+// Main function: Download tiket PDF
 export const handleFallbackDownload = async (
-  ticketRef: RefObject<HTMLDivElement | null>
+  ticketRef: RefObject<HTMLDivElement | null>,
+  ticketsUrl: string[],
+  BASE_URL: string
 ): Promise<void> => {
   if (!ticketRef.current) return;
 
-  let blobUrls: string[] = [];
-  const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB dalam bytes
+  const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
   try {
-    const clone = ticketRef.current.cloneNode(true) as HTMLElement;
-
-    // Preload images
-    const images = clone.querySelectorAll('img');
-    const imagePreloadPromises: Promise<void>[] = [];
-
-    images.forEach((img) => {
-      if (
-        img.src &&
-        (img.src.includes('localhost:5000') || img.src.includes('uploads'))
-      ) {
-        const promise = preloadImageWithAuth(img.src)
-          .then((blobUrl) => {
-            blobUrls.push(blobUrl);
-            img.src = blobUrl;
-            img.crossOrigin = 'anonymous';
-          })
-          .catch((error) => {
-            console.error('Failed to preload image:', error);
-            img.src =
-              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0IEltYWdlPC90ZXh0Pjwvc3ZnPg==';
-          });
-        imagePreloadPromises.push(promise);
-      }
-    });
-
-    await Promise.allSettled(imagePreloadPromises);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Buat container
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    tempContainer.style.top = '0';
-    tempContainer.style.width = '800px';
-    tempContainer.style.padding = '40px';
-    tempContainer.style.backgroundColor = '#f8fafc';
-    tempContainer.appendChild(clone);
-    document.body.appendChild(tempContainer);
-
-    // Style clone
-    clone.style.width = '100%';
-    clone.style.maxWidth = '720px';
-    clone.style.backgroundColor = '#ffffff';
-    clone.style.color = '#000000';
-    clone.style.fontSize = '14px';
-    clone.style.lineHeight = '1.5';
-    clone.style.borderRadius = '16px';
-    clone.style.boxShadow =
-      '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)';
-    clone.style.border = '1px solid #e2e8f0';
-    clone.style.padding = '32px';
-    clone.style.margin = '0 auto';
-    clone.style.fontFamily = 'system-ui, -apple-system, sans-serif';
-
-    // Helper function untuk check unsupported color formats
-    const hasUnsupportedColor = (colorValue: string) => {
-      return (
-        colorValue.includes('lab(') ||
-        colorValue.includes('oklch(') ||
-        colorValue.includes('lch(') ||
-        colorValue.includes('color(')
-      );
-    };
-
-    // Bersihkan styles
-    const allElements = clone.querySelectorAll('*');
-    allElements.forEach((element) => {
-      const htmlElement = element as HTMLElement;
-
-      // Reset warna yang tidak didukung
-      if (
-        htmlElement.style.backgroundColor &&
-        hasUnsupportedColor(htmlElement.style.backgroundColor)
-      ) {
-        htmlElement.style.backgroundColor = '#ffffff';
-      }
-      if (htmlElement.style.color && hasUnsupportedColor(htmlElement.style.color)) {
-        htmlElement.style.color = '#000000';
-      }
-      if (
-        htmlElement.style.borderColor &&
-        hasUnsupportedColor(htmlElement.style.borderColor)
-      ) {
-        htmlElement.style.borderColor = '#e2e8f0';
-      }
-
-      // Cek computed styles juga
-      const computedStyle = window.getComputedStyle(htmlElement);
-      if (computedStyle.backgroundColor && hasUnsupportedColor(computedStyle.backgroundColor)) {
-        htmlElement.style.backgroundColor = '#ffffff';
-      }
-      if (computedStyle.color && hasUnsupportedColor(computedStyle.color)) {
-        htmlElement.style.color = '#000000';
-      }
-
-      htmlElement.classList.remove(
-        'bg-secondary',
-        'text-primary',
-        'bg-black/30',
-        'fixed',
-        'inset-0'
-      );
-
-      // Header styling
-      if (htmlElement.tagName === 'H4') {
-        htmlElement.style.color = '#1e293b';
-        htmlElement.style.fontSize = '20px';
-        htmlElement.style.fontWeight = '700';
-        htmlElement.style.marginBottom = '20px';
-        htmlElement.style.marginTop = '0';
-        htmlElement.style.paddingBottom = '12px';
-        htmlElement.style.borderBottom = '2px solid #e2e8f0';
-        htmlElement.style.position = 'relative';
-      }
-
-      if (htmlElement.tagName === 'P') {
-        htmlElement.style.color = '#475569';
-        htmlElement.style.lineHeight = '1.6';
-        htmlElement.style.margin = '0';
-      }
-
-      if (htmlElement.classList.contains('font-semibold')) {
-        htmlElement.style.color = '#374151';
-        htmlElement.style.fontSize = '13px';
-        htmlElement.style.fontWeight = '600';
-        htmlElement.style.marginBottom = '6px';
-        htmlElement.style.textTransform = 'uppercase';
-        htmlElement.style.letterSpacing = '0.05em';
-      }
-
-      if (htmlElement.classList.contains('bg-slate-100')) {
-        htmlElement.style.backgroundColor = '#f8fafc';
-        htmlElement.style.border = '1px solid #e2e8f0';
-        htmlElement.style.borderRadius = '8px';
-        htmlElement.style.padding = '12px';
-        htmlElement.style.fontSize = '14px';
-        htmlElement.style.color = '#1e293b';
-        htmlElement.style.transition = 'all 0.2s ease';
-      }
-
-      if (
-        htmlElement.classList.contains('grid') ||
-        htmlElement.classList.contains('grid-cols-2')
-      ) {
-        htmlElement.style.display = 'grid';
-        htmlElement.style.gridTemplateColumns = '1fr 1fr';
-        htmlElement.style.gap = '20px';
-        htmlElement.style.marginBottom = '24px';
-      }
-
-      if (htmlElement.classList.contains('gap-4')) {
-        htmlElement.style.gap = '16px';
-      }
-
-      if (htmlElement.classList.contains('gap-2')) {
-        htmlElement.style.gap = '8px';
-      }
-
-      if (htmlElement.classList.contains('mt-4')) {
-        htmlElement.style.marginTop = '24px';
-      }
-
-      if (htmlElement.classList.contains('flex-col')) {
-        htmlElement.style.display = 'flex';
-        htmlElement.style.flexDirection = 'column';
-      }
-
-      if (htmlElement.tagName === 'BUTTON') {
-        htmlElement.style.display = 'none';
-      }
-
-      if (
-        htmlElement.querySelector('img') &&
-        htmlElement.classList.contains('relative')
-      ) {
-        htmlElement.style.width = '100%';
-        htmlElement.style.minHeight = '300px';
-        htmlElement.style.display = 'flex';
-        htmlElement.style.alignItems = 'center';
-        htmlElement.style.justifyContent = 'center';
-        htmlElement.style.backgroundColor = '#f1f5f9';
-        htmlElement.style.border = '2px dashed #cbd5e1';
-        htmlElement.style.borderRadius = '12px';
-        htmlElement.style.marginTop = '16px';
-        htmlElement.style.position = 'relative';
-        htmlElement.style.overflow = 'hidden';
-
-        const img = htmlElement.querySelector('img') as HTMLImageElement;
-        if (img) {
-          img.style.width = 'auto';
-          img.style.height = 'auto';
-          img.style.maxWidth = '100%';
-          img.style.maxHeight = '280px';
-          img.style.objectFit = 'contain';
-          img.style.borderRadius = '8px';
-          img.crossOrigin = 'anonymous';
-        }
-      }
-
-      if (
-        htmlElement.classList.contains('flex') &&
-        htmlElement.classList.contains('flex-col') &&
-        htmlElement.querySelector('h4')
-      ) {
-        htmlElement.style.position = 'relative';
-        htmlElement.style.paddingTop = '24px';
-
-        if (htmlElement.previousElementSibling) {
-          htmlElement.style.borderTop = '1px solid #e2e8f0';
-          htmlElement.style.marginTop = '24px';
-        }
-      }
-    });
-
-    // Header card
-    const cardHeader = document.createElement('div');
-    cardHeader.style.textAlign = 'center';
-    cardHeader.style.marginBottom = '32px';
-    cardHeader.style.paddingBottom = '20px';
-    cardHeader.style.borderBottom = '2px solid #e2e8f0';
-    cardHeader.innerHTML = `
-      <h2 style="
-        color: #1e293b;
-        font-size: 24px;
-        font-weight: 800;
-        margin: 0 0 8px 0;
-        font-family: system-ui, -apple-system, sans-serif;
-      ">E-TICKET</h2>
-      <p style="
-        color: #64748b;
-        font-size: 14px;
-        margin: 0;
-        font-family: system-ui, -apple-system, sans-serif;
-      ">Tiket Digital - ${new Date().toLocaleDateString('id-ID')}</p>
-    `;
-    clone.insertBefore(cardHeader, clone.firstChild);
-
-    // Footer card
-    const cardFooter = document.createElement('div');
-    cardFooter.style.textAlign = 'center';
-    cardFooter.style.marginTop = '32px';
-    cardFooter.style.paddingTop = '20px';
-    cardFooter.style.borderTop = '1px solid #e2e8f0';
-    cardFooter.style.color = '#9ca3af';
-    cardFooter.style.fontSize = '12px';
-    cardFooter.innerHTML = `
-      <p style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
-        Dokumen ini dibuat secara otomatis pada ${new Date().toLocaleString('id-ID')}
-      </p>
-    `;
-    clone.appendChild(cardFooter);
-
-    // Generate canvas dengan scale yang lebih rendah untuk menghemat ukuran
-    let scale = 2;
-    let canvas = await html2canvas(clone, {
-      scale: scale,
-      useCORS: false,
-      allowTaint: true,
-      backgroundColor: '#f8fafc',
-      width: 800,
-      height: clone.scrollHeight + 80,
-      x: 0,
-      y: 0,
-      scrollX: 0,
-      scrollY: 0,
-      logging: false,
-      onclone: (clonedDoc) => {
-        const clonedImages = clonedDoc.querySelectorAll('img');
-        clonedImages.forEach((img) => {
-          img.crossOrigin = 'anonymous';
-          if (!img.complete || img.naturalHeight === 0) {
-            img.src =
-              'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0PC90ZXh0Pjwvc3ZnPg==';
-          }
-        });
-      },
-    });
-
-    // Bersihkan DOM
-    document.body.removeChild(tempContainer);
-
-    // Cleanup blob URLs
-    blobUrls.forEach((url) => {
-      URL.revokeObjectURL(url);
-    });
-
-    // Kompresi otomatis sampai ukuran di bawah 3MB
-    let quality = 0.9;
-    let imgData = compressImage(canvas, quality);
-    let estimatedSize = estimatePDFSize(imgData);
-
-    console.log(`Ukuran awal (estimasi): ${(estimatedSize / 1024 / 1024).toFixed(2)}MB`);
-
-    // Loop kompresi jika ukuran terlalu besar
-    while (estimatedSize > MAX_FILE_SIZE && quality > 0.1) {
-      quality -= 0.1;
-      imgData = compressImage(canvas, quality);
-      estimatedSize = estimatePDFSize(imgData);
-      console.log(
-        `Kompresi quality ${quality.toFixed(1)}: ${(estimatedSize / 1024 / 1024).toFixed(2)}MB`
-      );
-    }
-
-    // Jika masih terlalu besar, kurangi scale
-    if (estimatedSize > MAX_FILE_SIZE && scale > 1) {
-      scale = 1.5;
-      console.log('Mengurangi resolusi canvas...');
-
-      canvas = await html2canvas(clone, {
-        scale: scale,
-        useCORS: false,
-        allowTaint: true,
-        backgroundColor: '#f8fafc',
-        width: 800,
-        height: clone.scrollHeight + 80,
-        logging: false,
-      });
-
-      quality = 0.8;
-      imgData = compressImage(canvas, quality);
-      estimatedSize = estimatePDFSize(imgData);
-
-      while (estimatedSize > MAX_FILE_SIZE && quality > 0.3) {
-        quality -= 0.1;
-        imgData = compressImage(canvas, quality);
-        estimatedSize = estimatePDFSize(imgData);
-        console.log(
-          `Kompresi quality ${quality.toFixed(1)}: ${(estimatedSize / 1024 / 1024).toFixed(2)}MB`
-        );
-      }
-    }
-
-    console.log(
-      `Ukuran final (estimasi): ${(estimatedSize / 1024 / 1024).toFixed(2)}MB dengan quality ${quality.toFixed(1)}`
-    );
-
-    // Buat PDF
     const pdf = new jsPDF('portrait', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    const margin = 30;
-    const availableWidth = pageWidth - margin * 2;
-    const availableHeight = pageHeight - margin * 2;
+    // 1️⃣ Preload semua image jadi Base64
+    const base64Images = await Promise.all(
+      ticketsUrl.map((url) => fetchImageAsBase64(BASE_URL + url))
+    );
 
-    const widthRatio = availableWidth / canvas.width;
-    const heightRatio = availableHeight / canvas.height;
-    const ratio = Math.min(widthRatio, heightRatio, 0.9);
+    for (let i = 0; i < ticketsUrl.length; i++) {
+      // 2️⃣ Clone node tiket
+      const clone = ticketRef.current.cloneNode(true) as HTMLElement;
 
-    const imgWidth = canvas.width * ratio;
-    const imgHeight = canvas.height * ratio;
+      // Temp container untuk render
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '0';
+      tempContainer.style.width = '800px';
+      tempContainer.style.backgroundColor = '#ffffff';
+      document.body.appendChild(tempContainer);
+      tempContainer.appendChild(clone);
 
-    const x = (pageWidth - imgWidth) / 2;
-    const y = margin;
+      // 3️⃣ Ganti semua <img> dengan Base64 dan tunggu load
+      const imgElements = clone.querySelectorAll('img');
+      await Promise.all(
+        Array.from(imgElements).map(
+          (imgEl, idx) =>
+            new Promise<void>((resolve, reject) => {
+              imgEl.src = base64Images[i]; // Asumsi 1 image per tiket
+              if (imgEl.complete) return resolve();
+              imgEl.onload = () => resolve();
+              imgEl.onerror = () => reject(`Failed to load image ${i}`);
+            })
+        )
+      );
 
-    // Handle multi-page
-    if (imgHeight > availableHeight) {
-      let currentY = 0;
-      let pageCount = 0;
+      // 4️⃣ Render ke canvas
+      const canvas = await html2canvas(clone, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+      });
 
-      while (currentY < canvas.height) {
-        if (pageCount > 0) {
-          pdf.addPage();
-        }
+      document.body.removeChild(tempContainer);
 
-        const remainingHeight = canvas.height - currentY;
-        const pageCanvasHeight = Math.min(
-          remainingHeight,
-          Math.floor(canvas.height * (availableHeight / imgHeight))
-        );
+      // 5️⃣ Kompres image jika terlalu besar
+      let quality = 0.9;
+      let imgData = compressImage(canvas, quality);
+      let estimatedSize = estimatePDFSize(imgData);
 
-        const pageCanvas = document.createElement('canvas');
-        const pageCtx = pageCanvas.getContext('2d')!;
-        pageCanvas.width = canvas.width;
-        pageCanvas.height = pageCanvasHeight;
-
-        pageCtx.drawImage(
-          canvas,
-          0,
-          currentY,
-          canvas.width,
-          pageCanvasHeight,
-          0,
-          0,
-          canvas.width,
-          pageCanvasHeight
-        );
-
-        const pageImgData = pageCanvas.toDataURL('image/jpeg', quality);
-        const pageImgHeight = pageCanvasHeight * ratio;
-
-        pdf.addImage(pageImgData, 'JPEG', x, y, imgWidth, pageImgHeight);
-
-        currentY += pageCanvasHeight;
-        pageCount++;
+      while (estimatedSize > MAX_FILE_SIZE && quality > 0.1) {
+        quality -= 0.1;
+        imgData = compressImage(canvas, quality);
+        estimatedSize = estimatePDFSize(imgData);
       }
-    } else {
+
+      // 6️⃣ Fit image ke halaman PDF
+      const margin = 30;
+      const availableWidth = pageWidth - margin * 2;
+      const availableHeight = pageHeight - margin * 2;
+      const widthRatio = availableWidth / canvas.width;
+      const heightRatio = availableHeight / canvas.height;
+      const ratio = Math.min(widthRatio, heightRatio, 0.9);
+
+      const imgWidth = canvas.width * ratio;
+      const imgHeight = canvas.height * ratio;
+      const x = (pageWidth - imgWidth) / 2;
+      const y = margin;
+
+      if (i > 0) pdf.addPage();
       pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
     }
 
-    pdf.save('e-ticket-card.pdf');
-    console.log('PDF berhasil diunduh!');
+    pdf.save('e-ticket.pdf');
   } catch (error) {
-    console.error('Card download failed:', error);
-
-    blobUrls.forEach((url) => {
-      try {
-        URL.revokeObjectURL(url);
-      } catch (cleanupError) {
-        console.error('Error cleaning up blob URL:', cleanupError);
-      }
-    });
-
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
-    alert(
-      `Gagal mengunduh PDF: ${errorMessage}. Pastikan Anda sudah login dan coba lagi.`
-    );
+    console.error('Download failed:', error);
+    alert('Gagal mengunduh PDF, coba lagi.');
   }
 };

@@ -10,7 +10,7 @@ import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { ITransaction } from '@/types/Transaction';
 import ViewTicketModal from '@/components/fragments/modal/ViewTicketModal';
 import { useAuth } from '@/context/authUserContext';
-import { handleFallbackDownload } from '@/utils/universalUtils';
+import { formattedDate, handleFallbackDownload } from '@/utils/universalUtils';
 
 export interface IHistoryByEvent {
   _id: string;
@@ -20,7 +20,9 @@ export interface IHistoryByEvent {
   transactions: ITransaction[];
 }
 
-type TransactionSummary = Pick<ITransaction, '_id' | 'tickets'>;
+type TransactionSummary = Pick<ITransaction, '_id' | 'tickets' | 'createdAt'>;
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
@@ -30,7 +32,7 @@ export default function ProfilePage() {
   const [paidTransactions, setPaidTransactions] = useState<
     TransactionSummary[]
   >([]);
-  const [selectedTicket, setSelectedTicket] = useState<string>('');
+  const [ticketsUrl, setTicketsUrl] = useState<string[]>([]);
 
   const lastHistory = historyEvent[historyEvent.length - 1];
 
@@ -49,6 +51,15 @@ export default function ProfilePage() {
     fetchProfil();
   }, []);
 
+  const handleTicketUrls = (index: number) => {
+    if (paidTransactions.length > 0) {
+      const url: string[] = paidTransactions[index].tickets.map((ticket) => {
+        return ticket.ticketImage;
+      });
+      setTicketsUrl(url);
+    }
+  };
+
   useEffect(() => {
     if (lastHistory && lastHistory?.transactions?.length > 0) {
       const filtered = lastHistory.transactions
@@ -56,12 +67,11 @@ export default function ProfilePage() {
         .map((ts) => ({
           _id: ts._id,
           tickets: ts.tickets,
+          createdAt: ts.createdAt,
         }));
       setPaidTransactions(filtered);
     }
   }, [lastHistory]);
-
-  console.log(paidTransactions);
 
   return (
     <div className="flex flex-col pt-24 pd-full">
@@ -87,12 +97,12 @@ export default function ProfilePage() {
         )}
 
         {paidTransactions.length > 0 &&
-          paidTransactions.map((data) =>
-            data.tickets.map((tc) => (
-              <div
-                key={tc._id}
-                className="flex flex-col bg-secondary p-4 mt-4 lg:p-8"
-              >
+          paidTransactions.map((transaction, index) => (
+            <div
+              key={index}
+              className="flex flex-col bg-bg-secondary p-4 mt-4 lg:p-8"
+            >
+              <div className="flex justify-between items-center">
                 <div className="flex items-center gap-8">
                   <p className="text-xs font-normal md:text-sm lg:text-lg">
                     E-Ticket
@@ -100,26 +110,35 @@ export default function ProfilePage() {
                   <div className="flex items-center text-xs gap-2 md:text-sm lg:text-lg">
                     <button
                       onClick={() => {
+                        handleTicketUrls(index);
                         setIsViewTicket(true);
-                        setSelectedTicket(tc.ticketImage);
                       }}
-                      className="text-primary cursor-pointer hover:underline duration-200"
+                      className="text-bg-primary cursor-pointer hover:underline duration-200"
                     >
                       view
                     </button>
                   </div>
                 </div>
+                <p className="text-xs">
+                  {formattedDate(transaction.createdAt || '')}
+                </p>
               </div>
-            ))
-          )}
+            </div>
+          ))}
 
         {isViewTicket && (
           <ViewTicketModal
             ref={ticketRef}
             profile={authUser}
-            ticketUrl={selectedTicket}
+            ticketsUrl={ticketsUrl}
             onClose={() => setIsViewTicket(false)}
-            onDownload={() => handleFallbackDownload(ticketRef)}
+            onDownload={() =>
+              handleFallbackDownload(
+                ticketRef,
+                ticketsUrl,
+                BASE_URL ? BASE_URL : ''
+              )
+            }
           />
         )}
       </section>
