@@ -13,6 +13,9 @@ interface DashboardSummary {
   events: number;
   tickets: {
     total: number;
+    totalStock: number;
+    totalSold: number;
+    totalSoldRevenue: number;
     stockPerCategory: Array<{
       _id: string;
       categoryName: string;
@@ -27,6 +30,8 @@ interface DashboardSummary {
   };
   transactions: {
     total: number;
+    totalCategoryTransactions: number;
+    totalTransactionAmount: number;
     paid: number;
     pending: number;
     rejected: number;
@@ -38,6 +43,7 @@ interface DashboardSummary {
       totalTransactions: number;
     }>;
   };
+  expectedTotalRevenue: number;
   totalRevenue: number;
 }
 
@@ -231,6 +237,7 @@ export default function AdminDashboardDisplay() {
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Ticket Stock per Category</h2>
               <div className="space-y-3">
+                <>
                 {summary.tickets.stockPerCategory.length > 0 ? (
                   summary.tickets.stockPerCategory.map((item, i) => (
                     <div key={item._id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
@@ -241,6 +248,11 @@ export default function AdminDashboardDisplay() {
                 ) : (
                   <p className="text-gray-500 italic">No stock data available</p>
                 )}
+                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-700 font-extrabold">Sisa Stock</span>
+                    <span className="font-bold text-blue-600">{summary.tickets.totalStock.toLocaleString()}</span>
+                  </div>
+                </>
               </div>
             </div>
 
@@ -248,6 +260,7 @@ export default function AdminDashboardDisplay() {
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Tickets Sold per Category</h2>
               <div className="space-y-3">
+                <>
                 {summary.tickets.soldPerCategory.length > 0 ? (
                   summary.tickets.soldPerCategory.map((item, i) => (
                     <div key={item._id} className="p-3 bg-gray-50 rounded-lg">
@@ -263,6 +276,16 @@ export default function AdminDashboardDisplay() {
                 ) : (
                   <p className="text-gray-500 italic">No sales data available</p>
                 )}
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-700 font-extrabold">Total Paid Ticket</span>
+                        <span className="font-bold text-green-600">{summary.tickets.totalSold.toLocaleString()}</span>
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        Revenue: Rp {summary.tickets.totalSoldRevenue.toLocaleString()}
+                      </div>
+                    </div>
+                </>
               </div>
             </div>
 
@@ -270,6 +293,7 @@ export default function AdminDashboardDisplay() {
             <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Revenue per Category</h2>
               <div className="space-y-3">
+                <>
                 {summary.transactions.perCategory.length > 0 ? (
                   summary.transactions.perCategory.map((item, i) => (
                     <div key={item._id} className="p-3 bg-gray-50 rounded-lg">
@@ -280,17 +304,38 @@ export default function AdminDashboardDisplay() {
                         </span>
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
-                        {item.totalTransactions} transactions
+                        {item.totalTransactions} ticket transaction
                       </div>
                     </div>
                   ))
                 ) : (
                   <p className="text-gray-500 italic">No transaction data available</p>
                 )}
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-700 font-extrabold">Total Revenue</span>
+                      <span className="font-bold text-orange-600">
+                         Rp {summary.transactions.totalTransactionAmount.toLocaleString()}
+                      </span>
+                    </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        {summary.transactions.totalCategoryTransactions} ticket transaction
+                      </div>
+                  </div>
+                </>
               </div>
             </div>
           </div>
 
+          <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6 rounded-xl shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Expected Total Revenue Summary</h2>
+            <p className="text-3xl font-bold">
+              Rp {summary.expectedTotalRevenue.toLocaleString()}
+            </p>
+            <p className="text-gray-300 mt-2">
+              From {summary.transactions.totalCategoryTransactions} transactions
+            </p>
+          </div>
           <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6 rounded-xl shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Total Revenue Summary</h2>
             <p className="text-3xl font-bold">

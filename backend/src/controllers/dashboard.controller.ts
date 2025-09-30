@@ -39,11 +39,18 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
     ]);
     const totalRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
 
+    // Expected total revenue (semua transaction tanpa filter status)
+    const expectedRevenueAgg = await TransactionModel.aggregate([
+      { $match: { deletedAt: null } },
+      { $group: { _id: null, expectedTotalRevenue: { $sum: "$totalPrice" } } },
+    ]);
+    const expectedTotalRevenue = expectedRevenueAgg.length > 0 ? expectedRevenueAgg[0].expectedTotalRevenue : 0;
+
     // Ticket stock per category - dengan lookup
     const stockPerCategory = await TicketModel.aggregate([
       {
         $lookup: {
-          from: "categories", // nama collection Category (biasanya plural)
+          from: "categories",
           localField: "category",
           foreignField: "_id",
           as: "categoryInfo"
@@ -100,7 +107,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
         $group: {
           _id: "$ticketInfo.category",
           categoryName: { $first: "$categoryInfo.name" },
-          totalSold: { $sum: 1 }, // setiap ticket yang terjual
+          totalSold: { $sum: 1 },
           totalRevenue: { $sum: "$ticketInfo.price" }
         }
       }
@@ -148,20 +155,42 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
       }
     ]);
 
+    const totalStock = stockPerCategory.reduce((sum, category) => sum + category.totalStock, 0);
+    const totalSold = soldPerCategory.reduce((sum, category) => sum + category.totalSold, 0);
+
+    // Hitung total revenue dari soldPerCategory
+    const totalSoldRevenue = soldPerCategory.reduce((sum, category) => sum + category.totalRevenue, 0);
+
+    // Hitung total amount dari transactionPerCategory
+    const totalTransactionAmount = transactionPerCategory.reduce((sum, category) => sum + category.totalAmount, 0);
+
+    // Hitung total transactions dari transactionPerCategory
+    const totalCategoryTransactions = transactionPerCategory.reduce((sum, category) => sum + category.totalTransactions, 0);
+
     res.status(OK).json({
       message: "Dashboard summary retrieved successfully",
       data: {
         users: { total: totalUsers, male: maleUsers, female: femaleUsers },
         events: totalEvents,
-        tickets: { total: totalTickets, stockPerCategory, soldPerCategory },
+        tickets: {
+          total: totalTickets,
+          totalStock,
+          totalSold,
+          totalSoldRevenue,
+          stockPerCategory,
+          soldPerCategory
+        },
         transactions: {
           total: totalTransactions,
           paid: paidTransactions,
           pending: pendingTransactions,
           rejected: rejectedTransactions,
           expired: expiredTransactions,
+          totalTransactionAmount,
+          totalCategoryTransactions,
           perCategory: transactionPerCategory,
         },
+        expectedTotalRevenue,
         totalRevenue,
       },
     });
