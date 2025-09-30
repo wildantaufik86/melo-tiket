@@ -216,9 +216,25 @@ const preloadImageWithAuth = async (src: string): Promise<string> => {
     return URL.createObjectURL(blob);
   } catch (error) {
     console.error('Error preloading image:', error);
-    // Return placeholder image sebagai fallback
     return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0PC90ZXh0Pjwvc3ZnPg==';
   }
+};
+
+// Helper function untuk compress image
+const compressImage = (
+  canvas: HTMLCanvasElement,
+  quality: number
+): string => {
+  return canvas.toDataURL('image/jpeg', quality);
+};
+
+// Helper function untuk estimasi ukuran PDF
+const estimatePDFSize = (base64String: string): number => {
+  // Estimasi: base64 string length * 0.75 (karena base64 encoding overhead)
+  // Ditambah overhead PDF (~50KB)
+  const base64Length = base64String.length;
+  const estimatedBytes = (base64Length * 3) / 4 + 50000;
+  return estimatedBytes;
 };
 
 export const handleFallbackDownload = async (
@@ -226,13 +242,13 @@ export const handleFallbackDownload = async (
 ): Promise<void> => {
   if (!ticketRef.current) return;
 
-  let blobUrls: string[] = []; // Untuk cleanup nanti
+  let blobUrls: string[] = [];
+  const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB dalam bytes
 
   try {
-    // Clone element dan bersihkan style yang bermasalah
     const clone = ticketRef.current.cloneNode(true) as HTMLElement;
 
-    // Preload semua images dengan authentication SEBELUM membuat DOM
+    // Preload images
     const images = clone.querySelectorAll('img');
     const imagePreloadPromises: Promise<void>[] = [];
 
@@ -243,13 +259,12 @@ export const handleFallbackDownload = async (
       ) {
         const promise = preloadImageWithAuth(img.src)
           .then((blobUrl) => {
-            blobUrls.push(blobUrl); // Store untuk cleanup
-            img.src = blobUrl; // Replace dengan authenticated blob URL
-            img.crossOrigin = 'anonymous'; // Set crossOrigin
+            blobUrls.push(blobUrl);
+            img.src = blobUrl;
+            img.crossOrigin = 'anonymous';
           })
           .catch((error) => {
             console.error('Failed to preload image:', error);
-            // Set placeholder jika gagal load
             img.src =
               'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0IEltYWdlPC90ZXh0Pjwvc3ZnPg==';
           });
@@ -257,13 +272,10 @@ export const handleFallbackDownload = async (
       }
     });
 
-    // Wait untuk semua images selesai diload
     await Promise.allSettled(imagePreloadPromises);
-
-    // Tambahkan delay kecil untuk memastikan images fully loaded
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Buat container sementara dengan ukuran yang lebih optimal
+    // Buat container
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
     tempContainer.style.left = '-9999px';
@@ -274,7 +286,7 @@ export const handleFallbackDownload = async (
     tempContainer.appendChild(clone);
     document.body.appendChild(tempContainer);
 
-    // Style clone sebagai card
+    // Style clone
     clone.style.width = '100%';
     clone.style.maxWidth = '720px';
     clone.style.backgroundColor = '#ffffff';
@@ -289,23 +301,47 @@ export const handleFallbackDownload = async (
     clone.style.margin = '0 auto';
     clone.style.fontFamily = 'system-ui, -apple-system, sans-serif';
 
-    // Bersihkan semua style yang menggunakan lab()
+    // Helper function untuk check unsupported color formats
+    const hasUnsupportedColor = (colorValue: string) => {
+      return (
+        colorValue.includes('lab(') ||
+        colorValue.includes('oklch(') ||
+        colorValue.includes('lch(') ||
+        colorValue.includes('color(')
+      );
+    };
+
+    // Bersihkan styles
     const allElements = clone.querySelectorAll('*');
     allElements.forEach((element) => {
       const htmlElement = element as HTMLElement;
 
-      // Reset ke warna standar
+      // Reset warna yang tidak didukung
       if (
         htmlElement.style.backgroundColor &&
-        htmlElement.style.backgroundColor.includes('lab(')
+        hasUnsupportedColor(htmlElement.style.backgroundColor)
       ) {
         htmlElement.style.backgroundColor = '#ffffff';
       }
-      if (htmlElement.style.color && htmlElement.style.color.includes('lab(')) {
+      if (htmlElement.style.color && hasUnsupportedColor(htmlElement.style.color)) {
+        htmlElement.style.color = '#000000';
+      }
+      if (
+        htmlElement.style.borderColor &&
+        hasUnsupportedColor(htmlElement.style.borderColor)
+      ) {
+        htmlElement.style.borderColor = '#e2e8f0';
+      }
+
+      // Cek computed styles juga
+      const computedStyle = window.getComputedStyle(htmlElement);
+      if (computedStyle.backgroundColor && hasUnsupportedColor(computedStyle.backgroundColor)) {
+        htmlElement.style.backgroundColor = '#ffffff';
+      }
+      if (computedStyle.color && hasUnsupportedColor(computedStyle.color)) {
         htmlElement.style.color = '#000000';
       }
 
-      // Hapus class yang mungkin menggunakan warna lab
       htmlElement.classList.remove(
         'bg-secondary',
         'text-primary',
@@ -314,7 +350,7 @@ export const handleFallbackDownload = async (
         'inset-0'
       );
 
-      // Header styling (card title)
+      // Header styling
       if (htmlElement.tagName === 'H4') {
         htmlElement.style.color = '#1e293b';
         htmlElement.style.fontSize = '20px';
@@ -326,14 +362,12 @@ export const handleFallbackDownload = async (
         htmlElement.style.position = 'relative';
       }
 
-      // Paragraph styling
       if (htmlElement.tagName === 'P') {
         htmlElement.style.color = '#475569';
         htmlElement.style.lineHeight = '1.6';
         htmlElement.style.margin = '0';
       }
 
-      // Label styling (font semibold)
       if (htmlElement.classList.contains('font-semibold')) {
         htmlElement.style.color = '#374151';
         htmlElement.style.fontSize = '13px';
@@ -343,7 +377,6 @@ export const handleFallbackDownload = async (
         htmlElement.style.letterSpacing = '0.05em';
       }
 
-      // Input field styling
       if (htmlElement.classList.contains('bg-slate-100')) {
         htmlElement.style.backgroundColor = '#f8fafc';
         htmlElement.style.border = '1px solid #e2e8f0';
@@ -354,7 +387,6 @@ export const handleFallbackDownload = async (
         htmlElement.style.transition = 'all 0.2s ease';
       }
 
-      // Grid styling
       if (
         htmlElement.classList.contains('grid') ||
         htmlElement.classList.contains('grid-cols-2')
@@ -365,7 +397,6 @@ export const handleFallbackDownload = async (
         htmlElement.style.marginBottom = '24px';
       }
 
-      // Gap styling untuk flex
       if (htmlElement.classList.contains('gap-4')) {
         htmlElement.style.gap = '16px';
       }
@@ -374,23 +405,19 @@ export const handleFallbackDownload = async (
         htmlElement.style.gap = '8px';
       }
 
-      // Margin top styling
       if (htmlElement.classList.contains('mt-4')) {
         htmlElement.style.marginTop = '24px';
       }
 
-      // Flex column styling
       if (htmlElement.classList.contains('flex-col')) {
         htmlElement.style.display = 'flex';
         htmlElement.style.flexDirection = 'column';
       }
 
-      // Button styling (jika ada)
       if (htmlElement.tagName === 'BUTTON') {
         htmlElement.style.display = 'none';
       }
 
-      // E-Ticket section styling
       if (
         htmlElement.querySelector('img') &&
         htmlElement.classList.contains('relative')
@@ -407,7 +434,6 @@ export const handleFallbackDownload = async (
         htmlElement.style.position = 'relative';
         htmlElement.style.overflow = 'hidden';
 
-        // Style untuk gambar di dalam
         const img = htmlElement.querySelector('img') as HTMLImageElement;
         if (img) {
           img.style.width = 'auto';
@@ -416,11 +442,10 @@ export const handleFallbackDownload = async (
           img.style.maxHeight = '280px';
           img.style.objectFit = 'contain';
           img.style.borderRadius = '8px';
-          img.crossOrigin = 'anonymous'; // Pastikan crossOrigin set
+          img.crossOrigin = 'anonymous';
         }
       }
 
-      // Divider antara sections
       if (
         htmlElement.classList.contains('flex') &&
         htmlElement.classList.contains('flex-col') &&
@@ -436,7 +461,7 @@ export const handleFallbackDownload = async (
       }
     });
 
-    // Tambahkan header card di bagian atas
+    // Header card
     const cardHeader = document.createElement('div');
     cardHeader.style.textAlign = 'center';
     cardHeader.style.marginBottom = '32px';
@@ -444,22 +469,22 @@ export const handleFallbackDownload = async (
     cardHeader.style.borderBottom = '2px solid #e2e8f0';
     cardHeader.innerHTML = `
       <h2 style="
-        color: #1e293b; 
-        font-size: 24px; 
-        font-weight: 800; 
+        color: #1e293b;
+        font-size: 24px;
+        font-weight: 800;
         margin: 0 0 8px 0;
         font-family: system-ui, -apple-system, sans-serif;
       ">E-TICKET</h2>
       <p style="
-        color: #64748b; 
-        font-size: 14px; 
+        color: #64748b;
+        font-size: 14px;
         margin: 0;
         font-family: system-ui, -apple-system, sans-serif;
       ">Tiket Digital - ${new Date().toLocaleDateString('id-ID')}</p>
     `;
     clone.insertBefore(cardHeader, clone.firstChild);
 
-    // Tambahkan footer card di bagian bawah
+    // Footer card
     const cardFooter = document.createElement('div');
     cardFooter.style.textAlign = 'center';
     cardFooter.style.marginTop = '32px';
@@ -469,18 +494,17 @@ export const handleFallbackDownload = async (
     cardFooter.style.fontSize = '12px';
     cardFooter.innerHTML = `
       <p style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
-        Dokumen ini dibuat secara otomatis pada ${new Date().toLocaleString(
-          'id-ID'
-        )}
+        Dokumen ini dibuat secara otomatis pada ${new Date().toLocaleString('id-ID')}
       </p>
     `;
     clone.appendChild(cardFooter);
 
-    // Generate canvas dengan kualitas tinggi dan options untuk handle auth images
-    const canvas = await html2canvas(clone, {
-      scale: 2,
-      useCORS: false, // Disable CORS karena kita sudah handle auth
-      allowTaint: true, // Allow tainted canvas dari blob URLs
+    // Generate canvas dengan scale yang lebih rendah untuk menghemat ukuran
+    let scale = 2;
+    let canvas = await html2canvas(clone, {
+      scale: scale,
+      useCORS: false,
+      allowTaint: true,
       backgroundColor: '#f8fafc',
       width: 800,
       height: clone.scrollHeight + 80,
@@ -488,13 +512,11 @@ export const handleFallbackDownload = async (
       y: 0,
       scrollX: 0,
       scrollY: 0,
-      logging: false, // Disable logging untuk produksi
+      logging: false,
       onclone: (clonedDoc) => {
-        // Last check untuk memastikan images ready
         const clonedImages = clonedDoc.querySelectorAll('img');
         clonedImages.forEach((img) => {
           img.crossOrigin = 'anonymous';
-          // Ensure images are loaded
           if (!img.complete || img.naturalHeight === 0) {
             img.src =
               'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjFmNWY5Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzY2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkUtVGlja2V0PC90ZXh0Pjwvc3ZnPg==';
@@ -511,19 +533,65 @@ export const handleFallbackDownload = async (
       URL.revokeObjectURL(url);
     });
 
-    const imgData = canvas.toDataURL('image/png', 0.95);
+    // Kompresi otomatis sampai ukuran di bawah 3MB
+    let quality = 0.9;
+    let imgData = compressImage(canvas, quality);
+    let estimatedSize = estimatePDFSize(imgData);
 
-    // Buat PDF dengan orientasi portrait
+    console.log(`Ukuran awal (estimasi): ${(estimatedSize / 1024 / 1024).toFixed(2)}MB`);
+
+    // Loop kompresi jika ukuran terlalu besar
+    while (estimatedSize > MAX_FILE_SIZE && quality > 0.1) {
+      quality -= 0.1;
+      imgData = compressImage(canvas, quality);
+      estimatedSize = estimatePDFSize(imgData);
+      console.log(
+        `Kompresi quality ${quality.toFixed(1)}: ${(estimatedSize / 1024 / 1024).toFixed(2)}MB`
+      );
+    }
+
+    // Jika masih terlalu besar, kurangi scale
+    if (estimatedSize > MAX_FILE_SIZE && scale > 1) {
+      scale = 1.5;
+      console.log('Mengurangi resolusi canvas...');
+
+      canvas = await html2canvas(clone, {
+        scale: scale,
+        useCORS: false,
+        allowTaint: true,
+        backgroundColor: '#f8fafc',
+        width: 800,
+        height: clone.scrollHeight + 80,
+        logging: false,
+      });
+
+      quality = 0.8;
+      imgData = compressImage(canvas, quality);
+      estimatedSize = estimatePDFSize(imgData);
+
+      while (estimatedSize > MAX_FILE_SIZE && quality > 0.3) {
+        quality -= 0.1;
+        imgData = compressImage(canvas, quality);
+        estimatedSize = estimatePDFSize(imgData);
+        console.log(
+          `Kompresi quality ${quality.toFixed(1)}: ${(estimatedSize / 1024 / 1024).toFixed(2)}MB`
+        );
+      }
+    }
+
+    console.log(
+      `Ukuran final (estimasi): ${(estimatedSize / 1024 / 1024).toFixed(2)}MB dengan quality ${quality.toFixed(1)}`
+    );
+
+    // Buat PDF
     const pdf = new jsPDF('portrait', 'pt', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Hitung dimensi dengan margin yang lebih kecil untuk card
     const margin = 30;
     const availableWidth = pageWidth - margin * 2;
     const availableHeight = pageHeight - margin * 2;
 
-    // Hitung rasio untuk fit ke halaman
     const widthRatio = availableWidth / canvas.width;
     const heightRatio = availableHeight / canvas.height;
     const ratio = Math.min(widthRatio, heightRatio, 0.9);
@@ -531,11 +599,10 @@ export const handleFallbackDownload = async (
     const imgWidth = canvas.width * ratio;
     const imgHeight = canvas.height * ratio;
 
-    // Center image
     const x = (pageWidth - imgWidth) / 2;
     const y = margin;
 
-    // Handle multi-page jika diperlukan
+    // Handle multi-page
     if (imgHeight > availableHeight) {
       let currentY = 0;
       let pageCount = 0;
@@ -551,13 +618,11 @@ export const handleFallbackDownload = async (
           Math.floor(canvas.height * (availableHeight / imgHeight))
         );
 
-        // Buat canvas untuk halaman ini
         const pageCanvas = document.createElement('canvas');
         const pageCtx = pageCanvas.getContext('2d')!;
         pageCanvas.width = canvas.width;
         pageCanvas.height = pageCanvasHeight;
 
-        // Gambar bagian canvas yang sesuai
         pageCtx.drawImage(
           canvas,
           0,
@@ -570,25 +635,23 @@ export const handleFallbackDownload = async (
           pageCanvasHeight
         );
 
-        const pageImgData = pageCanvas.toDataURL('image/png', 0.95);
+        const pageImgData = pageCanvas.toDataURL('image/jpeg', quality);
         const pageImgHeight = pageCanvasHeight * ratio;
 
-        pdf.addImage(pageImgData, 'PNG', x, y, imgWidth, pageImgHeight);
+        pdf.addImage(pageImgData, 'JPEG', x, y, imgWidth, pageImgHeight);
 
         currentY += pageCanvasHeight;
         pageCount++;
       }
     } else {
-      // Single page
-      pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'JPEG', x, y, imgWidth, imgHeight);
     }
 
     pdf.save('e-ticket-card.pdf');
-    console.log('PDF card berhasil diunduh!');
+    console.log('PDF berhasil diunduh!');
   } catch (error) {
     console.error('Card download failed:', error);
 
-    // Cleanup blob URLs jika ada error
     blobUrls.forEach((url) => {
       try {
         URL.revokeObjectURL(url);
