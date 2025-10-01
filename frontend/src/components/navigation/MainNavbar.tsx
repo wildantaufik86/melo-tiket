@@ -72,12 +72,12 @@ export default function MainNavbar() {
         >
           Line-Up
         </Link> */}
-        <Link
+        {/* <Link
           href="/contact"
           className="text-lg font-medium hover:text-hover transition-colors"
         >
           Contact
-        </Link>
+        </Link> */}
       </div>
 
       {/* button navigation */}
@@ -167,12 +167,12 @@ export default function MainNavbar() {
         >
           Line-Up
         </Link> */}
-        <Link
+        {/* <Link
           href="/contact"
           className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Contact
-        </Link>
+        </Link> */}
       </aside>
     </nav>
   );
