@@ -59,22 +59,22 @@ export default function AdminTransactionDisplay() {
         <section>
             <BreadCrumb items={breadcrumbItems} />
             <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200">
-<div className="flex justify-between items-center mb-6 gap-4">
-  <h1 className="text-xl font-extrabold text-gray-900">Transaction Management</h1>
-  <div className="flex items-center gap-3">
-    <input
-      type="text"
-      placeholder="Search by user or transaction ID..."
-      value={searchTerm}
-      onChange={(e) => {
-        setCurrentPage(1);
-        setSearchTerm(e.target.value);
-      }}
-      className="border rounded-lg px-3 py-2 text-sm"
-    />
-    <TransactionFilter currentFilter={statusFilter} onFilterChange={handleFilterChange} />
-  </div>
-</div>
+              <div className="flex justify-between items-center mb-6 gap-4">
+                <h1 className="text-xl font-extrabold text-gray-900">Transaction Management</h1>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    placeholder="Search by user or transaction ID..."
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setCurrentPage(1);
+                      setSearchTerm(e.target.value);
+                    }}
+                    className="border rounded-lg px-3 py-2 text-sm"
+                  />
+                  <TransactionFilter currentFilter={statusFilter} onFilterChange={handleFilterChange} />
+                </div>
+              </div>
 
                 {loading ? (
                     <p className='text-center'>Loading transactions...</p>

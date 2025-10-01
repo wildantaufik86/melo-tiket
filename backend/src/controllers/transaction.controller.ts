@@ -258,6 +258,11 @@ export const getAllTransactionsHandler: RequestHandler = async (req, res, next) 
         searchConditions.push({ _id: new mongoose.Types.ObjectId(searchQuery) });
       }
 
+      const searchNumber = parseFloat(searchQuery);
+      if (!isNaN(searchNumber)) {
+        searchConditions.push({ totalPrice: searchNumber });
+      }
+
       pipeline.push({ $match: { $or: searchConditions } });
     }
 
