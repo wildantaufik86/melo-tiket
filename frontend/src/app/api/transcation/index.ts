@@ -16,6 +16,10 @@ export interface IVerifyTransactionPayload {
   status: 'paid' | 'reject';
 }
 
+export interface IUpdateTransactionStatusPayload {
+  status: 'pending' | 'paid';
+}
+
 export interface IExportedTransaction {
   'Nama Pembeli': string;
   Email: string;
@@ -224,6 +228,30 @@ export async function revertTransaction(transactionId: string): Promise<{ status
     const responseData = await res.json();
     if (!res.ok)
       throw new Error(responseData.message || 'Gagal revert transaksi.');
+
+    return {
+      status: 'success',
+      message: responseData.message,
+      data: responseData.data,
+    };
+  } catch (error: any) {
+    return { status: 'error', message: error.message, data: null };
+  }
+}
+
+export async function updateTransactionStatus(
+  transactionId: string,
+  payload: IUpdateTransactionStatusPayload
+): Promise<{ status: string; message: string; data: ITransaction | null }> {
+  try {
+    const res = await fetchWithToken(`/transaction/${transactionId}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+
+    const responseData = await res.json();
+    if (!res.ok)
+      throw new Error(responseData.message || 'Gagal mengupdate status transaksi.');
 
     return {
       status: 'success',
