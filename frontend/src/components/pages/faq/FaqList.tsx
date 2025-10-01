@@ -7,7 +7,7 @@ export default function FaqList() {
         title="Apa itu Melofest"
         content="Melofest adalah Melophile Festival yang bertemakan seseorang yang sangat menyukai dan mencintai musik serta ingin merasakan euphoria dalam menyaksikan konser musik"
       />
-      <FaqAccordion title="Penukaran Tiket dimana min?" content="" />
+      {/* <FaqAccordion title="Penukaran Tiket dimana min?" content="" /> */}
     </div>
   );
 }
