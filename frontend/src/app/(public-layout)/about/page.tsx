@@ -12,65 +12,50 @@ const aboutMelofestContents: { text: string }[] = [
   },
 ];
 
-export const ticketTerms: { id: number; text: string }[] = [
+const ticketTerms: { text: string }[] = [
   {
-    id: 1,
     text: 'Tiket hanya dapat dibeli melalui melophilefestival.com',
   },
   {
-    id: 2,
     text: 'Pembelian tiket selain melalui melophilefestival.com TIDAK MENJADI TANGGUNGJAWAB PROMOTOR & segala resiko yang timbul menjadi tanggung jawab pembeli tiket.',
   },
   {
-    id: 3,
     text: 'Harga belum termasuk pajak dan biaya layanan.',
   },
   {
-    id: 4,
     text: 'Tiket yang sudah dibeli TIDAK DAPAT DIKEMBALIKAN dengan alasan apapun, termasuk dikarenakan perubahan jadwal dan/atau susunan acara dan/atau diakibatkan oleh batal tampilnya artis pengisi acara. Kecuali dikarenakan kesalahan/inisiatif dari PROMOTOR/EO.',
   },
   {
-    id: 5,
     text: 'Tiket tidak bisa di-refund apabila terjadi kondisi kahar seperti: gempa bumi, banjir, tsunami, serta meninggal Pemuka Agama/Ulama Terkhususnya di Aceh yang menyebabkan batalnya acara.',
   },
   {
-    id: 6,
     text: 'Pada saat proses pembelian tiket, pastikan mengisi SESUAI dengan identitas diri pembeli.',
   },
   {
-    id: 7,
     text: 'Setelah pembelian tiket bakal mendapakatkan voucher e-tiket yang bakal ditukarkan pada periode waktu penukaran gelang atau hari-h.',
   },
   {
-    id: 8,
     text: 'QR code pada e-tiket hanya bisa di scan sebanyak satu kali.',
   },
   {
-    id: 9,
     text: 'Menunjukkan QR code yang tertera pada e-tiket dan identitas diri yang sesuai dengan data pada e-tiket.',
   },
   {
-    id: 10,
     text: 'Promotor TIDAK AKAN membantu proses penukaran e-tiket menjadi gelang jika terdapat ketidaksesuaian data pada e-tiket dan identitas diri.',
   },
   {
-    id: 11,
     text: 'Penukaran gelang yang diwakilkan atau oleh sebab pindah tangan kepemilikan WAJIB membawa surat kuasa dalam bentuk fisik dan bermaterai, yang ditandatangani pemberi dan penerima surat kuasa, serta melampirkan fotokopi KTP pemberi dan penerima surat kuasa.',
   },
   {
-    id: 12,
     text: 'Anak dibawah usia 12 tahun WAJIB didampingi orang tua/wali dan keamanannya menjadi tanggung jawab orang tua/wali.',
   },
   {
-    id: 13,
     text: 'Ibu hamil harap dalam pendampingan dan mengambil posisi yang dianggap paling aman, mengingat tata cahaya panggung dan suara dapat mengganggu kenyamanan bagi kehamilan, dan promotor tidak bertanggung jawab atas resiko apapun dalam hal ini.',
   },
   {
-    id: 14,
     text: 'Gelang yang hilang/rusak tidak dapat digunakan dan menjadi tanggung jawab pemilik.',
   },
   {
-    id: 15,
     text: 'Dengan bertransaksi dianggap telah membaca dan menyetujui syarat dan ketentuan ini.',
   },
 ];
