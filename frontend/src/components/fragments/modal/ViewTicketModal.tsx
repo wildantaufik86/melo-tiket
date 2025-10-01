@@ -9,13 +9,14 @@ type TicketDataProps = {
   ticketsUrl: string[];
   onClose: () => void;
   onDownload: () => void;
+  isDownloading?: boolean;
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // forwardRef supaya parent bisa akses ref ke bg-white div
 const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
-  ({ profile, ticketsUrl, onClose, onDownload }, ref) => {
+  ({ profile, ticketsUrl, onClose, onDownload, isDownloading }, ref) => {
     return (
       <div
         className="fixed inset-0 flex justify-center items-center z-50"
@@ -109,22 +110,25 @@ const ViewTicketModal = forwardRef<HTMLDivElement, TicketDataProps>(
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={onDownload}
-              className="mt-2 w-32 flex justify-center items-center text-xs font-semibold py-2 px-4 rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
-              style={{ backgroundColor: '#1f2937', color: '#ffffff' }}
-            >
-              Download
-            </button>
-            <button
-              onClick={onClose}
-              className="mt-2 w-32 flex justify-center items-center text-xs font-semibold py-2 px-4 rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
-              style={{ backgroundColor: '#3b82f6', color: '#ffffff' }}
-            >
-              Close
-            </button>
-          </div>
+          {/* Buttons */}
+          {!isDownloading && (
+            <div className="flex items-center gap-4 mt-4">
+              <button
+                onClick={onDownload}
+                className="mt-2 w-32 flex justify-center items-center text-xs font-semibold py-2 px-4 rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
+                style={{ backgroundColor: '#1f2937', color: '#ffffff' }}
+              >
+                Download
+              </button>
+              <button
+                onClick={onClose}
+                className="mt-2 w-32 flex justify-center items-center text-xs font-semibold py-2 px-4 rounded-sm cursor-pointer hover:opacity-80 transition-opacity"
+                style={{ backgroundColor: '#3b82f6', color: '#ffffff' }}
+              >
+                Close
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );

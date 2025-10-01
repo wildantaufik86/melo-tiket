@@ -1,6 +1,7 @@
 'use client';
 
 import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
+import { useAuth } from '@/context/authUserContext';
 import { useOrder } from '@/context/ordersContext';
 import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { TicketProps, TicketWithState } from '@/types/Ticket';
@@ -17,6 +18,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   const { saveOrders } = useOrder();
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
   const router = useRouter();
+  const { authUser } = useAuth();
 
   useEffect(() => {
     if (tickets.length > 0) {
@@ -59,6 +61,11 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   };
 
   const createTemporaryOrder = (): void => {
+    if (!authUser?.idNumber) {
+      ToastError('Silahkan lengkapi data diri atau NIK anda terlebih dahulu');
+      return;
+    }
+
     if (selectedTickets.length > 0) {
       saveOrders(selectedTickets);
       router.push(`/checkout/event/${eventId}`);

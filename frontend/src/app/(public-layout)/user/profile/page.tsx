@@ -33,7 +33,7 @@ export default function ProfilePage() {
     TransactionSummary[]
   >([]);
   const [ticketsUrl, setTicketsUrl] = useState<string[]>([]);
-
+  const [isDownloading, setIsDownloading] = useState(false);
   const lastHistory = historyEvent[historyEvent.length - 1];
 
   const fetchProfil = async () => {
@@ -57,6 +57,17 @@ export default function ProfilePage() {
         return ticket.ticketImage;
       });
       setTicketsUrl(url);
+    }
+  };
+
+  const handleDownloadClick = async () => {
+    setIsDownloading(true); // hide buttons
+    try {
+      await handleFallbackDownload(ticketRef, ticketsUrl, BASE_URL!);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -132,13 +143,8 @@ export default function ProfilePage() {
             profile={authUser}
             ticketsUrl={ticketsUrl}
             onClose={() => setIsViewTicket(false)}
-            onDownload={() =>
-              handleFallbackDownload(
-                ticketRef,
-                ticketsUrl,
-                BASE_URL ? BASE_URL : ''
-              )
-            }
+            onDownload={() => handleDownloadClick()}
+            isDownloading={isDownloading}
           />
         )}
       </section>
