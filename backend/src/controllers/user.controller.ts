@@ -363,3 +363,19 @@ export const searchUsersHandler: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+
+export const exportAllUsersHandler: RequestHandler = async (req, res, next) => {
+    try {
+        const users = await UserModel.find({ deletedAt: null }).select("-password").lean();
+
+
+        res.status(200).json({
+            status: "success",
+            message: "All users retrieved for export",
+            data: users,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

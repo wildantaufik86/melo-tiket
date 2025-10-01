@@ -16,6 +16,17 @@ export interface IVerifyTransactionPayload {
   status: 'paid' | 'reject';
 }
 
+export interface IExportedTransaction {
+  'Nama Pembeli': string;
+  Email: string;
+  'Nomor Hp': string;
+  'Jumlah Tiket': number;
+  'Total Bayar': number;
+  Status: string;
+  Metode: string;
+  'Tanggal Pembelian': string;
+}
+
 export async function fetchWithToken(
   url: string,
   options?: RequestInit
@@ -170,5 +181,37 @@ export async function softDeleteTransaction(
     return { status: 'success', message: responseData.message };
   } catch (error: any) {
     return { status: 'error', message: error.message };
+  }
+}
+
+export async function fetchAllTransactionsForExport(
+  status?: string,
+  searchQuery?: string
+): Promise<{
+  status: string;
+  message: string;
+  data: IExportedTransaction[] | null;
+}> {
+  try {
+    const params = new URLSearchParams();
+    if (status && status !== 'all') {
+      params.append('status', status);
+    }
+    if (searchQuery) {
+      params.append('q', searchQuery);
+    }
+    const res = await fetchWithToken(
+      `/transaction/export/all?${params.toString()}`,
+      {
+        method: 'GET',
+      }
+    );
+    const responseData = await res.json();
+    if (!res.ok) {
+      throw new Error(responseData.message || 'Gagal mengekspor data transaksi.');
+    }
+    return responseData;
+  } catch (error: any) {
+    return { status: 'error', data: null, message: error.message };
   }
 }

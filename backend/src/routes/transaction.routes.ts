@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authenticate from "../middleware/authenticate";
 import validateRole from "../middleware/validateRole";
-import { createTransactionHandler, getAllTransactionsHandler, getTransactionByIdHandler, softDeleteTransactionHandler, verifyTransactionHandler } from "../controllers/transaction.controller";
+import { createTransactionHandler, exportAllTransactionsHandler, getAllTransactionsHandler, getTransactionByIdHandler, softDeleteTransactionHandler, verifyTransactionHandler } from "../controllers/transaction.controller";
 import createUploader from "../middleware/upload";
 
 const transactionRoutes = Router()
@@ -13,5 +13,6 @@ transactionRoutes.get( "/", authenticate, validateRole("operator", "admin", "sup
 transactionRoutes.get("/:transactionId", authenticate, validateRole("operator", "admin", "superadmin"), getTransactionByIdHandler);
 transactionRoutes.patch("/:transactionId/verify", authenticate, verifyTransactionHandler);
 transactionRoutes.delete("/:transactionId", authenticate, validateRole("superadmin"), softDeleteTransactionHandler);
+transactionRoutes.get("/export/all", authenticate, validateRole("superadmin"), exportAllTransactionsHandler);
 
 export default transactionRoutes;

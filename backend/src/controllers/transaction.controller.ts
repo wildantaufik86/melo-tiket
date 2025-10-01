@@ -18,38 +18,38 @@ import nodeCron from 'node-cron';
 const getBaseUrl = (req: Request): string =>
   `${req.protocol}://${req.get('host')}`;
 
-nodeCron.schedule('*/10 * * * *', async () => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+// nodeCron.schedule('*/10 * * * *', async () => {
+//   const session = await mongoose.startSession();
+//   session.startTransaction();
 
-  try {
-    const expiredTransactions = await TransactionModel.find({
-      status: 'pending',
-      expiredAt: { $lt: new Date() },
-    }).session(session);
+//   try {
+//     const expiredTransactions = await TransactionModel.find({
+//       status: 'pending',
+//       expiredAt: { $lt: new Date() },
+//     }).session(session);
 
-    for (const transaction of expiredTransactions) {
-      for (const purchasedTicket of transaction.tickets) {
-        await TicketModel.findByIdAndUpdate(
-          purchasedTicket.ticketId,
-          { $inc: { stock: 1 } },
-          { session }
-        );
-      }
+//     for (const transaction of expiredTransactions) {
+//       for (const purchasedTicket of transaction.tickets) {
+//         await TicketModel.findByIdAndUpdate(
+//           purchasedTicket.ticketId,
+//           { $inc: { stock: 1 } },
+//           { session }
+//         );
+//       }
 
-      // ubah status transaksi jadi expired
-      transaction.status = 'expired';
-      await transaction.save({ session });
-    }
+//       // ubah status transaksi jadi expired
+//       transaction.status = 'expired';
+//       await transaction.save({ session });
+//     }
 
-    await session.commitTransaction();
-  } catch (err) {
-    await session.abortTransaction();
-    console.error('Error expiring transactions:', err);
-  } finally {
-    session.endSession();
-  }
-});
+//     await session.commitTransaction();
+//   } catch (err) {
+//     await session.abortTransaction();
+//     console.error('Error expiring transactions:', err);
+//   } finally {
+//     session.endSession();
+//   }
+// });
 
 export const createTransactionHandler: RequestHandler = async (
   req,
@@ -484,5 +484,74 @@ export const softDeleteTransactionHandler: RequestHandler = async (
     next(error);
   } finally {
     session.endSession();
+  }
+};
+
+export const exportAllTransactionsHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const status = req.query.status as string | undefined;
+    const searchQuery = req.query.q as string | undefined;
+
+    const match: any = { deletedAt: null };
+
+    if (status && status !== "all") {
+      match.status = status;
+    }
+
+    const pipeline: any[] = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      { $match: match },
+    ];
+
+    if (searchQuery) {
+      const searchConditions: any[] = [
+        { "user.name": { $regex: searchQuery, $options: "i" } },
+        { "user.email": { $regex: searchQuery, $options: "i" } },
+      ];
+      if (mongoose.Types.ObjectId.isValid(searchQuery)) {
+        searchConditions.push({ _id: new mongoose.Types.ObjectId(searchQuery) });
+      }
+      const searchNumber = parseFloat(searchQuery);
+      if (!isNaN(searchNumber)) {
+        searchConditions.push({ totalPrice: searchNumber });
+      }
+      pipeline.push({ $match: { $or: searchConditions } });
+    }
+
+    pipeline.push({ $sort: { createdAt: -1 } });
+
+    // Project untuk memilih field yang akan diekspor
+    pipeline.push({
+      $project: {
+        _id: 0, // Hilangkan _id agar tidak muncul di Excel jika tidak perlu
+        "Nama Pembeli": "$user.name",
+        "Email": "$user.email",
+        "Nomor Hp": "$user.phone", // PASTIKAN NAMA FIELD DI MODEL USER ADALAH 'phone'
+        "Jumlah Tiket": "$totalTicket",
+        "Total Bayar": "$totalPrice",
+        "Status": "$status",
+        "Metode": "$transactionMethod",
+        "Tanggal Pembelian": "$createdAt",
+      },
+    });
+
+    const transactions = await TransactionModel.aggregate(pipeline);
+
+    res.status(OK).json({
+      status: "success",
+      message: "Transactions retrieved successfully for export",
+      data: transactions,
+    });
+
+  } catch (error) {
+    next(error);
   }
 };

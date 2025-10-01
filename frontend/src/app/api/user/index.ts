@@ -136,3 +136,23 @@ export async function searchUsers(query: string): Promise<{ status: 'success' | 
         return { status: 'error', data: null, message: error.message };
     }
 }
+
+
+// app/api/user.ts atau sejenisnya
+
+export async function fetchAllUsersForExport(): Promise<{ status: string; message: string; data: IUser[] | null }> {
+    try {
+        // PERBAIKAN 1: URL disesuaikan menjadi '/user/export/all'
+        const res = await fetchWithToken(`/user/export/all`, { method: 'GET' });
+        const responseData = await res.json();
+
+        if (!res.ok) {
+            throw new Error(responseData.message || 'Gagal mengekspor data pengguna.');
+        }
+
+        // PERBAIKAN 2: Kembalikan seluruh objek respons, bukan hanya responseData.data
+        return responseData;
+    } catch (error: any) {
+        return { status: 'error', data: null, message: error.message };
+    }
+}
