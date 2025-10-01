@@ -82,7 +82,8 @@ export default function TicketSection() {
             <Swiper
               spaceBetween={20}
               breakpoints={{
-                320: { slidesPerView: 3 }, // mobile: 3
+                320: { slidesPerView: 2 }, // mobile: 3
+                430: { slidesPerView: 3 }, // mobile: 3
                 768: { slidesPerView: 4 }, // tablet: 4
                 1024: { slidesPerView: 5 }, // laptop: 5
               }}
