@@ -1,6 +1,7 @@
 'use client'
 
-import { verifyTransaction } from "@/app/api/transcation";
+import { revertTransaction, verifyTransaction } from "@/app/api/transcation";
+import { useAuth } from "@/context/authUserContext";
 import { ToastError, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 import { ITransaction } from "@/types/Transaction";
 import { useState } from "react";
@@ -17,6 +18,8 @@ const isUserObject = (user: any): user is { name: string; email: string } => {
 
 export default function TransactionDetailModal({ transaction, onClose, onSuccessAction }: ModalProps) {
     const [isVerifying, setIsVerifying] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const authUser = useAuth();
 
     const handleVerify = async (status: 'paid' | 'reject') => {
         setIsVerifying(true);
@@ -29,6 +32,19 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
             ToastError(`Error: ${result.message}`);
         }
         setIsVerifying(false);
+    };
+
+    const handleRevert = async () => {
+      setIsProcessing(true);
+      const result = await revertTransaction(transaction._id!);
+      if (result.status === "success") {
+          ToastSuccess("Transaction successfully reverted to PAID!");
+          onSuccessAction();
+          onClose();
+      } else {
+          ToastError(`Error: ${result.message}`);
+      }
+      setIsProcessing(false);
     };
 
     return (
@@ -76,6 +92,17 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
                             disabled={isVerifying}
                             className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400">
                             {isVerifying ? 'Processing...' : 'Approve Payment'}
+                        </button>
+                    </div>
+                )}
+                {authUser?.authUser?.role === 'superadmin' &&
+                 (transaction.status === 'reject' || transaction.status === 'expired') && (
+                    <div className="flex justify-end pt-4 border-t">
+                        <button
+                            onClick={handleRevert}
+                            disabled={isProcessing}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400">
+                            {isProcessing ? 'Processing...' : 'Revert to Paid'}
                         </button>
                     </div>
                 )}

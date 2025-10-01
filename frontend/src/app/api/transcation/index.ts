@@ -215,3 +215,22 @@ export async function fetchAllTransactionsForExport(
     return { status: 'error', data: null, message: error.message };
   }
 }
+
+export async function revertTransaction(transactionId: string): Promise<{ status: string; message: string; data: ITransaction | null }> {
+  try {
+    const res = await fetchWithToken(`/transaction/${transactionId}/revert`, {
+      method: 'PATCH'
+    });
+    const responseData = await res.json();
+    if (!res.ok)
+      throw new Error(responseData.message || 'Gagal revert transaksi.');
+
+    return {
+      status: 'success',
+      message: responseData.message,
+      data: responseData.data,
+    };
+  } catch (error: any) {
+    return { status: 'error', message: error.message, data: null };
+  }
+}

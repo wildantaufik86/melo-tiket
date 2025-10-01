@@ -6,6 +6,8 @@ export interface IPurchasedTicket {
   qrCode: string;
   ticketImage: string;
   isScanned: boolean;
+  quantity?: number;
+  price?: number;
 }
 
 export interface ITransaction extends Document {

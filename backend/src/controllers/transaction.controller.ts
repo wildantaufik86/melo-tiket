@@ -555,3 +555,59 @@ export const exportAllTransactionsHandler: RequestHandler = async (req, res, nex
     next(error);
   }
 };
+
+
+export const revertTransactionStatusHandler: RequestHandler = async (req: any, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { transactionId } = req.params;
+    const superAdminId = req.user?._id; // dari JWT
+
+    // ambil transaksi
+    const transaction = await TransactionModel.findById(transactionId).session(session);
+    appAssert(transaction, 404, "Transaksi tidak ditemukan");
+
+    // hanya boleh revert kalau status reject/expired
+    if (!["reject", "expired"].includes(transaction.status)) {
+      throw new Error(`Transaksi dengan status ${transaction.status} tidak bisa di-revert`);
+    }
+
+    // validasi stok
+    for (const item of transaction.tickets) {
+      const ticket = await TicketModel.findById(item.ticketId).session(session);
+      if (!ticket) throw new Error(`Tiket tidak ditemukan`);
+      // stok tidak boleh minus
+      if (ticket.stock < 1) {
+        throw new Error(`Stok tiket habis, tidak bisa revert`);
+      }
+    }
+
+    // potong ulang stok sesuai jumlah tiket yang ada di transaksi
+    for (const item of transaction.tickets) {
+      await TicketModel.findByIdAndUpdate(
+        item.ticketId,
+        { $inc: { stock: -1 } }, // karena tiap `tickets` sudah represent 1 tiket
+        { session }
+      );
+    }
+
+    // update transaksi jadi paid
+    transaction.status = "paid";
+
+    await transaction.save({ session });
+
+    await session.commitTransaction();
+    res.status(200).json({
+      success: true,
+      message: "Transaksi berhasil di-revert ke status PAID",
+      data: transaction,
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    next(err);
+  } finally {
+    session.endSession();
+  }
+};

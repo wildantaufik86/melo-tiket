@@ -6,6 +6,12 @@ export interface IPurchasedTicket {
   qrCode: string;
   ticketImage: string;
   isScanned: boolean;
+  quantity?: number;
+  price?: number;
+}
+
+export interface IRevertTransactionPayload {
+  status: 'paid'; // untuk sekarang cuma boleh revert jadi paid
 }
 
 export interface ITransaction extends Document {

@@ -6,6 +6,8 @@ const PurchasedTicketSchema = new Schema<IPurchasedTicket>({
   qrCode: { type: String, required: true },
   ticketImage: { type: String, required: true },
   isScanned: { type: Boolean, default: false },
+  quantity: { type: Number, default: 1 },
+  price: { type: Number, default: 0 },
 })
 
 const TransactionSchema = new Schema<ITransaction>(
