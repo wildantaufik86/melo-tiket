@@ -1,7 +1,6 @@
 'use client';
 
 import { fetchEventById } from '@/app/api/event';
-import { fetchAllTicket } from '@/app/api/ticket';
 import HeroSection from '@/components/pages/homePage/HeroSection';
 import AboutSection from '@/components/pages/ticket/AboutSection';
 import HeaderSection from '@/components/pages/ticket/HeaderSection';
