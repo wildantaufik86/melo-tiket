@@ -1,6 +1,6 @@
 'use client'
 
-import { revertTransaction, verifyTransaction } from "@/app/api/transcation";
+import { revertTransaction, updateTransactionStatus, verifyTransaction } from "@/app/api/transcation";
 import { useAuth } from "@/context/authUserContext";
 import { ToastError, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 import { ITransaction } from "@/types/Transaction";
@@ -19,6 +19,9 @@ const isUserObject = (user: any): user is { name: string; email: string } => {
 export default function TransactionDetailModal({ transaction, onClose, onSuccessAction }: ModalProps) {
     const [isVerifying, setIsVerifying] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<'pending' | 'paid'>(transaction.status as 'pending' | 'paid');
+
     const authUser = useAuth();
 
     const handleVerify = async (status: 'paid' | 'reject') => {
@@ -45,6 +48,24 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
           ToastError(`Error: ${result.message}`);
       }
       setIsProcessing(false);
+    };
+
+       const handleStatusUpdate = async () => {
+        setIsUpdating(true);
+        try {
+            const result = await updateTransactionStatus(transaction._id!, { status: selectedStatus });
+            if (result.status === 'success') {
+                ToastSuccess(`Transaction status updated to ${selectedStatus}`);
+                onSuccessAction();
+                onClose();
+            } else {
+                ToastError(`Error: ${result.message}`);
+            }
+        } catch (err: any) {
+            ToastError(`Error: ${err.message}`);
+        } finally {
+            setIsUpdating(false);
+        }
     };
 
     return (
@@ -103,6 +124,27 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
                             disabled={isProcessing}
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                             {isProcessing ? 'Processing...' : 'Revert to Paid'}
+                        </button>
+                    </div>
+                )}
+                {authUser?.authUser?.role === 'superadmin' && (
+                  transaction.status === 'paid') && (
+                    <div className="flex flex-col justify-end md:flex-row items-center gap-4 pt-4 border-t">
+                        <select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value as 'pending' | 'paid')}
+                            className="border rounded-md px-3 py-2"
+                            disabled={isUpdating}
+                        >
+                            <option value="pending">Pending</option>
+                            <option value="paid">Paid</option>
+                        </select>
+                        <button
+                            onClick={handleStatusUpdate}
+                            disabled={isUpdating || selectedStatus === transaction.status}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
+                        >
+                            {isUpdating ? 'Updating...' : 'Update Status'}
                         </button>
                     </div>
                 )}

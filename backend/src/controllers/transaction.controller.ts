@@ -611,3 +611,39 @@ export const revertTransactionStatusHandler: RequestHandler = async (req: any, r
     session.endSession();
   }
 };
+
+export const updateTransactionStatusHandler: RequestHandler = async (req: any, res, next) => {
+  try {
+    const { transactionId } = req.params;
+    const { status } = req.body;
+    const superAdminId = req.user?._id;
+
+    // validasi status
+    if (!["paid", "pending"].includes(status)) {
+      throw new AppError(400, "Status hanya boleh 'paid' atau 'pending'");
+    }
+
+    const transaction = await TransactionModel.findById(transactionId);
+    appAssert(transaction, 404, "Transaksi tidak ditemukan");
+
+    // jika status yang diubah sama dengan status sekarang, skip
+    if (transaction.status === status) {
+      throw new AppError(400, `Transaksi sudah memiliki status '${status}'`);
+    }
+
+    // update status
+    transaction.status = status;
+    transaction.verifiedBy = superAdminId;
+    transaction.verifiedAt = new Date();
+
+    await transaction.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Transaksi berhasil diubah menjadi '${status}'`,
+      data: transaction,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
