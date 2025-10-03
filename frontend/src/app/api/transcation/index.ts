@@ -8,7 +8,7 @@ export interface ICreateTransactionPayload {
   }[];
   transactionMethod: 'Online' | 'Onsite';
   userId?: string;
-  isComplimentary: boolean;
+  isComplimentary?: boolean;
   paymentProof: File | null;
   totalPrice: number;
 }
