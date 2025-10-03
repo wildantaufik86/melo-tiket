@@ -72,14 +72,17 @@ export const createTransactionHandler: RequestHandler = async (
       );
     }
 
-    const { transactionMethod, userId: targetUserIdFromAdmin, isComplimentary } = req.body;
+    // [PERBAIKAN] Ubah isComplimentary dari body menjadi boolean yang sesungguhnya
+    // Ini akan menangani nilai string "true", "false", atau undefined dengan benar.
+    const isComplimentaryTxn = req.body.isComplimentary === 'true';
+    const { transactionMethod, userId: targetUserIdFromAdmin } = req.body;
 
-    if (isComplimentary && initiator.role !== 'superadmin') {
+    // Gunakan variabel boolean yang sudah bersih
+    if (isComplimentaryTxn && initiator.role !== 'superadmin') {
       throw new AppError(FORBIDDEN, 'Hanya superadmin yang dapat membuat transaksi komplimen.');
     }
 
     const totalPriceFromFE = Number(req.body.totalPrice);
-    console.log(req.body);
     appAssert(
       !isNaN(totalPriceFromFE),
       BAD_REQUEST,
@@ -142,8 +145,8 @@ export const createTransactionHandler: RequestHandler = async (
         `Ticket type ${request.ticketId} not found`
       );
 
-      // [MODIFIKASI] Cek stok HANYA jika bukan transaksi komplimen
-      if (!isComplimentary) {
+      // [PERBAIKAN] Gunakan variabel boolean yang sudah bersih
+      if (!isComplimentaryTxn) {
         appAssert(
           ticketDoc.stock >= request.quantity,
           BAD_REQUEST,
@@ -154,7 +157,6 @@ export const createTransactionHandler: RequestHandler = async (
           BAD_REQUEST,
           `Ticket ${ticketDoc.category} is currently not available`
         );
-        // Kurangi stok HANYA jika bukan komplimen
         ticketDoc.stock -= request.quantity;
       }
 
@@ -165,8 +167,8 @@ export const createTransactionHandler: RequestHandler = async (
       }
     }
 
-    // ✅ Validate payment proof only for pending transactions
-    const requiresPaymentProof = transactionMethod !== 'OnSite';
+    // [PERBAIKAN] Gunakan variabel boolean yang sudah bersih
+    const requiresPaymentProof = transactionMethod === 'Online' && !isComplimentaryTxn;
     if (requiresPaymentProof) {
       appAssert(
         req.file,
@@ -178,13 +180,13 @@ export const createTransactionHandler: RequestHandler = async (
     const formattedTickets = await Promise.all(ticketProcessingPromises);
     const baseUrl = getBaseUrl(req);
 
-    // ✅ Only set payment proof path if file exists
     let paymentProofPath = null;
     if (req.file) {
       paymentProofPath = `${baseUrl}/uploads/paymentProof/${req.file.filename}`;
     }
 
-    if (!isComplimentary) {
+    // [PERBAIKAN] Gunakan variabel boolean yang sudah bersih
+    if (!isComplimentaryTxn) {
       const stockUpdatePromises = ticketsFromDb.map((t) => t.save({ session }));
       await Promise.all(stockUpdatePromises);
     }
@@ -197,7 +199,8 @@ export const createTransactionHandler: RequestHandler = async (
       paymentProof: paymentProofPath,
       status: transactionMethod === 'Onsite' ? 'paid' : 'pending',
       transactionMethod,
-      isComplimentary: isComplimentary || false,
+      // [PERBAIKAN] Gunakan variabel boolean yang sudah bersih
+      isComplimentary: isComplimentaryTxn,
       expiredAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     });
     await transaction.save({ session });
@@ -210,7 +213,6 @@ export const createTransactionHandler: RequestHandler = async (
 
     await session.commitTransaction();
 
-    // ✅ Only include paymentProof in response if it exists
     const responseData: any = {
       message: 'Transaction created successfully.',
       transactionId: transaction._id,
@@ -219,7 +221,6 @@ export const createTransactionHandler: RequestHandler = async (
       expiredAt: transaction.expiredAt,
     };
 
-    // Only add paymentProof to response if it exists
     if (paymentProofPath) {
       responseData.paymentProof = paymentProofPath;
     }
