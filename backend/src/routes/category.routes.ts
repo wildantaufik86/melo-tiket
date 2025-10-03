@@ -7,8 +7,8 @@ const categoryRoutes = Router();
 
 categoryRoutes.get('/', getCategories);
 categoryRoutes.get('/:id', getCategoryById);
-categoryRoutes.post('/create', authenticate, createCategory);
-categoryRoutes.put('/update/:id', authenticate, updateCategory);
+categoryRoutes.post('/create', authenticate, validateRole("superadmin"), createCategory);
+categoryRoutes.put('/update/:id', authenticate, validateRole("superadmin"), updateCategory);
 categoryRoutes.delete('/:categoryId', authenticate, validateRole("admin", "superadmin"), softDeleteCategoryHandler);
 
 export default categoryRoutes;
