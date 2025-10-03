@@ -4,6 +4,7 @@ import { fetchAllEvents } from "@/app/api/event";
 import { fetchAllTicket } from "@/app/api/ticket";
 import { createTransaction, ICreateTransactionPayload } from "@/app/api/transcation";
 import { searchUsers } from "@/app/api/user";
+import { useAuth } from "@/context/authUserContext";
 import { IEvent } from "@/types/Event";
 import { ITicket } from "@/types/Ticket";
 import { IUser } from "@/types/User";
@@ -17,6 +18,7 @@ export default function CreateTransactionForm() {
     const [users, setUsers] = useState<IUser[]>([]);
     const [events, setEvents] = useState<IEvent[]>([]);
     const [availableTickets, setAvailableTickets] = useState<ITicket[]>([]);
+    const authUser = useAuth();
 
     const [userSearch, setUserSearch] = useState('');
     const [selectedUserId, setSelectedUserId] = useState('');
@@ -24,6 +26,8 @@ export default function CreateTransactionForm() {
     const [cart, setCart] = useState<Record<string, number>>({});
     const [transactionMethod, setTransactionMethod] = useState<'Online' | 'Onsite'>('Onsite');
     const [paymentProof, setPaymentProof] = useState<File | null>(null);
+
+    const [isComplimentary, setIsComplimentary] = useState(false);
 
     const [loading, setLoading] = useState({ users: false, events: false, tickets: false });
     const [submitting, setSubmitting] = useState(false);
@@ -74,7 +78,7 @@ export default function CreateTransactionForm() {
         setCart(prev => ({ ...prev, [ticketId]: Math.max(0, quantity) }));
     };
 
-    const totalPrice = useMemo(() => {
+    const displayTotalPrice = useMemo(() => {
         return availableTickets.reduce((total, ticket) => {
             const quantity = cart[ticket._id!] || 0;
             return total + (ticket.price * quantity);
@@ -99,8 +103,9 @@ export default function CreateTransactionForm() {
             userId: selectedUserId,
             transactionMethod,
             paymentProof,
-            totalPrice,
+            totalPrice: isComplimentary ? 0 : displayTotalPrice, // Kirim 0 jika komplimen
             tickets: ticketsInCart.map(([ticketId, quantity]) => ({ ticketId, quantity })),
+            isComplimentary: isComplimentary,
         };
 
         const result = await createTransaction(payload);
@@ -128,10 +133,11 @@ export default function CreateTransactionForm() {
                     className="w-full p-2 border rounded-md"
                 />
                 {loading.users && <p className="text-xs mt-1">Searching users...</p>}
+
                 {users.length > 0 && (
                     <select onChange={(e) => setSelectedUserId(e.target.value)} value={selectedUserId} className="w-full p-2 border rounded-md mt-2">
                         <option value="">-- Select a User --</option>
-                        {users.map(user => <option key={user._id} value={user._id!}>{user.name} ({user.email})</option>)}
+                        {users.map(user => <option key={user.user._id} value={user.user._id!}>{user.user.name} ({user.user.email})</option>)}
                     </select>
                 )}
             </div>
@@ -169,7 +175,7 @@ export default function CreateTransactionForm() {
             )}
 
             {/* Step 3: Finalize Transaction */}
-            {totalPrice > 0 && (
+            {Object.values(cart).some(q => q > 0) && (
                 <div className="p-4 border rounded-lg">
                     <h3 className="font-bold mb-2">3. Finalize Purchase</h3>
                     <div className="space-y-4">
@@ -178,9 +184,26 @@ export default function CreateTransactionForm() {
                             <option value="Onsite">Onsite (Cash)</option>
                             <option value="Online">Online (Transfer)</option>
                         </select>
+                        {authUser?.authUser?.role === 'superadmin' && (
+                            <div className="flex items-center gap-3 p-3 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                                <input
+                                    type="checkbox"
+                                    id="isComplimentary"
+                                    checked={isComplimentary}
+                                    onChange={(e) => setIsComplimentary(e.target.checked)}
+                                    className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <label htmlFor="isComplimentary" className="font-medium text-sm text-yellow-900">
+                                    Tandai sebagai Transaksi Komplimen (Tidak memotong stok & harga Rp 0)
+                                </label>
+                            </div>
+                        )}
                         <input type="file" onChange={(e) => setPaymentProof(e.target.files ? e.target.files[0] : null)} className="w-full text-sm"/>
                         <div className="text-right">
-                            <p className="text-lg font-bold">Total: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalPrice)}</p>
+                            <p className="text-lg font-bold">
+                                Total: {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(displayTotalPrice)}
+                                {isComplimentary && <span className="ml-2 text-sm font-normal text-green-600">(Complimentary)</span>}
+                            </p>
                             <button onClick={handleSubmit} disabled={submitting} className="mt-2 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400">
                                 {submitting ? 'Processing...' : 'Create Transaction'}
                             </button>

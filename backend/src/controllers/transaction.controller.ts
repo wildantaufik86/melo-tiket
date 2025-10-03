@@ -72,7 +72,11 @@ export const createTransactionHandler: RequestHandler = async (
       );
     }
 
-    const { transactionMethod, userId: targetUserIdFromAdmin } = req.body;
+    const { transactionMethod, userId: targetUserIdFromAdmin, isComplimentary } = req.body;
+
+    if (isComplimentary && initiator.role !== 'superadmin') {
+      throw new AppError(FORBIDDEN, 'Hanya superadmin yang dapat membuat transaksi komplimen.');
+    }
 
     const totalPriceFromFE = Number(req.body.totalPrice);
     console.log(req.body);
@@ -137,19 +141,24 @@ export const createTransactionHandler: RequestHandler = async (
         NOT_FOUND,
         `Ticket type ${request.ticketId} not found`
       );
-      appAssert(
-        ticketDoc.stock >= request.quantity,
-        BAD_REQUEST,
-        `Not enough stock for ${ticketDoc.category}`
-      );
-      appAssert(
-        ticketDoc.status === 'Available',
-        BAD_REQUEST,
-        `Ticket ${ticketDoc.category} is currently not available`
-      );
+
+      // [MODIFIKASI] Cek stok HANYA jika bukan transaksi komplimen
+      if (!isComplimentary) {
+        appAssert(
+          ticketDoc.stock >= request.quantity,
+          BAD_REQUEST,
+          `Not enough stock for ${ticketDoc.category}`
+        );
+        appAssert(
+          ticketDoc.status === 'Available',
+          BAD_REQUEST,
+          `Ticket ${ticketDoc.category} is currently not available`
+        );
+        // Kurangi stok HANYA jika bukan komplimen
+        ticketDoc.stock -= request.quantity;
+      }
 
       totalTicket += request.quantity;
-      ticketDoc.stock -= request.quantity;
 
       for (let i = 0; i < request.quantity; i++) {
         ticketProcessingPromises.push(processAndGenerateTicket(ticketDoc));
@@ -175,8 +184,10 @@ export const createTransactionHandler: RequestHandler = async (
       paymentProofPath = `${baseUrl}/uploads/paymentProof/${req.file.filename}`;
     }
 
-    const stockUpdatePromises = ticketsFromDb.map((t) => t.save({ session }));
-    await Promise.all(stockUpdatePromises);
+    if (!isComplimentary) {
+      const stockUpdatePromises = ticketsFromDb.map((t) => t.save({ session }));
+      await Promise.all(stockUpdatePromises);
+    }
 
     const transaction = new TransactionModel({
       userId: targetUserId,
@@ -186,6 +197,7 @@ export const createTransactionHandler: RequestHandler = async (
       paymentProof: paymentProofPath,
       status: transactionMethod === 'Onsite' ? 'paid' : 'pending',
       transactionMethod,
+      isComplimentary: isComplimentary || false,
       expiredAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
     });
     await transaction.save({ session });
@@ -225,6 +237,7 @@ export const getAllTransactionsHandler: RequestHandler = async (req, res, next) 
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
+    const userRole = req.user?.role;
 
     const status = req.query.status as string | undefined;
     const searchQuery = req.query.q as string | undefined;
@@ -233,6 +246,10 @@ export const getAllTransactionsHandler: RequestHandler = async (req, res, next) 
 
     if (status && status !== "all") {
       match.status = status;
+    }
+
+    if (userRole === 'admin' || userRole === 'operator') {
+      match.isComplimentary = { $ne: true };
     }
 
     const pipeline: any[] = [
@@ -346,6 +363,10 @@ export const getTransactionByIdHandler: RequestHandler = async (
       });
 
     appAssert(transaction, NOT_FOUND, 'Transaction not found');
+
+    if ((user.role === 'admin' || user.role === 'operator') && transaction.isComplimentary) {
+      throw new AppError(FORBIDDEN, 'You are not authorized to view this transaction');
+    }
 
     if (
       user.role === 'user' &&
@@ -492,7 +513,7 @@ export const exportAllTransactionsHandler: RequestHandler = async (req, res, nex
     const status = req.query.status as string | undefined;
     const searchQuery = req.query.q as string | undefined;
 
-    const match: any = { deletedAt: null };
+    const match: any = { deletedAt: null, isComplimentary: { $ne: true } };
 
     if (status && status !== "all") {
       match.status = status;

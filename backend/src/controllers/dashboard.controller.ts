@@ -19,6 +19,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
       TicketModel.countDocuments({}),
     ]);
 
+    // Transactions summary (exclude complimentary)
     const [
       totalTransactions,
       paidTransactions,
@@ -26,27 +27,27 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
       rejectedTransactions,
       expiredTransactions,
     ] = await Promise.all([
-      TransactionModel.countDocuments({ deletedAt: null }),
-      TransactionModel.countDocuments({ status: "paid", deletedAt: null }),
-      TransactionModel.countDocuments({ status: "pending", deletedAt: null }),
-      TransactionModel.countDocuments({ status: "reject", deletedAt: null }),
-      TransactionModel.countDocuments({ status: "expired", deletedAt: null }),
+      TransactionModel.countDocuments({ deletedAt: null, isComplimentary: { $ne: true } }),
+      TransactionModel.countDocuments({ status: "paid", deletedAt: null, isComplimentary: { $ne: true } }),
+      TransactionModel.countDocuments({ status: "pending", deletedAt: null, isComplimentary: { $ne: true } }),
+      TransactionModel.countDocuments({ status: "reject", deletedAt: null, isComplimentary: { $ne: true } }),
+      TransactionModel.countDocuments({ status: "expired", deletedAt: null, isComplimentary: { $ne: true } }),
     ]);
 
+    // Revenue (exclude complimentary)
     const revenueAgg = await TransactionModel.aggregate([
-      { $match: { status: "paid", deletedAt: null } },
+      { $match: { status: "paid", deletedAt: null, isComplimentary: { $ne: true } } },
       { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } },
     ]);
     const totalRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
 
-    // Expected total revenue (semua transaction tanpa filter status)
     const expectedRevenueAgg = await TransactionModel.aggregate([
-      { $match: { deletedAt: null } },
+      { $match: { deletedAt: null, isComplimentary: { $ne: true } } },
       { $group: { _id: null, expectedTotalRevenue: { $sum: "$totalPrice" } } },
     ]);
     const expectedTotalRevenue = expectedRevenueAgg.length > 0 ? expectedRevenueAgg[0].expectedTotalRevenue : 0;
 
-    // Ticket stock per category - dengan lookup
+    // Ticket stock per category
     const stockPerCategory = await TicketModel.aggregate([
       {
         $lookup: {
@@ -56,12 +57,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
           as: "categoryInfo"
         }
       },
-      {
-        $unwind: {
-          path: "$categoryInfo",
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: "$categoryInfo", preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: "$category",
@@ -71,9 +67,9 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
       }
     ]);
 
-    // Ticket sold per category - dengan lookup yang lebih complex
+    // Ticket sold per category (exclude complimentary)
     const soldPerCategory = await TransactionModel.aggregate([
-      { $match: { status: "paid", deletedAt: null } },
+      { $match: { status: "paid", deletedAt: null, isComplimentary: { $ne: true } } },
       { $unwind: "$tickets" },
       {
         $lookup: {
@@ -83,12 +79,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
           as: "ticketInfo"
         }
       },
-      {
-        $unwind: {
-          path: "$ticketInfo",
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: "$ticketInfo", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "categories",
@@ -97,12 +88,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
           as: "categoryInfo"
         }
       },
-      {
-        $unwind: {
-          path: "$categoryInfo",
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: "$categoryInfo", preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: "$ticketInfo.category",
@@ -113,9 +99,9 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
       }
     ]);
 
-    // Transaction per category - dengan lookup
+    // Transaction per category (exclude complimentary)
     const transactionPerCategory = await TransactionModel.aggregate([
-      { $match: { deletedAt: null } },
+      { $match: { deletedAt: null, isComplimentary: { $ne: true } } },
       { $unwind: "$tickets" },
       {
         $lookup: {
@@ -125,12 +111,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
           as: "ticketInfo"
         }
       },
-      {
-        $unwind: {
-          path: "$ticketInfo",
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: "$ticketInfo", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
           from: "categories",
@@ -139,12 +120,7 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
           as: "categoryInfo"
         }
       },
-      {
-        $unwind: {
-          path: "$categoryInfo",
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      { $unwind: { path: "$categoryInfo", preserveNullAndEmptyArrays: true } },
       {
         $group: {
           _id: "$ticketInfo.category",
@@ -157,14 +133,8 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
 
     const totalStock = stockPerCategory.reduce((sum, category) => sum + category.totalStock, 0);
     const totalSold = soldPerCategory.reduce((sum, category) => sum + category.totalSold, 0);
-
-    // Hitung total revenue dari soldPerCategory
     const totalSoldRevenue = soldPerCategory.reduce((sum, category) => sum + category.totalRevenue, 0);
-
-    // Hitung total amount dari transactionPerCategory
     const totalTransactionAmount = transactionPerCategory.reduce((sum, category) => sum + category.totalAmount, 0);
-
-    // Hitung total transactions dari transactionPerCategory
     const totalCategoryTransactions = transactionPerCategory.reduce((sum, category) => sum + category.totalTransactions, 0);
 
     res.status(OK).json({

@@ -8,6 +8,7 @@ export interface ICreateTransactionPayload {
   }[];
   transactionMethod: 'Online' | 'Onsite';
   userId?: string;
+  isComplimentary: boolean;
   paymentProof: File | null;
   totalPrice: number;
 }
@@ -62,6 +63,7 @@ export async function createTransaction(
     formData.append('tickets', JSON.stringify(payload.tickets));
     formData.append('transactionMethod', payload.transactionMethod);
     formData.append('totalPrice', payload.totalPrice.toString());
+    formData.append('isComplimentary', String(payload.isComplimentary));
 
     if (payload.userId) {
       formData.append('userId', payload.userId);

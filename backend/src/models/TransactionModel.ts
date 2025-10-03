@@ -26,6 +26,7 @@ const TransactionSchema = new Schema<ITransaction>(
       enum: ["Online", "Onsite"],
       default: "Online",
     },
+    isComplimentary: { type: Boolean, default: false },
     expiredAt: { type: Date, required: true },
     paymentProof: { type: String },
     verifiedBy: { type: Schema.Types.ObjectId, ref: "User" },

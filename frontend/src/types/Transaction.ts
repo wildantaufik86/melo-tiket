@@ -18,6 +18,7 @@ export interface ITransaction extends Document {
   _id?: string;
   userId?: string | IUser;
   tickets: IPurchasedTicket[];
+  isComplimentary: boolean;
   totalTicket: number;
   totalPrice: number;
   status: 'expired' | 'reject' | 'pending' | 'paid';
