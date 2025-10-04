@@ -66,12 +66,12 @@ export default function MainNavbar() {
         >
           Ticket
         </Link>
-        {/* <Link
+        <Link
           href="/line-up"
           className="text-lg font-medium hover:text-hover transition-colors"
         >
           Line-Up
-        </Link> */}
+        </Link>
         {/* <Link
           href="/contact"
           className="text-lg font-medium hover:text-hover transition-colors"
@@ -167,12 +167,12 @@ export default function MainNavbar() {
         >
           Ticket
         </Link>
-        {/* <Link
+        <Link
           href="/line-up"
           className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Line-Up
-        </Link> */}
+        </Link>
         {/* <Link
           href="/contact"
           className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
