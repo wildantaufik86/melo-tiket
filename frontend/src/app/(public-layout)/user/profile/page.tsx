@@ -11,7 +11,7 @@ import { ITransaction } from '@/types/Transaction';
 import ViewTicketModal from '@/components/fragments/modal/ViewTicketModal';
 import { useAuth } from '@/context/authUserContext';
 import { formattedDate, handleFallbackDownload } from '@/utils/universalUtils';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 export interface IHistoryByEvent {
   _id: string;
@@ -39,7 +39,6 @@ export default function ProfilePage() {
 
   // navigation
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const fetchProfil = async () => {
     try {
@@ -97,7 +96,7 @@ export default function ProfilePage() {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return (
     <div className="flex flex-col pt-24 pd-full">
