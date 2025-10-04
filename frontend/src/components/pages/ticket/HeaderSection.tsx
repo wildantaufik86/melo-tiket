@@ -3,6 +3,7 @@ import { formattedDate } from '@/utils/universalUtils';
 import { FaCalendar } from 'react-icons/fa';
 import { FaLocationDot } from 'react-icons/fa6';
 import { RiInstagramFill } from 'react-icons/ri';
+import Link from 'next/link';
 
 type Props = {
   event?: IEvent;
@@ -23,10 +24,13 @@ export default function HeaderSection({ event }: Props) {
           <FaCalendar />
           {formattedDate(event?.date || '') || 'tidak ada tanggal'}
         </p>
-        <p className="flex items-center gap-1">
+        <Link
+          href="https://www.instagram.com/melofest.id?igsh=dGtrYXg1dmZpNHBu"
+          className="flex items-center gap-1"
+        >
           <RiInstagramFill />
           <span className="text-[#FEBC2F]">melofest.id</span>
-        </p>
+        </Link>
       </div>
       <div className="bg-white w-full h-[2px]"></div>
     </section>
