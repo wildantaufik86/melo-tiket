@@ -11,6 +11,7 @@ import { ITransaction } from '@/types/Transaction';
 import ViewTicketModal from '@/components/fragments/modal/ViewTicketModal';
 import { useAuth } from '@/context/authUserContext';
 import { formattedDate, handleFallbackDownload } from '@/utils/universalUtils';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export interface IHistoryByEvent {
   _id: string;
@@ -35,6 +36,10 @@ export default function ProfilePage() {
   const [ticketsUrl, setTicketsUrl] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const lastHistory = historyEvent[historyEvent.length - 1];
+
+  // navigation
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   const fetchProfil = async () => {
     try {
@@ -84,6 +89,16 @@ export default function ProfilePage() {
     }
   }, [lastHistory]);
 
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [pathname, searchParams]);
+
   return (
     <div className="flex flex-col pt-24 pd-full">
       <div className="flex flex-col gap-4 md:flex-row md:gap-8">
@@ -93,7 +108,7 @@ export default function ProfilePage() {
         />
       </div>
 
-      <section className="flex flex-col mt-4">
+      <section id="ticketSection" className="flex flex-col mt-4">
         <div className="w-full md:w-1/2">
           <Label text="E TIKET" />
         </div>

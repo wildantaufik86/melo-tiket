@@ -120,7 +120,7 @@ export default function MainNavbar() {
                 LOG OUT
               </button>
               <Link
-                href="/user/profile"
+                href="/user/profile#ticketSection"
                 className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
                 TIKET SAYA
