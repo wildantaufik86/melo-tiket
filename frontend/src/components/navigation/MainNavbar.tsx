@@ -123,6 +123,12 @@ export default function MainNavbar() {
                 href="/user/profile"
                 className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
+                TIKET SAYA
+              </Link>
+              <Link
+                href="/user/profile"
+                className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+              >
                 PROFILE
               </Link>
 
