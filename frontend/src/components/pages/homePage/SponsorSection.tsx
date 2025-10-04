@@ -91,7 +91,7 @@ const dummyData: Sponsor[] = [
 
 const medpartData: Sponsor[] = [
   {
-    url: '/images/medpart-logo/aac.png',
+    url: '/images/medpart-logo/aac-logo.png',
     alt: 'aac-logo',
   },
   {
@@ -99,7 +99,7 @@ const medpartData: Sponsor[] = [
     alt: 'agenda-event-logo',
   },
   {
-    url: '/images/medpart-logo/awak.png',
+    url: '/images/medpart-logo/awak-logo.png',
     alt: 'awak-logo',
   },
   {
@@ -147,7 +147,7 @@ const medpartData: Sponsor[] = [
     alt: 'news-rb-logo',
   },
   {
-    url: '/images/medpart-logo/persiraja.png',
+    url: '/images/medpart-logo/persiraja-logo.png',
     alt: 'persiraja-logo',
   },
   {
