@@ -58,7 +58,7 @@ export default function Footer() {
               />
             </Link>
             <Link
-              href="/instagram"
+              href="https://www.instagram.com/melofest.id?igsh=dGtrYXg1dmZpNHBu"
               className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaInstagram

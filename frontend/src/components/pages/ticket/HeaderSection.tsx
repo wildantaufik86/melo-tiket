@@ -3,6 +3,7 @@ import { formattedDate } from '@/utils/universalUtils';
 import { FaCalendar } from 'react-icons/fa';
 import { FaLocationDot } from 'react-icons/fa6';
 import { RiInstagramFill } from 'react-icons/ri';
+import Link from 'next/link';
 
 type Props = {
   event?: IEvent;
@@ -10,7 +11,7 @@ type Props = {
 
 export default function HeaderSection({ event }: Props) {
   return (
-    <section className="flex flex-col mt-[27%] pd-lr gap-4">
+    <section className="flex flex-col mt-[27%] pd-lr gap-4 z-20">
       <h2 className="text-xl font-black lg:text-[50px]">
         {event?.eventName || 'MELOPHILE FESTIVAL Vol 2'}
       </h2>
@@ -23,10 +24,13 @@ export default function HeaderSection({ event }: Props) {
           <FaCalendar />
           {formattedDate(event?.date || '') || 'tidak ada tanggal'}
         </p>
-        <p className="flex items-center gap-1">
+        <Link
+          href="https://www.instagram.com/melofest.id?igsh=dGtrYXg1dmZpNHBu"
+          className="flex items-center gap-1 cursor-pointer"
+        >
           <RiInstagramFill />
           <span className="text-[#FEBC2F]">melofest.id</span>
-        </p>
+        </Link>
       </div>
       <div className="bg-white w-full h-[2px]"></div>
     </section>

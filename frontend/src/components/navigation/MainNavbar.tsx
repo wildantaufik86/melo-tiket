@@ -66,12 +66,12 @@ export default function MainNavbar() {
         >
           Ticket
         </Link>
-        {/* <Link
+        <Link
           href="/line-up"
           className="text-lg font-medium hover:text-hover transition-colors"
         >
           Line-Up
-        </Link> */}
+        </Link>
         {/* <Link
           href="/contact"
           className="text-lg font-medium hover:text-hover transition-colors"
@@ -120,6 +120,12 @@ export default function MainNavbar() {
                 LOG OUT
               </button>
               <Link
+                href="/user/profile#ticketSection"
+                className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+              >
+                TIKET SAYA
+              </Link>
+              <Link
                 href="/user/profile"
                 className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
               >
@@ -161,12 +167,12 @@ export default function MainNavbar() {
         >
           Ticket
         </Link>
-        {/* <Link
+        <Link
           href="/line-up"
           className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
         >
           Line-Up
-        </Link> */}
+        </Link>
         {/* <Link
           href="/contact"
           className="text-sm font-medium hover:bg-bg-primary transition-colors p-2 rounded-sm"
