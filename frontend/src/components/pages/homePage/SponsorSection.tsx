@@ -8,84 +8,10 @@ type Sponsor = {
   alt: string;
 };
 
-const dummyData: Sponsor[] = [
-  {
-    id: 1,
-    url: '/images/sponsor-1.png',
-    alt: 'adidas',
-  },
-  {
-    id: 2,
-    url: '/images/sponsor-2.png',
-    alt: 'spotify',
-  },
-  {
-    id: 3,
-    url: '/images/sponsor-3.png',
-    alt: 'netflix',
-  },
-];
-
-// const dummyDataMedia: Sponsor[] = [
+// const sponsorData: Sponsor[] = [
 //   {
-//     id: 1,
-//     url: '/images/sponsor-1.png',
-//     alt: 'adidas',
-//   },
-//   {
-//     id: 2,
-//     url: '/images/sponsor-2.png',
-//     alt: 'spotify',
-//   },
-//   {
-//     id: 3,
-//     url: '/images/sponsor-3.png',
-//     alt: 'netflix',
-//   },
-//   {
-//     id: 4,
-//     url: '/images/sponsor-1.png',
-//     alt: 'adidas',
-//   },
-//   {
-//     id: 5,
-//     url: '/images/sponsor-2.png',
-//     alt: 'spotify',
-//   },
-//   {
-//     id: 6,
-//     url: '/images/sponsor-3.png',
-//     alt: 'netflix',
-//   },
-//   {
-//     id: 7,
-//     url: '/images/sponsor-1.png',
-//     alt: 'adidas',
-//   },
-//   {
-//     id: 8,
-//     url: '/images/sponsor-2.png',
-//     alt: 'spotify',
-//   },
-//   {
-//     id: 9,
-//     url: '/images/sponsor-3.png',
-//     alt: 'netflix',
-//   },
-//   {
-//     id: 10,
-//     url: '/images/sponsor-1.png',
-//     alt: 'adidas',
-//   },
-//   {
-//     id: 11,
-//     url: '/images/sponsor-2.png',
-//     alt: 'spotify',
-//   },
-//   {
-//     id: 12,
-//     url: '/images/sponsor-3.png',
-//     alt: 'netflix',
+//     url: '/images/bca-syariah.png',
+//     alt: 'bca-syariah-logo',
 //   },
 // ];
 
@@ -175,17 +101,17 @@ export default function SponsorSection() {
 
         <div className="flex flex-col gap-8">
           <Label text="SPONSOR" />
-          <div className="grid grid-cols-3 gap-4 place-items-center mt-8">
-            {/* {dummyData.map((sponsort) => (
-              <SponsorCard
-                key={sponsort.id}
-                url={sponsort.url}
-                alt={sponsort.alt}
+          <div className="grid grid-cols-1 gap-4 place-items-center mt-8">
+            <div className="flex justify-center items-center w-full max-w-[200px] lg:max-w-[300px]">
+              <img
+                src="/images/bca-syariah.png"
+                alt="bca-syariah-logo"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
               />
-            ))} */}
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-8 mt-12">
+        <div className="flex flex-col gap-8 mt-16">
           <Label text="MEDIA PARTNER" />
           <div className="mt-8 grid grid-cols-4 md:grid-cols-6 gap-4 place-items-center md:gap-8">
             {medpartData.map((logo, index) => (
