@@ -162,26 +162,42 @@ export const updateUserProfileHandler: RequestHandler = async (req, res, next) =
     const { id } = req.params;
     const updateData = req.body;
 
-    delete updateData.password;
+    // Cari user terlebih dahulu
+    const user = await UserModel.findById(id);
 
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      id,
-      {$set: updateData},
-      {new: true, runValidators: true}
-    );
-
-    if (!updatedUser) {
+    if (!user) {
       return res.status(NOT_FOUND).json({ message: "User not found" });
     }
 
+    // Destructure password dari updateData
+    const { password, ...otherData } = updateData;
+
+    // Update field-field biasa dengan type assertion
+    const allowedFields: (keyof typeof user)[] = ['name', 'email', 'idNumber', 'role'];
+
+    allowedFields.forEach(field => {
+      if (otherData[field] !== undefined) {
+        (user as any)[field] = otherData[field];
+      }
+    });
+
+    // Jika password diisi, update password
+    // Password akan di-hash otomatis oleh pre-save hook di model
+    if (password && password.trim() !== '') {
+      user.password = password;
+    }
+
+    // Save akan trigger pre-save hook untuk hash password
+    await user.save();
+
     res.status(OK).json({
       message: "User profile updated successfully",
-      data: updatedUser.omitPassword()
+      data: user.omitPassword()
     });
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
 
 export const createUserHandler: RequestHandler = async (req, res, next) => {
   try {

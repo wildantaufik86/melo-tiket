@@ -51,13 +51,7 @@ export default function UserFormModal({
         password: '', // Password tidak diisi saat edit
       });
     } else {
-      setFormData({
-        name: '',
-        email: '',
-        idNumber: '',
-        role: 'user',
-        password: '',
-      });
+      setFormData(initialState);
     }
   }, [editingUser, isOpen]);
 
@@ -73,14 +67,16 @@ export default function UserFormModal({
     e.preventDefault();
     setSubmitting(true);
 
-    const payload = {
-      ...formData,
+    const payload: any = {
+      name: formData.name,
+      email: formData.email,
       idNumber: Number(formData.idNumber),
+      role: formData.role,
     };
 
-    // Hapus password dari payload jika tidak diisi saat edit
-    if (isEditMode && !payload.password) {
-      delete (payload as any).password;
+    // Hanya kirim password jika diisi (untuk create atau edit yang ingin ganti password)
+    if (formData.password && formData.password.trim() !== '') {
+      payload.password = formData.password;
     }
 
     await onSave(payload);
@@ -100,7 +96,7 @@ export default function UserFormModal({
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label>Name</label>
+            <label className="block text-sm font-medium mb-1">Name</label>
             <input
               type="text"
               name="name"
@@ -111,7 +107,7 @@ export default function UserFormModal({
             />
           </div>
           <div>
-            <label>Email</label>
+            <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               name="email"
@@ -122,7 +118,7 @@ export default function UserFormModal({
             />
           </div>
           <div>
-            <label>ID Number (KTP/SIM)</label>
+            <label className="block text-sm font-medium mb-1">ID Number (KTP/SIM)</label>
             <input
               type="number"
               name="idNumber"
@@ -133,7 +129,7 @@ export default function UserFormModal({
             />
           </div>
           <div>
-            <label>Role</label>
+            <label className="block text-sm font-medium mb-1">Role</label>
             <select
               name="role"
               value={formData.role}
@@ -147,7 +143,9 @@ export default function UserFormModal({
           </div>
           {authUser?.role === 'superadmin' && (
             <div>
-              <label>Password</label>
+              <label className="block text-sm font-medium mb-1">
+                Password {isEditMode && <span className="text-gray-500 text-xs">(optional)</span>}
+              </label>
               <input
                 type="password"
                 name="password"
@@ -155,10 +153,15 @@ export default function UserFormModal({
                 onChange={handleChange}
                 className="w-full border p-2 rounded"
                 placeholder={
-                  isEditMode ? 'Leave blank to keep current password' : ''
+                  isEditMode ? 'Leave blank to keep current password' : 'Enter password'
                 }
                 required={!isEditMode}
               />
+              {isEditMode && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Only fill this if you want to change the password
+                </p>
+              )}
             </div>
           )}
           <div className="flex justify-end gap-4 pt-4 border-t">
