@@ -14,5 +14,5 @@ eventRoutes.patch("/:eventId", authenticate, validateRole("superadmin", "admin")
 eventRoutes.delete("/:eventId", authenticate, validateRole("superadmin"), deleteEventHandler);
 
 eventRoutes.post("/:eventId/tickets", authenticate, validateRole("superadmin"), addTicketTypeToEventHandler);
-eventRoutes.patch("/:eventId/tickets/:ticketId", authenticate, validateRole("superadmin"), updateTicketTypeHandler);
+eventRoutes.patch("/:eventId/tickets/:ticketId", authenticate, validateRole("admin", "superadmin"), updateTicketTypeHandler);
 export default eventRoutes;
