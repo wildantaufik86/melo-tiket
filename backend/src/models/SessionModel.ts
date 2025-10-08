@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { thirtyDaysFromNow } from "../utils/date";
+import { oneHourFromNow, thirtyDaysFromNow } from "../utils/date";
 import { SessionDocument } from "../types/Session";
 
 const sessionSchema = new mongoose.Schema<SessionDocument>({
@@ -17,7 +17,7 @@ const sessionSchema = new mongoose.Schema<SessionDocument>({
   expiresAt: {
     type: Date,
     required: true,
-    default: thirtyDaysFromNow,
+    default: oneHourFromNow,
   },
 });
 

@@ -51,43 +51,57 @@ export const setCookie = (
   document.cookie = cookieString;
 };
 
-/**
- * Retrieves a cookie value from the client-side using `document.cookie`.
- * Values are automatically JSON.parse-d.
- * @param name The name of the cookie.
- * @returns The parsed cookie value or null if not found/parse error.
- */
-export const getCookie = <T = unknown>(name: string): T | null => {
-  if (typeof document === 'undefined') return null; // Only run in browser environment
 
-  const nameEQ = name + '=';
-  const ca = document.cookie.split(';');
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) {
-      try {
-        const encodedValue = c.substring(nameEQ.length, c.length);
-        const decodedValue = decodeURIComponent(encodedValue); // <--- ADD THIS LINE!
-        return JSON.parse(decodedValue) as T; // Parse the decoded value
-      } catch (error) {
-        console.error(`Error parsing client cookie '${name}':`, error);
-        return null;
-      }
+// utils/clientUtils.ts
+export function getCookie<T>(name: string): T | null {
+  if (typeof document === 'undefined') return null;
+
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+
+  if (parts.length === 2) {
+    try {
+      const cookieValue = parts.pop()?.split(';').shift();
+      return cookieValue ? JSON.parse(decodeURIComponent(cookieValue)) : null;
+    } catch (e) {
+      return null;
     }
   }
   return null;
-};
+}
 
-/**
- * Deletes a cookie on the client-side.
- * @param name The name of the cookie to delete.
- * @param path The path of the cookie (defaults to '/').
- */
-export const deleteCookie = (name: string, path: string = '/'): void => {
-  if (typeof document === 'undefined') return; // Only run in browser environment
-  document.cookie = `${name}=; Path=${path}; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
-};
+export function deleteCookie(name: string) {
+  if (typeof document === 'undefined') return;
+
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+}
+
+// export const getCookie = <T = unknown>(name: string): T | null => {
+//   if (typeof document === 'undefined') return null; // Only run in browser environment
+
+//   const nameEQ = name + '=';
+//   const ca = document.cookie.split(';');
+//   for (let i = 0; i < ca.length; i++) {
+//     let c = ca[i];
+//     while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+//     if (c.indexOf(nameEQ) === 0) {
+//       try {
+//         const encodedValue = c.substring(nameEQ.length, c.length);
+//         const decodedValue = decodeURIComponent(encodedValue); // <--- ADD THIS LINE!
+//         return JSON.parse(decodedValue) as T; // Parse the decoded value
+//       } catch (error) {
+//         console.error(`Error parsing client cookie '${name}':`, error);
+//         return null;
+//       }
+//     }
+//   }
+//   return null;
+// };
+
+// export const deleteCookie = (name: string, path: string = '/'): void => {
+//   if (typeof document === 'undefined') return; // Only run in browser environment
+//   document.cookie = `${name}=; Path=${path}; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+// };
 
 /**
  * Sets an item in localStorage.

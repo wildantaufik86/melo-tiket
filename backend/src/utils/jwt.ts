@@ -30,7 +30,7 @@ const accessTokenSignOptions: SignOptionsAndSecret = {
 };
 
 export const refreshTokenSignOptions: SignOptionsAndSecret = {
-  expiresIn: '30d',
+  expiresIn: '1d',
   secret: JWT_REFRESH_SECRET,
 };
 

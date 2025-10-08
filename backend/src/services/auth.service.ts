@@ -5,7 +5,7 @@ import SessionModel from "../models/SessionModel";
 import UserModel from "../models/UserModel";
 import VerificationCodeModel from "../models/VerificationCodeModel";
 import appAssert from "../utils/appAssert";
-import { ONE_DAY_MS, oneYearFromNow, thirtyDaysFromNow } from "../utils/date";
+import { ONE_DAY_MS, oneHourFromNow, oneYearFromNow, thirtyDaysFromNow } from "../utils/date";
 import jwt from "jsonwebtoken";
 import {
   RefreshTokenPayload,
@@ -119,6 +119,28 @@ export const loginUser = async ({
   appAssert(isValid, UNAUTHORIZED, "Invalid Email or Password");
 
   const userId = user._id;
+
+  // ← TAMBAHKAN: Cleanup expired sessions untuk user ini
+  await SessionModel.deleteMany({
+    userId,
+    expiresAt: { $lt: new Date() }
+  });
+
+  // ← OPSIONAL: Limit max sessions per user (misal 3 device)
+  const MAX_SESSIONS = 3;
+  const activeSessions = await SessionModel.countDocuments({ userId });
+
+  if (activeSessions >= MAX_SESSIONS) {
+    // Hapus session paling lama
+    const oldestSession = await SessionModel.findOne({ userId })
+      .sort({ createdAt: 1 });
+
+    if (oldestSession) {
+      await SessionModel.findByIdAndDelete(oldestSession._id);
+    }
+  }
+
+  // Create new session
   const session = await SessionModel.create({
     userId,
     userAgent,
@@ -158,7 +180,7 @@ export const refreshUserAccessToken = async (refreshToken: string) => {
   // refresh the session if it expires in the next 24hrs
   const sessionNeedsRefresh = session.expiresAt.getTime() - now <= ONE_DAY_MS;
   if (sessionNeedsRefresh) {
-    session.expiresAt = thirtyDaysFromNow();
+    session.expiresAt = oneHourFromNow();
     await session.save();
   }
 

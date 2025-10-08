@@ -5,6 +5,7 @@ import { UNAUTHORIZED } from "../constants/http";
 import { verifyToken } from "../utils/jwt";
 import mongoose from "mongoose";
 import UserModel from "../models/UserModel";
+import SessionModel from "../models/SessionModel";
 
 const authenticate: RequestHandler = async (req, res, next) => {
   try {
@@ -17,7 +18,7 @@ const authenticate: RequestHandler = async (req, res, next) => {
     appAssert(
       accessToken,
       UNAUTHORIZED,
-      "Not authorized: Token is missing",
+      "Tidak ada izin: Token tidak ditemukan, silahkan Login kembali",
       AppErrorCode.InvalidAccessToken
     );
 
@@ -26,36 +27,63 @@ const authenticate: RequestHandler = async (req, res, next) => {
     appAssert(
       payload,
       UNAUTHORIZED,
-      error === "jwt expired" ? "Token expired" : "Invalid token",
+      error === "jwt expired" ? "Token sudah kadaluwarsa, silahkan Login kembali" : "Token tidak valid, silahkan Login kembali",
       AppErrorCode.InvalidAccessToken
     );
 
     // Validasi payload userId dan sessionId
     const { userId, sessionId } = payload;
-    const userFromDb = await UserModel.findById(userId).select('_id role');
 
-    if (!userFromDb) {
-      return res.status(UNAUTHORIZED).json({ message: "User for this token not found" });
+    // ← TAMBAHKAN: Validasi sessionId format
+    if (typeof userId !== "string" || typeof sessionId !== "string") {
+      appAssert(
+        false,
+        UNAUTHORIZED,
+        "Token payload tidak valid, silahkan login kembali",
+        AppErrorCode.InvalidAccessToken
+      );
     }
 
+    // ← PENTING: Cek apakah session masih ada dan valid di database
+    const session = await SessionModel.findById(sessionId);
+    appAssert(
+      session,
+      UNAUTHORIZED,
+      "Sesi tidak ditemukan, silahkan login kembali",
+      AppErrorCode.InvalidAccessToken
+    );
+
+    appAssert(
+      session.expiresAt.getTime() > Date.now(),
+      UNAUTHORIZED,
+      "Sesi telah habis, silahkan login kembali",
+      AppErrorCode.InvalidAccessToken
+    );
+
+    // Validasi user masih ada
+    const userFromDb = await UserModel.findById(userId).select('_id role email');
+    appAssert(
+      userFromDb,
+      UNAUTHORIZED,
+      "Pengguna tidak ditemukan",
+      AppErrorCode.InvalidAccessToken
+    );
+
+    // Set user info ke request
     req.user = {
       _id: userFromDb._id as mongoose.Types.ObjectId,
       role: userFromDb.role!,
       email: userFromDb.email
     };
 
-    if (typeof userId === "string" && typeof sessionId === "string") {
-      try {
-        req.userId = new mongoose.Types.ObjectId(userId);
-        req.sessionId = new mongoose.Types.ObjectId(sessionId);
-      } catch (err) {
-        throw new Error("Invalid ObjectId format in token payload");
-      }
-    } else {
+    try {
+      req.userId = new mongoose.Types.ObjectId(userId);
+      req.sessionId = new mongoose.Types.ObjectId(sessionId);
+    } catch (err) {
       appAssert(
         false,
         UNAUTHORIZED,
-        "Invalid token payload",
+        "Invalid ObjectId format in token payload",
         AppErrorCode.InvalidAccessToken
       );
     }
@@ -63,7 +91,6 @@ const authenticate: RequestHandler = async (req, res, next) => {
     // Jika semua valid, lanjut ke route berikutnya
     next();
   } catch (error: unknown) {
-    // Pastikan error adalah instance dari Error
     let message = "Authentication failed";
     if (error instanceof Error) {
       message = error.message;
