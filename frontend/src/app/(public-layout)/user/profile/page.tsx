@@ -5,55 +5,24 @@ import Label from '@/components/fragments/label/Label';
 import ProfileSection from '@/components/pages/user/profile/ProfileSection';
 import RiwayatPembelian from '@/components/pages/user/profile/RiwayatPembelianSection';
 import { FaCircleInfo } from 'react-icons/fa6';
-import { getMyProfile } from '@/app/api/profile';
-import { ToastError } from '@/lib/validations/toast/ToastNofication';
-import { ITransaction } from '@/types/Transaction';
 import ViewTicketModal from '@/components/fragments/modal/ViewTicketModal';
 import { useAuth } from '@/context/authUserContext';
 import { formattedDate, handleFallbackDownload } from '@/utils/universalUtils';
 import { usePathname } from 'next/navigation';
-
-export interface IHistoryByEvent {
-  _id: string;
-  eventName: string;
-  date: string;
-  address: string;
-  transactions: ITransaction[];
-}
-
-type TransactionSummary = Pick<ITransaction, '_id' | 'tickets' | 'createdAt'>;
+import { useTickets } from '@/hooks/useTickets';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function ProfilePage() {
   const ticketRef = useRef<HTMLDivElement>(null);
-  const [historyEvent, setHistoryEvent] = useState<IHistoryByEvent[]>([]);
   const [isViewTicket, setIsViewTicket] = useState(false);
   const { authUser } = useAuth();
-  const [paidTransactions, setPaidTransactions] = useState<
-    TransactionSummary[]
-  >([]);
+  const { paidTransactions, lastHistoryEvent } = useTickets();
   const [ticketsUrl, setTicketsUrl] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
-  const lastHistory = historyEvent[historyEvent.length - 1];
 
   // navigation
   const pathname = usePathname();
-
-  const fetchProfil = async () => {
-    try {
-      const response = await getMyProfile();
-      if (response.data) {
-        setHistoryEvent(response.data.historyByEvent);
-      }
-    } catch (error: any) {
-      ToastError(error.message || '');
-    }
-  };
-
-  useEffect(() => {
-    fetchProfil();
-  }, []);
 
   const handleTicketUrls = (index: number) => {
     if (paidTransactions.length > 0) {
@@ -76,19 +45,6 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    if (lastHistory && lastHistory?.transactions?.length > 0) {
-      const filtered = lastHistory.transactions
-        .filter((data) => data.status === 'paid')
-        .map((ts) => ({
-          _id: ts._id,
-          tickets: ts.tickets,
-          createdAt: ts.createdAt,
-        }));
-      setPaidTransactions(filtered);
-    }
-  }, [lastHistory]);
-
-  useEffect(() => {
     const hash = window.location.hash;
     if (hash) {
       const element = document.querySelector(hash);
@@ -103,7 +59,7 @@ export default function ProfilePage() {
       <div className="flex flex-col gap-4 md:flex-row md:gap-8">
         <ProfileSection />
         <RiwayatPembelian
-          historyTransactions={lastHistory?.transactions ?? []}
+          historyTransactions={lastHistoryEvent?.transactions ?? []}
         />
       </div>
 

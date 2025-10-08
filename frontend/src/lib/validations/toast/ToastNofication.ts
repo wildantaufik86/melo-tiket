@@ -14,7 +14,7 @@ export const ToastSuccess = (message: string): void => {
 
 export const ToastError = (message: string): void => {
   toast.error(message, {
-    position: 'top-right',
+    position: 'top-center',
     autoClose: 2000,
     pauseOnHover: false,
     hideProgressBar: true,
@@ -32,7 +32,10 @@ export const ToastInfo = (message: string): void => {
   });
 };
 
-export const ToastAlert = (message: string, router: AppRouterInstance): void => {
+export const ToastAlert = (
+  message: string,
+  router: AppRouterInstance
+): void => {
   toast.error(message, {
     position: 'top-center',
     autoClose: false,
