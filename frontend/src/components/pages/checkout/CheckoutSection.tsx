@@ -18,6 +18,7 @@ import { formattedPrice, generate3Digit } from '@/utils/universalUtils';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import { FaCircleInfo } from 'react-icons/fa6';
 
 type Props = {
   listOrder: Orders[];
@@ -209,6 +210,9 @@ export default function CheckoutSection({
 
       <div className="p-4">
         <h1 className="font-bold text-lg mb-2">Syarat & Ketentuan</h1>
+        <p className="flex items-center gap-2 text-xs opacity-70 mb-2 lg:text-sm">
+          <FaCircleInfo /> Klik tulisan merah untuk membaca syarat dan ketentuan
+        </p>
         <p className="text-sm">
           Silahkan baca{' '}
           <span
@@ -216,7 +220,7 @@ export default function CheckoutSection({
               setIsPdfRead(true);
               setIsTermsModalOpen(true);
             }}
-            className="text-bg-primary font-bold italic cursor-pointer"
+            className="text-bg-primary text-base lg:text-lg font-bold italic cursor-pointer"
           >
             syarat & ketentuan
           </span>{' '}
