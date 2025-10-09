@@ -2,12 +2,11 @@
 
 import TickedAccordion from '@/components/fragments/accordion/TicketAccordion';
 import { useAuth } from '@/context/authUserContext';
+import { useModals } from '@/context/modalContext';
 import { useOrder } from '@/context/ordersContext';
-import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { TicketProps, TicketWithState } from '@/types/Ticket';
 import { formattedPrice } from '@/utils/universalUtils';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -19,6 +18,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
   const [selectedTickets, setSelectedTickets] = useState<TicketWithState[]>([]);
   const router = useRouter();
   const { authUser } = useAuth();
+  const { showErrorModal } = useModals();
 
   useEffect(() => {
     if (tickets.length > 0) {
@@ -62,7 +62,9 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
 
   const createTemporaryOrder = (): void => {
     if (!authUser?.idNumber) {
-      ToastError('Silahkan lengkapi data diri atau NIK anda terlebih dahulu');
+      showErrorModal(
+        'Silahkan lengkapi data diri atau NIK anda terlebih dahulu'
+      );
       return;
     }
 
@@ -70,7 +72,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
       saveOrders(selectedTickets);
       router.push(`/checkout/event/${eventId}`);
     } else {
-      ToastError('Silahkan pilih tiket terlebih dahulu');
+      showErrorModal('Silahkan pilih tiket terlebih dahulu');
     }
   };
 

@@ -1,6 +1,7 @@
 import Footer from '@/components/navigation/Footer';
 import MainNavbar from '@/components/navigation/MainNavbar';
 import { AuthProvider } from '@/context/authUserContext';
+import { ModalProvider } from '@/context/modalContext';
 import { OrderProvider } from '@/context/ordersContext';
 import { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
@@ -27,7 +28,9 @@ export default function HomepageLayout({
     <AuthProvider>
       <MainNavbar />
       <main className={`${montserrat.className} text-white`}>
-        <OrderProvider>{children}</OrderProvider>
+        <ModalProvider>
+          <OrderProvider>{children}</OrderProvider>
+        </ModalProvider>
       </main>
       <Footer />
     </AuthProvider>
