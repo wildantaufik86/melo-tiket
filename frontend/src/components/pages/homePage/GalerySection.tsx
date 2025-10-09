@@ -43,6 +43,7 @@ export default function GalerySection() {
               src={image.url}
               alt={image.alt}
               fill
+              priority={false}
               className="object-center object-contain"
             />
           </SwiperSlide>

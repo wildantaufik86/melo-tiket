@@ -1,12 +1,12 @@
 // import GalerySection from '@/components/pages/homePage/GalerySection';
 // import HeroSection from '@/components/pages/homePage/HeroSection';
 import SponsorSection from '@/components/pages/homePage/SponsorSection';
-import TicketSection from '@/components/pages/homePage/TicketSection';
 import { fetchEventById } from '../api/event';
 import dynamic from 'next/dynamic';
 
 const GalerySection = dynamic(() => import('@/components/pages/homePage/GalerySection'))
 const HeroSection = dynamic(() => import('@/components/pages/homePage/HeroSection'))
+const TicketSection = dynamic(() => import('@/components/pages/homePage/TicketSection'))
 
 async function getEventData() {
   try {
