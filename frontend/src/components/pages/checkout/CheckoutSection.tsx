@@ -8,11 +8,9 @@ import AlertModal from '@/components/fragments/modal/AlertModal';
 import SuccessModal from '@/components/fragments/modal/SuccessModal';
 import TermsModal from '@/components/fragments/modal/TermsModal';
 import { useAuth } from '@/context/authUserContext';
+import { useModals } from '@/context/modalContext';
 import { Orders, useOrder } from '@/context/ordersContext';
-import {
-  ToastError,
-  ToastSuccess,
-} from '@/lib/validations/toast/ToastNofication';
+import { ToastSuccess } from '@/lib/validations/toast/ToastNofication';
 import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice, generate3Digit } from '@/utils/universalUtils';
 import { useRouter } from 'next/navigation';
@@ -55,6 +53,9 @@ export default function CheckoutSection({
   const [codeUnique, setCodeUnique] = useState<number>(0);
   const total = subTotal + platformFee * totalTicket + codeUnique;
 
+  // modal state
+  const { showErrorModal } = useModals();
+
   const clearOrderData = () => {
     return deleteLocalStorage('orders');
   };
@@ -62,7 +63,7 @@ export default function CheckoutSection({
   const handleCreateTransaction = async () => {
     try {
       if (!authUser) {
-        ToastError('Tolong login terlebih dahulu');
+        showErrorModal('Tolong login terlebih dahulu');
         return;
       }
 
@@ -72,12 +73,12 @@ export default function CheckoutSection({
       }
 
       if (payload && payload?.tickets.length === 0) {
-        ToastError('Silahkan pesan tiket terlebih dahulu');
+        showErrorModal('Silahkan pesan tiket terlebih dahulu');
         return;
       }
 
       if (payload && !payload?.paymentProof) {
-        ToastError('Tolong unggah bukti pembayaran');
+        showErrorModal('Tolong unggah bukti pembayaran');
         return;
       }
 
@@ -88,10 +89,10 @@ export default function CheckoutSection({
         setOpenModalSuccess(true);
         router.push('/user/profile');
       } else {
-        ToastError(response.message);
+        showErrorModal(response.message);
       }
     } catch (err: any) {
-      ToastError(err.message);
+      showErrorModal(err.message);
     }
   };
 
