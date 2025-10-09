@@ -69,7 +69,7 @@ export default function VenueSection() {
       </div>
       <div className="relative aspect-1/1 mt-16">
         <Image
-          src="/images/panel-ticket-venue.jpg"
+          src="/images/panel-ticket-venue.webp"
           alt="Venue"
           fill
           className="object-contain"

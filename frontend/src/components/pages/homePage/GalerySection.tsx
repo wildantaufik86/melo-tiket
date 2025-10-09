@@ -21,7 +21,7 @@ const dummyImages: Image[] = [
   // },
   {
     id: 2,
-    url: '/images/hero-image.jpg',
+    url: '/images/hero-image.webp',
     alt: 'Slide 1',
   },
 ];

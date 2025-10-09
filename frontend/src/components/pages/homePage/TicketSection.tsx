@@ -1,12 +1,11 @@
 'use client';
 
-import { fetchEventById } from '@/app/api/event';
 import TicketCard from '@/components/fragments/card/TicketCard';
 import Label from '@/components/fragments/label/Label';
-import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import { IEvent } from '@/types/Event';
 import { Orders, useOrder } from '@/context/ordersContext';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 // import swiper
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -17,31 +16,11 @@ const brotherFont = localFont({
   src: '../../../../public/fonts/BROTHER-Bold.otf',
 });
 
-export default function TicketSection() {
-  const [event, setEvent] = useState<IEvent | null>(null);
-  const [loading, setLoading] = useState(true);
+// 1. Terima 'event' sebagai prop, bukan lagi mengambilnya dari state
+export default function TicketSection({ event }: { event: IEvent | null }) {
+  // 2. Hapus state 'event' dan 'loading'. Hanya 'availableTickets' yang dibutuhkan
   const [availableTickets, setAvailableTickets] = useState<Orders[]>([]);
   const { saveOrders } = useOrder();
-
-  const getEvent = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetchEventById('6899f694bbde0daae146f849');
-      if (response.status == 'success' && response.data) {
-        const combinedData: IEvent = {
-          ...response.data.event,
-          tickets: response.data.tickets,
-        };
-        setEvent(combinedData);
-      } else {
-        ToastError(response.message);
-      }
-    } catch (err: any) {
-      ToastError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
 
   const handleOrder = (idTicket: string) => {
     const filtered = availableTickets
@@ -50,42 +29,58 @@ export default function TicketSection() {
     saveOrders(filtered);
   };
 
-  useEffect(() => {
-    getEvent();
-  }, [getEvent]);
-
+  // 3. useEffect ini sekarang hanya bertugas memproses prop 'event' menjadi state 'availableTickets'
   useEffect(() => {
     if (event && event.tickets) {
-      const filteredTicket: Orders[] = event.tickets.map((tc) => ({
+      const initialTickets: Orders[] = event.tickets.map((tc) => ({
         ...tc,
         quantity: 0,
         isOpen: false,
       }));
-      setAvailableTickets(filteredTicket);
+      setAvailableTickets(initialTickets);
     }
-  }, [event]);
+  }, [event]); // <-- Bergantung pada prop 'event'
 
-  if (loading) return null;
+  // 4. Ganti 'if (loading)' dengan 'if (!event)'. Ini akan menangani kasus jika data gagal diambil di server.
+  if (!event) {
+    // Anda bisa menampilkan pesan atau komponen skeleton loading di sini
+    return (
+      <section className="text-center py-20">
+        <h2 className="text-2xl">Memuat data event...</h2>
+      </section>
+    );
+  }
 
   return (
     <section className="relative flex flex-col items-center py-[28%]">
       <h2
-        className={`z-10 text-2xl mb-2 font-bold text-center w-[40%] text-wrap font-brother sm:text-4xl  md:text-5xl lg:text-7xl ${brotherFont.className}`}
+        className={`z-10 text-2xl mb-2 font-bold text-center w-[40%] text-wrap font-brother sm:text-4xl md:text-5xl lg:text-7xl ${brotherFont.className}`}
       >
-        {event?.eventName || 'Melophile Festival Vol 2'}
+        {/* Gunakan data 'event' dari props */}
+        {event.eventName}
       </h2>
 
       <Label text="GET YOUR TICKET NOW" />
       <div className="absolute inset-0 top-15 mt-32">
-        <div className="flex justify-center items-center pb-12 bg-[url(/images/awan.png)] bg-cover bg-no-repeat bg-center aspect-square">
+        <Image
+          src="/images/awan.webp"
+          alt="Cloud background"
+          fill
+          className="object-cover object-center"
+          priority={true}
+          fetchPriority='high'
+          sizes="100vw"
+        />
+
+        <div className="relative z-10 flex justify-center items-center pb-12 aspect-square">
           <div className="w-full px-4 lg:px-12 lg:mt-12">
             <Swiper
               spaceBetween={20}
               breakpoints={{
-                320: { slidesPerView: 2 }, // mobile: 3
-                430: { slidesPerView: 3 }, // mobile: 3
-                768: { slidesPerView: 4 }, // tablet: 4
-                1024: { slidesPerView: 5 }, // laptop: 5
+                320: { slidesPerView: 2 },
+                430: { slidesPerView: 3 },
+                768: { slidesPerView: 4 },
+                1024: { slidesPerView: 5 },
               }}
             >
               {availableTickets.length > 0 &&
@@ -94,7 +89,7 @@ export default function TicketSection() {
                     <TicketCard
                       ticket={tc}
                       handleOrder={handleOrder}
-                      idEvent={event?._id}
+                      idEvent={event._id}
                     />
                   </SwiperSlide>
                 ))}

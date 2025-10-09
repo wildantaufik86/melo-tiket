@@ -10,78 +10,78 @@ type Sponsor = {
 
 // const sponsorData: Sponsor[] = [
 //   {
-//     url: '/images/bca-syariah.png',
+//     url: '/images/bca-syariah.webp',
 //     alt: 'bca-syariah-logo',
 //   },
 // ];
 
 const medpartData: Sponsor[] = [
   {
-    url: '/images/medpart-logo/aac-logo.png',
+    url: '/images/medpart-logo/aac-logo.webp',
     alt: 'aac-logo',
   },
   {
-    url: '/images/medpart-logo/agenda-event.png',
+    url: '/images/medpart-logo/agenda-event.webp',
     alt: 'agenda-event-logo',
   },
   {
-    url: '/images/medpart-logo/awak-logo.png',
+    url: '/images/medpart-logo/awak-logo.webp',
     alt: 'awak-logo',
   },
   {
-    url: '/images/medpart-logo/dgigs-project.png',
+    url: '/images/medpart-logo/dgigs-project.webp',
     alt: 'dgigs-project-logo',
   },
   {
-    url: '/images/medpart-logo/event-daily.png',
+    url: '/images/medpart-logo/event-daily.webp',
     alt: 'event-daily-logo',
   },
   {
-    url: '/images/medpart-logo/gac-music.png',
+    url: '/images/medpart-logo/gac-music.webp',
     alt: 'gac-msuic-logo',
   },
   {
-    url: '/images/medpart-logo/hobby-konser.png',
+    url: '/images/medpart-logo/hobby-konser.webp',
     alt: 'hobby-konser-logo',
   },
   {
-    url: '/images/medpart-logo/infomusikita-logo.png',
+    url: '/images/medpart-logo/infomusikita-logo.webp',
     alt: 'infomusikita-logo',
   },
   {
-    url: '/images/medpart-logo/konser-daily.png',
+    url: '/images/medpart-logo/konser-daily.webp',
     alt: 'konser-daily-logo',
   },
   {
-    url: '/images/medpart-logo/konser-terus.png',
+    url: '/images/medpart-logo/konser-terus.webp',
     alt: 'konser-terus-logo',
   },
+  // {
+  //   url: '/images/medpart-logo/logo-event-aceh.webp',
+  //   alt: 'logo-event-aceh',
+  // },
   {
-    url: '/images/medpart-logo/logo-event-aceh.png',
-    alt: 'logo-event-aceh',
-  },
-  {
-    url: '/images/medpart-logo/logo-gac-music.png',
+    url: '/images/medpart-logo/logo-gac-music.webp',
     alt: 'logo-gac-music',
   },
   {
-    url: '/images/medpart-logo/nanggroe-media.png',
+    url: '/images/medpart-logo/nanggroe-media.webp',
     alt: 'nanggroe-media-logo',
   },
   {
-    url: '/images/medpart-logo/news-rb.png',
+    url: '/images/medpart-logo/news-rb.webp',
     alt: 'news-rb-logo',
   },
   {
-    url: '/images/medpart-logo/persiraja-logo.png',
+    url: '/images/medpart-logo/persiraja-logo.webp',
     alt: 'persiraja-logo',
   },
   {
-    url: '/images/medpart-logo/story-ngonser.png',
+    url: '/images/medpart-logo/story-ngonser.webp',
     alt: 'story-ngonser-logo',
   },
   {
-    url: '/images/medpart-logo/support-konser.png',
+    url: '/images/medpart-logo/support-konser.webp',
     alt: 'support-konser-logo',
   },
 ];
@@ -103,9 +103,12 @@ export default function SponsorSection() {
           <Label text="SPONSOR" />
           <div className="grid grid-cols-1 gap-4 place-items-center mt-8">
             <div className="flex justify-center items-center w-full max-w-[200px] lg:max-w-[300px]">
-              <img
-                src="/images/bca-syariah.png"
+              <Image
+                src={"/images/bca-syariah.png"}
                 alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
                 className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
               />
             </div>

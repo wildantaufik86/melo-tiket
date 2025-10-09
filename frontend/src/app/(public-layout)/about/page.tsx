@@ -62,7 +62,7 @@ const ticketTerms: { text: string }[] = [
 
 export default function AboutPage() {
   return (
-    <div className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-28 pd-full flex flex-col gap-4">
+    <div className="bg-[url(/images/webpjpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-28 pd-full flex flex-col gap-4">
       <section className="flex flex-col mt-8 lg:mt-16">
         <Label text="About Melofest" />
         <div className="mt-8 bg-[url(/images/accessoris-bg.jpg)] bg-cover bg-center bg-no-repeat w-full p-4 border border-bg-primary rounded-sm flex flex-col gap-4 lg:mt-12">

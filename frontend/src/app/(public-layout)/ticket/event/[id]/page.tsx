@@ -45,7 +45,7 @@ export default function EventDetailPage({
   if (loading) return null;
 
   return (
-    <main className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
+    <main className="bg-[url(/images/dark-gradient.webp)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
       <div className="relative flex flex-col">
         <HeroSection />
         <HeaderSection event={eventDetail?.event} />

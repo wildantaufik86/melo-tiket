@@ -84,7 +84,7 @@ export default function TicketPage() {
   }, [ordersTicket, paymentProof]);
 
   return (
-    <section className="bg-[url(/images/dark-gradient.jpg)] bg-cover bg-center bg-no-repeat min-h-screen pt-20">
+    <section className="bg-[url(/images/dark-gradient.webp)] bg-cover bg-center bg-no-repeat min-h-screen pt-20">
       <div className="pd-full flex flex-col">
         <h3 className="text-lg font-black md:text-xl lg:text-5xl">
           RINCIAN PESANAN

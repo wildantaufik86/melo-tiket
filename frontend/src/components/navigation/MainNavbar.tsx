@@ -82,7 +82,6 @@ export default function MainNavbar() {
               width={50}
               height={50}
               className="w-10 h-10 lg:w-12 lg:h-12 object-contain"
-              priority
             />
           </Link>
         </div>

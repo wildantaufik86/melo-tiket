@@ -73,7 +73,7 @@ export default function DetailOrderSection({
         <div className="flex flex-col gap-4 md:flex-row md:items-center">
           <div className="relative w-full aspect-3/1 md:aspect-3/2 md:w-1/2 lg:h-[140px]">
             <Image
-              src="/images/post-dewa-panel-2-1.png"
+              src="/images/post-dewa-panel-2-1.webp"
               alt="event image"
               fill
               className="object-contain object-top md:object-center"

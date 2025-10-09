@@ -4,7 +4,7 @@ import { FaFacebook, FaInstagram, FaSpotify, FaTiktok } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-[url(/images/footer-bg.jpg)] bg-cover bg-top bg-no-repeat pd-full">
+    <footer className="bg-[url(/images/footer-bg.webp)] bg-cover bg-top bg-no-repeat pd-full">
       <div className="flex justify-between items-center">
         <div className="flex flex-col items-center">
           <div className="relative  w-12 sm:w-full sm:max-w-[50px] lg:max-w-[100px] aspect-square">
@@ -12,7 +12,6 @@ export default function Footer() {
               src="/images/melo-logo.png"
               alt="Melotiket Logo"
               fill
-              priority
               className="object-contain"
             />
           </div>
@@ -25,7 +24,6 @@ export default function Footer() {
               src="/images/logo-omar-jaya.png"
               alt="Omar Jaya Logo"
               fill
-              priority
               className="object-contain"
             />
           </div>

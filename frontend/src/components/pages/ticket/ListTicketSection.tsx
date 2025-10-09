@@ -85,7 +85,7 @@ export default function ListTicketSection({ tickets, eventId }: TicketProps) {
     <section className="flex flex-col md:flex-1 md:mt-10">
       <div className="relative aspect-2/3">
         <Image
-          src="/images/panel-ticket-venue.jpg"
+          src="/images/panel-ticket-venue.webp"
           alt="ticket-poster"
           fill
           className="object-contain md:object-top"
