@@ -62,23 +62,22 @@ export default function TicketSection({ event }: { event: IEvent | null }) {
 
       <Label text="GET YOUR TICKET NOW" />
       <div className="absolute inset-0 top-15 mt-32">
-        <Image
-          src="/images/awan.webp"
-          alt="Cloud background"
-          fill
-          className="object-cover object-center"
-          priority={true}
-          fetchPriority='high'
-          sizes="100vw"
-        />
-
-        <div className="relative z-10 flex justify-center items-center pb-12 aspect-square">
+        <div className="relative flex justify-center items-center pb-12 aspect-square">
+          <Image
+            src="/images/awan.webp"
+            alt="Cloud background"
+            fill
+            className="object-cover object-center"
+            priority={true}
+            fetchPriority="high"
+            sizes="100vw"
+          />
           <div className="w-full px-4 lg:px-12 lg:mt-12">
             <Swiper
               spaceBetween={20}
               breakpoints={{
                 320: { slidesPerView: 2 },
-                430: { slidesPerView: 3 },
+                430: { slidesPerView: 2.5 },
                 768: { slidesPerView: 4 },
                 1024: { slidesPerView: 5 },
               }}
