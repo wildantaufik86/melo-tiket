@@ -104,7 +104,8 @@ export default function AdminSidebar() {
 
           {/* Sidebar Navigation Links */}
           <ul className="space-y-2 mt-6">
-            {authUser?.authUser?.role === 'superadmin' && (
+            {(authUser?.authUser?.role === 'superadmin' ||
+              authUser?.authUser?.role === 'admin') && (
               <li>
                 <Link
                   href={'/admin'}
