@@ -5,7 +5,10 @@ import AuthForm from '@/components/fragments/form/AuthForm';
 import InputContainer from '@/components/fragments/inputContainer/InputContainer';
 import MainNavbar from '@/components/navigation/MainNavbar';
 import { loginSchema } from '@/lib/validations/authValidation';
-import { ToastError, ToastSuccess } from '@/lib/validations/toast/ToastNofication';
+import {
+  ToastError,
+  ToastSuccess,
+} from '@/lib/validations/toast/ToastNofication';
 import { setCookie } from '@/utils/clientUtils';
 import { validateInput } from '@/utils/universalUtils';
 import { useRouter } from 'next/navigation';
@@ -16,7 +19,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const router = useRouter(); // Renamed 'route' to 'router' for consistency with Next.js docs
 
-  const handleLogin = async (e: React.FormEvent) => { // Type the event for better safety
+  const handleLogin = async (e: React.FormEvent) => {
+    // Type the event for better safety
     e.preventDefault();
 
     try {
@@ -37,7 +41,9 @@ export default function LoginPage() {
 
       // 3. Handle Server Action Response
       if (result.error) {
-        ToastError(result.message || 'Login failed. Please check your credentials.');
+        ToastError(
+          result.message || 'Login failed. Please check your credentials.'
+        );
         return; // Stop execution if server action reported an error
       }
 
@@ -54,8 +60,8 @@ export default function LoginPage() {
       // but for client-side `setCookie`, you might not have these options directly unless your `setCookie` utility handles them.
       // For proper security, ideally, `accessToken` should be HttpOnly and set by the server.
       // If `setCookie` is a client-side utility, ensure it's not exposing sensitive data.
-      setCookie('accessToken', result.data.accessToken); // e.g., 7 days
-      setCookie('user', result.data.user); // Store user object as a string
+      // setCookie('accessToken', result.data.accessToken); // e.g., 7 days
+      // setCookie('user', result.data.user); // Store user object as a string
 
       ToastSuccess('Login successful!');
 
@@ -66,8 +72,8 @@ export default function LoginPage() {
         // Redirect non-admin users to a default page, e.g., home or a user dashboard
         router.replace('/');
       }
-
-    } catch (error: any) { // Explicitly type 'error' as 'any' or more specific if known
+    } catch (error: any) {
+      // Explicitly type 'error' as 'any' or more specific if known
       // Catch any unexpected errors during the process
       console.error('Login process error:', error);
       ToastError(error.message || 'An unexpected error occurred during login.');
@@ -76,24 +82,24 @@ export default function LoginPage() {
 
   return (
     <>
-    <div className='flex h-screen w-full justify-center items-center'>
-      <AuthForm className='shadow-2xl' type="login" onSubmit={handleLogin}>
-        <InputContainer
-          type="email"
-          name="email"
-          value={email}
-          setValue={setEmail}
-          required={true}
-        />
-        <InputContainer
-          type="password"
-          name="password"
-          value={password}
-          setValue={setPassword}
-          required={true}
-        />
-      </AuthForm>
-    </div>
+      <div className="flex h-screen w-full justify-center items-center">
+        <AuthForm className="shadow-2xl" type="login" onSubmit={handleLogin}>
+          <InputContainer
+            type="email"
+            name="email"
+            value={email}
+            setValue={setEmail}
+            required={true}
+          />
+          <InputContainer
+            type="password"
+            name="password"
+            value={password}
+            setValue={setPassword}
+            required={true}
+          />
+        </AuthForm>
+      </div>
     </>
   );
 }
