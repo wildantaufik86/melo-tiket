@@ -8,6 +8,7 @@ const defaults: CookieOptions = {
   sameSite: "strict",
   httpOnly: true,
   secure,
+  path: "/",
 };
 
 export const getAccessTokenCookieOptions = (): CookieOptions => ({
@@ -18,7 +19,6 @@ export const getAccessTokenCookieOptions = (): CookieOptions => ({
 export const getRefreshTokenCookieOptions = (): CookieOptions => ({
   ...defaults,
   expires: thirtyDaysFromNow(),
-  path: "/auth/refresh",
 });
 
 type Params = {
@@ -32,27 +32,22 @@ export const setAuthCookies = ({ res, accessToken, refreshToken }: Params) =>
     .cookie("accessToken", accessToken, getAccessTokenCookieOptions())
     .cookie("refreshToken", refreshToken, getRefreshTokenCookieOptions());
 
-// Di dalam file utils/cookies.js (atau di mana pun fungsi ini berada)
-
 export const clearAuthCookies = (res: any) => {
-  // Menghapus accessToken
   res.cookie("accessToken", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Pastikan sama dengan saat set
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    expires: new Date(0), // Mengatur tanggal kedaluwarsa ke masa lalu
-    path: "/", // PENTING: Path harus sama persis dengan saat cookie di-set
+    expires: new Date(0),
+    path: "/",
   });
 
-  // Menghapus refreshToken
   res.cookie("refreshToken", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Pastikan sama dengan saat set
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    expires: new Date(0), // Mengatur tanggal kedaluwarsa ke masa lalu
-    path: "/", // PENTING: Path harus sama persis dengan saat cookie di-set
+    expires: new Date(0),
+    path: "/",
   });
 
-  // Mengembalikan `res` agar bisa di-chain dengan .status().json()
   return res;
 };

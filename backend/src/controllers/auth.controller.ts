@@ -13,7 +13,7 @@ import {
   setAuthCookies,
 } from "../utils/cookies";
 import { loginSchema, registerSchema } from "./auth.schemas";
-import { verifyToken } from "../utils/jwt";
+import { AccessTokenPayload, verifyToken } from "../utils/jwt";
 import SessionModel from "../models/SessionModel";
 import appAssert from "../utils/appAssert";
 
@@ -51,14 +51,14 @@ export const loginHandler = catchErrors(async (req, res) => {
 
 export const logoutHandler = catchErrors(async (req, res) => {
   const accessToken = req.cookies.accessToken as string | undefined;
-  const { payload } = verifyToken(accessToken || "");
 
-  if (payload) {
-    // remove session from db
-    await SessionModel.findByIdAndDelete(payload.sessionId);
+  if (accessToken) {
+    const { payload } = verifyToken<AccessTokenPayload>(accessToken);
+    if (payload?.sessionId) {
+      await SessionModel.findByIdAndDelete(payload.sessionId);
+    }
   }
 
-  // clear cookies
   return clearAuthCookies(res)
     .status(OK)
     .json({ message: "Logout successful" });
