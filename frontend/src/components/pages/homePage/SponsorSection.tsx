@@ -104,12 +104,14 @@ export default function SponsorSection() {
           <div className="grid grid-cols-1 gap-4 place-items-center mt-8">
             <div className="flex justify-center items-center w-full max-w-[200px] lg:max-w-[300px]">
               <Image
-                src={"/images/bca-syariah.png"}
+                src={'/images/bca-syariah.png'}
                 alt="bca-syariah-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
                 className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
               />
             </div>
           </div>
