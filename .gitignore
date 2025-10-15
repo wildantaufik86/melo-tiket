@@ -7,7 +7,7 @@ node_modules/
 node_modules
 package-lock.json
 yarn.lock
-
+ecosystem.config.js
 # Yarn & npm logs
 .yarn/*
 !.yarn/patches
