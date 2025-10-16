@@ -68,6 +68,12 @@ app.get("/", ({ req, res }: any) => {
 });
 
 app.set('trust proxy', 1);
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    req.headers['x-forwarded-proto'] = 'https';
+  }
+  next();
+});
 
 app.use("/ticket", express.json(), express.urlencoded({ extended: true }), ticketRoutes);
 app.use("/transaction",express.json(), express.urlencoded({ extended: true }), transactionRoutes);
