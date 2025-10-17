@@ -1,11 +1,12 @@
 import Image from 'next/image';
+import { memo } from 'react';
 
 type Sponsor = {
   url: string;
   alt: string;
 };
 
-export default function SponsorCard({ url, alt }: Sponsor) {
+const SponsorCard = memo(function SponsorCard({ url, alt }: Sponsor) {
   return (
     <div className="flex justify-center items-center rounded-sm w-full max-w-[200px]">
       <Image
@@ -17,8 +18,10 @@ export default function SponsorCard({ url, alt }: Sponsor) {
         className="object-cover p-2 hover:scale-110 duration-500 ease-in-out"
         sizes="(max-width: 768px) 50vw, 200px"
         loading="lazy"
-        quality={60}
+        quality={50}
       />
     </div>
   );
-}
+});
+
+export default SponsorCard;

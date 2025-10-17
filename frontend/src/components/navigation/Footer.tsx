@@ -13,6 +13,8 @@ export default function Footer() {
               alt="Melotiket Logo"
               fill
               className="object-contain"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              loading="lazy"
             />
           </div>
 
@@ -25,6 +27,8 @@ export default function Footer() {
               alt="Omar Jaya Logo"
               fill
               className="object-contain"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              loading="lazy"
             />
           </div>
         </div>

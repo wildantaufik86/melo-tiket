@@ -4,7 +4,7 @@ import TicketCard from '@/components/fragments/card/TicketCard';
 import Label from '@/components/fragments/label/Label';
 import { IEvent } from '@/types/Event';
 import { Orders, useOrder } from '@/context/ordersContext';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 
 // import swiper
@@ -18,11 +18,17 @@ const brotherFont = localFont({
   display: 'swap',
 });
 
-// 1. Terima 'event' sebagai prop, bukan lagi mengambilnya dari state
 export default function TicketSection({ event }: { event: IEvent | null }) {
-  // 2. Hapus state 'event' dan 'loading'. Hanya 'availableTickets' yang dibutuhkan
-  const [availableTickets, setAvailableTickets] = useState<Orders[]>([]);
   const { saveOrders } = useOrder();
+
+  const availableTickets = useMemo<Orders[]>(() => {
+    if (!event?.tickets) return [];
+    return event.tickets.map((tc) => ({
+      ...tc,
+      quantity: 0,
+      isOpen: false,
+    }));
+  }, [event]);
 
   const handleOrder = useCallback(
     (idTicket: string) => {
@@ -34,21 +40,7 @@ export default function TicketSection({ event }: { event: IEvent | null }) {
     [availableTickets, saveOrders]
   );
 
-  // 3. useEffect ini sekarang hanya bertugas memproses prop 'event' menjadi state 'availableTickets'
-  useEffect(() => {
-    if (event && event.tickets) {
-      const initialTickets: Orders[] = event.tickets.map((tc) => ({
-        ...tc,
-        quantity: 0,
-        isOpen: false,
-      }));
-      setAvailableTickets(initialTickets);
-    }
-  }, [event]); // <-- Bergantung pada prop 'event'
-
-  // 4. Ganti 'if (loading)' dengan 'if (!event)'. Ini akan menangani kasus jika data gagal diambil di server.
   if (!event) {
-    // Anda bisa menampilkan pesan atau komponen skeleton loading di sini
     return (
       <section className="text-center py-20">
         <h2 className="text-2xl">Memuat data event...</h2>
@@ -74,7 +66,6 @@ export default function TicketSection({ event }: { event: IEvent | null }) {
             fill
             className="object-cover object-center"
             priority
-            fetchPriority="high"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
             quality={60}
           />

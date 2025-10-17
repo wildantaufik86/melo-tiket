@@ -21,22 +21,19 @@ const TicketCard = memo(function TicketCard({
   handleOrder,
 }: TicketCardProps) {
   return (
-    // Div utama sekarang menjadi container untuk posisi
     <div
       className={`relative aspect-[2/3] w-full max-w-[200px] lg:max-w-[250px] xl:max-w-[300px] hover:scale-105 duration-200 ease-in-out ${
         ticket.status === 'Available' ? 'opacity-100' : 'opacity-90'
       }`}
     >
-      {/* 2. Tambahkan komponen Image sebagai background */}
       <Image
         src="/images/bg-ticket.webp"
         alt="Ticket background"
         fill
         className="object-contain select-none pointer-events-none"
         quality={70}
-        loading="lazy"
-        sizes="(max-width: 768px) 40vw, (max-width: 1200px) 20vw, 200px"
-        priority={false}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 33vw"
+        priority={true}
       />
 
       {/* 3. Bungkus konten dengan div yang diletakkan di atas gambar */}

@@ -4,19 +4,36 @@ import {
   createTransaction,
   ICreateTransactionPayload,
 } from '@/app/api/transcation';
-import AlertModal from '@/components/fragments/modal/AlertModal';
-import SuccessModal from '@/components/fragments/modal/SuccessModal';
-import TermsModal from '@/components/fragments/modal/TermsModal';
 import { useAuth } from '@/context/authUserContext';
 import { useModals } from '@/context/modalContext';
 import { Orders, useOrder } from '@/context/ordersContext';
 import { ToastSuccess } from '@/lib/validations/toast/ToastNofication';
 import { deleteLocalStorage } from '@/utils/clientUtils';
 import { formattedPrice, generate3Digit } from '@/utils/universalUtils';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { FaCircleInfo } from 'react-icons/fa6';
+
+const SuccessModal = dynamic(
+  () => import('@/components/fragments/modal/SuccessModal'),
+  {
+    ssr: false,
+  }
+);
+const AlertModal = dynamic(
+  () => import('@/components/fragments/modal/AlertModal'),
+  {
+    ssr: false,
+  }
+);
+const TermsModal = dynamic(
+  () => import('@/components/fragments/modal/TermsModal'),
+  {
+    ssr: false,
+  }
+);
 
 type Props = {
   listOrder: Orders[];

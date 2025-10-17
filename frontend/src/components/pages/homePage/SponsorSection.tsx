@@ -8,13 +8,6 @@ type Sponsor = {
   alt: string;
 };
 
-// const sponsorData: Sponsor[] = [
-//   {
-//     url: '/images/bca-syariah.webp',
-//     alt: 'bca-syariah-logo',
-//   },
-// ];
-
 const medpartData: Sponsor[] = [
   {
     url: '/images/medpart-logo/aac-logo.webp',
@@ -56,10 +49,6 @@ const medpartData: Sponsor[] = [
     url: '/images/medpart-logo/konser-terus.webp',
     alt: 'konser-terus-logo',
   },
-  // {
-  //   url: '/images/medpart-logo/logo-event-aceh.webp',
-  //   alt: 'logo-event-aceh',
-  // },
   {
     url: '/images/medpart-logo/logo-gac-music.webp',
     alt: 'logo-gac-music',
@@ -90,15 +79,6 @@ export default function SponsorSection() {
   return (
     <section className="relative pd-full py-30">
       <div className="flex flex-col">
-        {/* <div className="absolute left-0 w-full md:max-w-[80%] lg:max-w-[60%] aspect-square">
-          <Image
-            src="/images/accesoris.png"
-            alt="accessoris left"
-            fill
-            className="object-contain object-center"
-          />
-        </div> */}
-
         <div className="flex flex-col gap-8">
           <Label text="SPONSOR" />
           <div className="grid grid-cols-1 gap-4 place-items-center mt-8">
@@ -112,6 +92,8 @@ export default function SponsorSection() {
                 className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
+                priority={false}
+                quality={75}
               />
             </div>
           </div>

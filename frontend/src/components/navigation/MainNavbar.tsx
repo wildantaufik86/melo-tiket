@@ -7,8 +7,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
-import ViewTicketModal from '../fragments/modal/ViewTicketModal';
 import { ToastError } from '@/lib/validations/toast/ToastNofication';
+import dynamic from 'next/dynamic';
+
+const ViewTicketModal = dynamic(
+  () => import('../fragments/modal/ViewTicketModal'),
+  {
+    ssr: false,
+  }
+);
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
