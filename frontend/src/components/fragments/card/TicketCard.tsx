@@ -3,37 +3,37 @@ import { formattedPrice } from '@/utils/universalUtils';
 import localFont from 'next/font/local';
 import Link from 'next/link';
 import Image from 'next/image'; // <-- 1. Import komponen Image
+import { memo } from 'react';
 
 const brotherFont = localFont({
   src: '../../../../public/fonts/BROTHER-Bold.otf',
+  display: 'swap',
 });
-
 type TicketCardProps = {
   ticket: Orders;
   idEvent?: string;
   handleOrder: (params: string) => void;
 };
 
-export default function TicketCard({
+const TicketCard = memo(function TicketCard({
   ticket,
   idEvent,
   handleOrder,
 }: TicketCardProps) {
   return (
-    // Div utama sekarang menjadi container untuk posisi
     <div
-      className={`relative aspect-[2/3] w-full max-w-[200px] lg:max-w-[250px] xl:max-w-[300px] hover:scale-110 duration-200 ease-in-out ${
+      className={`relative aspect-[2/3] w-full max-w-[200px] lg:max-w-[250px] xl:max-w-[300px] hover:scale-105 duration-200 ease-in-out ${
         ticket.status === 'Available' ? 'opacity-100' : 'opacity-90'
       }`}
     >
-      {/* 2. Tambahkan komponen Image sebagai background */}
       <Image
         src="/images/bg-ticket.webp"
         alt="Ticket background"
         fill
-        className="object-contain"
-        quality={75}
-        sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+        className="object-contain select-none pointer-events-none"
+        quality={70}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 33vw"
+        priority={true}
       />
 
       {/* 3. Bungkus konten dengan div yang diletakkan di atas gambar */}
@@ -74,4 +74,6 @@ export default function TicketCard({
       </div>
     </div>
   );
-}
+});
+
+export default TicketCard;

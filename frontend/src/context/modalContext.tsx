@@ -1,6 +1,13 @@
 'use client';
 
-import ErrorModal from '@/components/fragments/modal/ErrorModal';
+import dynamic from 'next/dynamic';
+const ErrorModal = dynamic(
+  () => import('@/components/fragments/modal/ErrorModal'),
+  {
+    ssr: false,
+  }
+);
+
 import { createContext, useContext, useEffect, useState } from 'react';
 
 type ModalContextType = {

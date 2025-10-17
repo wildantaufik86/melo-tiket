@@ -137,13 +137,11 @@ export default function DetailOrderSection({
             <p className="text-[10px] md:text-sm lg:text-base font-bold">
               Nama Rekening
             </p>
-            <p className="text-[10px] md:text-sm lg:text-base">
-              : M. MAULANA RIDWAN
-            </p>
+            <p className="text-[10px] md:text-sm lg:text-base">: OMAR JAYA</p>
             <p className="text-[10px] md:text-sm lg:text-base font-bold">
               Nomor Rekening
             </p>
-            <p className="text-[10px] md:text-sm lg:text-base">: 0722171717</p>
+            <p className="text-[10px] md:text-sm lg:text-base">: 0729777771</p>
           </div>
         </div>
       </div>
