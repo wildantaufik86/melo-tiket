@@ -14,8 +14,8 @@ export default function RiwayatPembelian({
   historyTransactions,
 }: PropsRiwayatPembelian) {
   const dataOwnerMelo = {
-    name: 'M MAULANA RIDWAN',
-    accountNumber: '0722171717',
+    name: 'OMAR JAYA',
+    accountNumber: '0729777771',
   };
 
   const { authUser } = useAuth();
