@@ -18,6 +18,7 @@ const SponsorCard = memo(function SponsorCard({ url, alt }: Sponsor) {
         className="object-cover p-2 hover:scale-110 duration-500 ease-in-out"
         sizes="(max-width: 768px) 50vw, 200px"
         loading="lazy"
+        priority={false}
         quality={50}
       />
     </div>

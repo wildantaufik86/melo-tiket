@@ -14,6 +14,7 @@ export default function Footer() {
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, 50vw"
+              priority={false}
               loading="lazy"
             />
           </div>
@@ -28,6 +29,7 @@ export default function Footer() {
               fill
               className="object-contain"
               sizes="(max-width: 768px) 100vw, 50vw"
+              priority={false}
               loading="lazy"
             />
           </div>
