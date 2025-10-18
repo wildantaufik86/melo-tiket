@@ -38,7 +38,7 @@ const allowedOrigins = [
 ];
 
 const app = express();
-
+app.set('trust proxy', 1);
 app.use(cors({
   origin: function (origin, callback) {
       // Untuk requests tanpa origin (seperti dari Postman atau curl)
@@ -65,14 +65,6 @@ app.get("/", ({ req, res }: any) => {
   return res.status(OK).json({
     status: "Perfectly Connected",
   });
-});
-
-app.set('trust proxy', 1);
-app.use((req, res, next) => {
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    req.headers['x-forwarded-proto'] = 'https';
-  }
-  next();
 });
 
 app.use("/ticket", express.json(), express.urlencoded({ extended: true }), ticketRoutes);
