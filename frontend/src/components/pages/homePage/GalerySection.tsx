@@ -22,7 +22,7 @@ type Image = {
 
 export default function GalerySection() {
   return (
-    <section className="mt-[20%] sm:mt-[15%] lg:mt-[10%]">
+    <section className="mt-[30%] sm:mt-[15%] lg:mt-[10%]">
       <div className="relative aspect-16/9">
         <Image
           src="/images/hero-image.webp"
