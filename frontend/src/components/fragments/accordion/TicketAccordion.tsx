@@ -11,9 +11,13 @@ export default function TickedAccordion({
   return (
     <div className="flex flex-col rounded-sm p-4 bg-bg-secondary">
       <p
-        onClick={ticket.status === 'Available' ? toggleOpen : undefined}
+        onClick={
+          ticket.status === 'Available' && ticket.stock > 0
+            ? toggleOpen
+            : undefined
+        }
         className={`font-black lg:text-xl flex justify-between items-center ${
-          ticket.status === 'Available'
+          ticket.status === 'Available' && ticket.stock > 0
             ? 'cursor-pointer'
             : 'cursor-not-allowed'
         } `}
@@ -40,7 +44,7 @@ export default function TickedAccordion({
         </p>
         <div className="flex items-center">
           <div
-            onClick={decrementQty}
+            onClick={ticket.stock > 0 ? decrementQty : undefined}
             className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
           >
             -
@@ -49,7 +53,7 @@ export default function TickedAccordion({
             {ticket.quantity}
           </span>
           <div
-            onClick={incrementQty}
+            onClick={ticket.stock > 0 ? incrementQty : undefined}
             className="font-semibold text-white bg-red-500 w-5 h-5 rounded-full flex justify-center items-center cursor-pointer"
           >
             +

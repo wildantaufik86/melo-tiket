@@ -80,7 +80,7 @@ export default function MainNavbar() {
 
   return (
     <>
-      <nav className="fixed top-0 inset-x-0 py-4 pd-lr flex justify-between bg-bg-secondary text-white items-center z-50">
+      <nav className="fixed top-0 left-0 w-full max-w-[100vw] z-50 bg-bg-secondary text-white flex justify-between items-center py-4 px-4 md:px-8">
         <div className="">
           <Link href="/">
             <Image

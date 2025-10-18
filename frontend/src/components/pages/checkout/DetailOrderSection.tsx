@@ -66,7 +66,7 @@ export default function DetailOrderSection({
   if (loading) return null;
 
   return (
-    <section className="flex flex-col md:w-[60%] lg:w-[55%]">
+    <section className="flex flex-col w-full md:w-[60%] lg:w-[55%]">
       {/* detail order */}
       <div className="flex-1 flex flex-col bg-bg-secondary p-4 rounded-sm">
         {/* header */}
@@ -130,7 +130,8 @@ export default function DetailOrderSection({
               src="/images/bca-syariah.png"
               alt="Bank_BCA_Syariah_logo"
               fill
-              className="object-contain object-left"
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-contain"
             />
           </div>
           <div className="flex-1 grid grid-cols-[1fr_auto] gap-4">
