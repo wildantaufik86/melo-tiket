@@ -54,21 +54,27 @@ const TicketCard = memo(function TicketCard({
 
         <Link
           onClick={
-            ticket.status === 'Available'
+            ticket.status === 'Available' && ticket.stock > 0
               ? () => handleOrder(ticket._id!)
               : undefined
           }
           href={`${
-            ticket.status === 'Available' ? `/checkout/event/${idEvent}` : ''
+            ticket.status === 'Available' && ticket.stock > 0
+              ? `/checkout/event/${idEvent}`
+              : ''
           }`}
           className={`p-[1px] rounded-sm bg-gradient-to-r from-blue-500 via-purple-500 to-red-500 ${
-            ticket.status === 'Available'
+            ticket.status === 'Available' && ticket.stock > 0
               ? 'cursor-pointer'
               : 'cursor-not-allowed'
           } mb-7`}
         >
           <div className="rounded-sm font-semibold bg-[#252222] text-center text-[10px] py-2 px-4 sm:text-sm">
-            {ticket.status === 'Available' ? 'BUY TICKETS' : ticket.status}
+            {ticket.status === 'Available'
+              ? ticket.stock > 0
+                ? 'BUY TICKETS'
+                : 'SOLD OUT'
+              : ticket.status}
           </div>
         </Link>
       </div>
