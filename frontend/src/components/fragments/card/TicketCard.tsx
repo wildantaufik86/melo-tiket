@@ -67,7 +67,7 @@ const TicketCard = memo(function TicketCard({
             ticket.status === 'Available' && ticket.stock > 0
               ? 'cursor-pointer'
               : 'cursor-not-allowed'
-          } mb-7`}
+          } mb-7 lg:mb-12`}
         >
           <div className="rounded-sm font-semibold bg-[#252222] text-center text-[10px] py-2 px-4 sm:text-sm">
             {ticket.status === 'Available'
