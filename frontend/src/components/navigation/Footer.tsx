@@ -4,7 +4,7 @@ import { FaFacebook, FaInstagram, FaSpotify, FaTiktok } from 'react-icons/fa';
 
 export default function Footer() {
   return (
-    <footer className="bg-[url(/images/footer-bg.webp)] bg-cover bg-top bg-no-repeat pd-full">
+    <footer className="bg-[#151618] pd-full">
       <div className="flex justify-between items-center">
         <div className="flex flex-col items-center">
           <div className="relative  w-12 sm:w-full sm:max-w-[50px] lg:max-w-[100px] aspect-square">
@@ -50,7 +50,7 @@ export default function Footer() {
           </div>
           <div className="flex items-center gap-4 mt-4">
             <Link
-              href="/tiktok"
+              href="/#"
               className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaTiktok
@@ -70,7 +70,7 @@ export default function Footer() {
               />
             </Link>
             <Link
-              href="/facebook"
+              href="/#"
               className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaFacebook
@@ -80,7 +80,7 @@ export default function Footer() {
               />
             </Link>
             <Link
-              href="/spotify"
+              href="/#"
               className="bg-white p-1 rounded-sm hover:bg-bg-primary transition-colors"
             >
               <FaSpotify
