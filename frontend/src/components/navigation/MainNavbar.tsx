@@ -162,7 +162,7 @@ export default function MainNavbar() {
                 <button
                   onClick={logoutUser}
                   type="button"
-                  className="py-2 px-4 text-xs lg:text-sm font-medium border border-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors"
+                  className="py-2 px-4 text-xs lg:text-sm font-medium border border-bg-primary justify-center items-center rounded-sm hover:bg-hover transition-colors cursor-pointer hidden md:flex"
                 >
                   LOG OUT
                 </button>
@@ -226,6 +226,15 @@ export default function MainNavbar() {
         >
           Contact
         </Link> */}
+          {authUser && (
+            <button
+              onClick={logoutUser}
+              type="button"
+              className="py-2 px-4 text-xs lg:text-sm font-medium border border-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors md:hidden"
+            >
+              LOG OUT
+            </button>
+          )}
         </aside>
       </nav>
       {isViewTicket && (

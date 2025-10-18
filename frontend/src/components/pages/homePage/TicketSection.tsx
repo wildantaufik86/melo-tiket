@@ -69,7 +69,7 @@ export default function TicketSection({ event }: { event: IEvent | null }) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
             quality={60}
           />
-          <div className="w-full px-4 lg:px-12 lg:mt-12">
+          <div className="w-full px-4 mt-16 lg:px-12 lg:mt-12">
             <Swiper
               key={availableTickets.length}
               spaceBetween={20}
