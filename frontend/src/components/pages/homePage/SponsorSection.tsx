@@ -50,10 +50,6 @@ const medpartData: Sponsor[] = [
     alt: 'konser-terus-logo',
   },
   {
-    url: '/images/medpart-logo/logo-gac-music.webp',
-    alt: 'logo-gac-music',
-  },
-  {
     url: '/images/medpart-logo/nanggroe-media.webp',
     alt: 'nanggroe-media-logo',
   },
@@ -71,6 +67,34 @@ const medpartData: Sponsor[] = [
   },
   {
     url: '/images/medpart-logo/support-konser.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/jateng-ambyar.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/jateng-bang.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/konser-indonesia.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/konser-medan.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/local-media-indonesia.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/musikku-indonesia.webp',
+    alt: 'support-konser-logo',
+  },
+  {
+    url: '/images/medpart-logo/warta-konser-music.webp',
     alt: 'support-konser-logo',
   },
 ];
