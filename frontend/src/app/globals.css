@@ -41,6 +41,7 @@
   --sidebar-ring: oklch(0.708 0 0);
   --bg-bg-primary: #b70a0a;
   --bg-bg-secondary: #252222;
+  --dark-gradient: #121212;
 }
 
 @theme inline {
@@ -92,6 +93,7 @@
   --color-card: var(--card);
   --color-bg-secondary: var(--bg-bg-secondary);
   --color-bg-primary: var(--bg-bg-primary);
+  --color-dark-gradient: var(--dark-gradient);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

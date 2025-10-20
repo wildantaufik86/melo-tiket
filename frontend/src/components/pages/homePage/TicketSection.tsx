@@ -61,7 +61,7 @@ export default function TicketSection({ event }: { event: IEvent | null }) {
       <div className="absolute inset-0 top-15 mt-32">
         <div className="relative flex justify-center items-center pb-12 aspect-[1/1]">
           <Image
-            src="/images/awan.webp"
+            src="/images/awan-soft.webp"
             alt="Cloud background"
             fill
             className="object-cover object-center"
