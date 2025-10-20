@@ -34,6 +34,7 @@ const TicketCard = memo(function TicketCard({
         quality={70}
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 55vw, 33vw"
         priority={true}
+        fetchPriority='high'
       />
 
       {/* 3. Bungkus konten dengan div yang diletakkan di atas gambar */}
