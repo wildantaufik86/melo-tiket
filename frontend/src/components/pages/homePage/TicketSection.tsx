@@ -65,7 +65,7 @@ export default function TicketSection({ event }: { event: IEvent | null }) {
             alt="Cloud background"
             fill
             className="object-cover object-center"
-            priority
+            priority={false}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 70vw, 50vw"
             quality={60}
           />
