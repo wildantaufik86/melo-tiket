@@ -2,7 +2,7 @@ import VenueSection from '@/components/pages/venue/VenueSection';
 
 export default function VenuePage() {
   return (
-    <section className="bg-[url(/images/dark-gradient.webp)] bg-cover bg-center bg-no-repeat min-h-screen pt-28 pd-full">
+    <section className="bg-dark-gradient min-h-screen pt-28 pd-full">
       <VenueSection />
     </section>
   );

@@ -31,7 +31,7 @@ async function getEventData() {
 export default async function homepage() {
   const eventData = await getEventData();
   return (
-    <div className="bg-[url(/images/dark-gradient.webp)] bg-cover bg-center bg-no-repeat min-h-screen pt-32">
+    <div className="bg-dark-gradient min-h-screen pt-32">
       <div className="relative">
         <HeroSection />
         <TicketSection event={eventData} />
