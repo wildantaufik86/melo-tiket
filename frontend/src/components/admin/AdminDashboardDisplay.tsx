@@ -26,6 +26,9 @@ interface DashboardSummary {
       categoryName: string;
       totalSold: number;
       totalRevenue: number;
+      male: number;
+      female: number;
+      totalCount: number;
     }>;
   };
   transactions: {
@@ -372,6 +375,47 @@ export default function AdminDashboardDisplay() {
                         <div className="text-sm text-gray-500 mt-1">
                           Revenue: Rp {item.totalRevenue.toLocaleString()}
                         </div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Pria: {item.male.toLocaleString()}
+                        </div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Wanita: {item.female.toLocaleString()}
+                        </div>
+                        <div className="mt-4">
+                          <div className="flex rounded-full overflow-hidden h-3 bg-gray-200">
+                            <div
+                              className="bg-blue-500"
+                              style={{
+                                width: `${
+                                  (item.male / item.totalCount) * 100
+                                }%`,
+                              }}
+                            ></div>
+                            <div
+                              className="bg-pink-500"
+                              style={{
+                                width: `${
+                                  (item.female / item.totalCount) * 100
+                                }%`,
+                              }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between text-sm text-gray-500 mt-1">
+                            <span>
+                              {((item.male / item.totalCount) * 100).toFixed(
+                                1
+                              )}
+                              % Pria
+                            </span>
+                            <span>
+                              {(
+                                (item.female / item.totalCount) *
+                                100
+                              ).toFixed(1)}
+                              % Wanita
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     ))
                   ) : (
@@ -453,7 +497,7 @@ export default function AdminDashboardDisplay() {
               Rp {summary.expectedTotalRevenue.toLocaleString()}
             </p>
             <p className="text-gray-300 mt-2">
-              From {summary.transactions.totalCategoryTransactions} transactions
+              From {summary.transactions.totalCategoryTransactions} Ticket
             </p>
           </div>
           <div className="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6 rounded-xl shadow-lg">
@@ -464,7 +508,7 @@ export default function AdminDashboardDisplay() {
               Rp {summary.totalRevenue.toLocaleString()}
             </p>
             <p className="text-gray-300 mt-2">
-              From {summary.transactions.paid} paid transactions
+              From {summary.transactions.paid} PAID transactions
             </p>
           </div>
         </>

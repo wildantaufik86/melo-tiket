@@ -70,6 +70,18 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
     // Ticket sold per category (exclude complimentary)
     const soldPerCategory = await TransactionModel.aggregate([
       { $match: { status: "paid", deletedAt: null, isComplimentary: { $ne: true } } },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userInfo"
+        }
+      },
+
+      { $unwind: { path: "$userInfo", preserveNullAndEmptyArrays: true } },
+
       { $unwind: "$tickets" },
       {
         $lookup: {
@@ -89,12 +101,37 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
         }
       },
       { $unwind: { path: "$categoryInfo", preserveNullAndEmptyArrays: true } },
+
       {
         $group: {
           _id: "$ticketInfo.category",
           categoryName: { $first: "$categoryInfo.name" },
           totalSold: { $sum: 1 },
-          totalRevenue: { $sum: "$ticketInfo.price" }
+          totalRevenue: { $sum: "$ticketInfo.price" },
+          male: {
+            $sum: {
+              $cond: [{ $eq: ["$userInfo.profile.gender", "male"] }, 1, 0]
+            }
+          },
+          female: {
+            $sum: {
+              $cond: [{ $eq: ["$userInfo.profile.gender", "female"] }, 1, 0]
+            }
+          },
+          totalCount: {
+            $sum: {
+              $cond: {
+                if: {
+                  $or: [
+                    { $eq: ["$userInfo.profile.gender", "male"] },
+                    { $eq: ["$userInfo.profile.gender", "female"] }
+                  ]
+                },
+                then: 1,
+                else: 0
+              }
+            }
+          }
         }
       }
     ]);
