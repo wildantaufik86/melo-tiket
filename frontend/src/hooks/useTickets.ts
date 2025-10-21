@@ -64,5 +64,79 @@ export function useTickets() {
     };
   }, [lastHistoryEvent]);
 
-  return { lastTransactions, paidTransactions, lastHistoryEvent };
+  const { filteredPhaseTransaction } = useMemo(() => {
+    if (paidTransactions && paidTransactions.length > 0) {
+      const filteredPhaseOne = paidTransactions.filter((data) => {
+        if (data.createdAt) {
+          const itemDate = new Date(data.createdAt);
+          const phaseOneStart = new Date('2025-09-28');
+          const phaseOneEnd = new Date(' 2025-10-12');
+
+          // ambil tanggal lokal (tanpa jam)
+          const itemLocal = new Date(
+            itemDate.getFullYear(),
+            itemDate.getMonth(),
+            itemDate.getDate()
+          );
+          const startLocal = new Date(
+            phaseOneStart.getFullYear(),
+            phaseOneStart.getMonth(),
+            phaseOneStart.getDate()
+          );
+          const endLocal = new Date(
+            phaseOneEnd.getFullYear(),
+            phaseOneEnd.getMonth(),
+            phaseOneEnd.getDate()
+          );
+
+          return itemLocal >= startLocal && itemLocal <= endLocal;
+        }
+      });
+
+      const filteredPhaseTwo = paidTransactions.filter((data) => {
+        if (data.createdAt) {
+          const itemDate = new Date(data.createdAt);
+          const phaseTwoStart = new Date('2025-10-21');
+          const phaseTwoEnd = new Date('2025-10-31');
+
+          // ambil tanggal lokal (tanpa jam)
+          const itemLocal = new Date(
+            itemDate.getFullYear(),
+            itemDate.getMonth(),
+            itemDate.getDate()
+          );
+          const startLocal = new Date(
+            phaseTwoStart.getFullYear(),
+            phaseTwoStart.getMonth(),
+            phaseTwoStart.getDate()
+          );
+          const endLocal = new Date(
+            phaseTwoEnd.getFullYear(),
+            phaseTwoEnd.getMonth(),
+            phaseTwoEnd.getDate()
+          );
+
+          return itemLocal >= startLocal && itemLocal <= endLocal;
+        }
+      });
+
+      return {
+        filteredPhaseTransaction: {
+          phaseOne: filteredPhaseOne,
+          phaseTwo: filteredPhaseTwo,
+        },
+      };
+    }
+
+    return {
+      filteredPhaseTransaction: null,
+    };
+  }, [paidTransactions]);
+
+  return {
+    lastTransactions,
+    paidTransactions,
+    lastHistoryEvent,
+    filteredPhaseTransaction,
+  };
 }

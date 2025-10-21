@@ -7,11 +7,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
-import { ToastError } from '@/lib/validations/toast/ToastNofication';
 import dynamic from 'next/dynamic';
 
-const ViewTicketModal = dynamic(
-  () => import('../fragments/modal/ViewTicketModal'),
+const TicketListModal = dynamic(
+  () => import('../fragments/modal/TicketListModal'),
   {
     ssr: false,
   }
@@ -22,44 +21,49 @@ const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function MainNavbar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { authUser, logoutUser, loading } = useAuth();
-  const { lastTransactions } = useTickets();
+  const { lastTransactions, paidTransactions } = useTickets();
   const [ticketsUrl, setTicketsUrl] = useState<string[]>([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const ticketRef = useRef<HTMLDivElement>(null);
   const [isViewTicket, setIsViewTicket] = useState(false);
+  const [isOpenListTicket, setIsOpenListTicket] = useState(false);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleTicketUrls = () => {
-    if (lastTransactions) {
-      const url: string[] = lastTransactions.tickets.map((ticket) => {
-        return ticket.ticketImage;
-      });
-      setTicketsUrl(url);
-    }
+  const closeListTicket = () => {
+    setIsOpenListTicket(false);
   };
 
-  const handleOpenModal = () => {
-    if (lastTransactions) {
-      handleTicketUrls();
-      setIsViewTicket(true);
-    } else {
-      ToastError('Kamu belum memiliki tiket');
-    }
-  };
+  // const handleTicketUrls = () => {
+  //   if (lastTransactions) {
+  //     const url: string[] = lastTransactions.tickets.map((ticket) => {
+  //       return ticket.ticketImage;
+  //     });
+  //     setTicketsUrl(url);
+  //   }
+  // };
 
-  const handleDownloadClick = async () => {
-    setIsDownloading(true); // hide buttons
-    try {
-      await handleFallbackDownload(ticketRef, ticketsUrl, BASE_URL!);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+  // const handleOpenModal = () => {
+  //   if (lastTransactions) {
+  //     handleTicketUrls();
+  //     setIsViewTicket(true);
+  //   } else {
+  //     ToastError('Kamu belum memiliki tiket');
+  //   }
+  // };
+
+  // const handleDownloadClick = async () => {
+  //   setIsDownloading(true); // hide buttons
+  //   try {
+  //     await handleFallbackDownload(ticketRef, ticketsUrl, BASE_URL!);
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     setIsDownloading(false);
+  //   }
+  // };
 
   // Close sidebar when clicking outside
   useEffect(() => {
@@ -168,7 +172,7 @@ export default function MainNavbar() {
                   LOG OUT
                 </button>
                 <button
-                  onClick={handleOpenModal}
+                  onClick={() => setIsOpenListTicket(true)}
                   className="py-2 px-4 text-xs lg:text-sm font-medium bg-bg-primary flex justify-center items-center rounded-sm hover:bg-hover transition-colors cursor-pointer"
                 >
                   TIKET SAYA
@@ -238,7 +242,7 @@ export default function MainNavbar() {
           )}
         </aside>
       </nav>
-      {isViewTicket && (
+      {/* {isViewTicket && (
         <ViewTicketModal
           ref={ticketRef}
           profile={authUser}
@@ -247,6 +251,10 @@ export default function MainNavbar() {
           onDownload={() => handleDownloadClick()}
           isDownloading={isDownloading}
         />
+      )} */}
+
+      {isOpenListTicket && (
+        <TicketListModal closeListTicket={closeListTicket} />
       )}
     </>
   );
