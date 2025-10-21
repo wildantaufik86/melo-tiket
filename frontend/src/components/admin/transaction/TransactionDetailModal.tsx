@@ -1,6 +1,6 @@
 'use client'
 
-import { regenerateTransaction, revertTransaction, updateTransactionStatus, verifyTransaction } from "@/app/api/transcation";
+import { regenerateTransaction, revertTransaction, updatePaymentProof, updateTransactionStatus, verifyTransaction } from "@/app/api/transcation";
 import { useAuth } from "@/context/authUserContext";
 import { ToastError, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 import { ITransaction } from "@/types/Transaction";
@@ -22,6 +22,8 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
     const [isUpdating, setIsUpdating] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<'pending' | 'paid'>(transaction.status as 'pending' | 'paid');
     const [isRegenerating, setIsRegenerating] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [uploadFile, setUploadFile] = useState<File | null>(null);
 
     const authUser = useAuth();
 
@@ -69,29 +71,56 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
       }
     };
 
+    const handleRegenerate = async () => {
+      if (!transaction._id) {
+        ToastError("Transaction ID tidak ditemukan");
+        return;
+      }
 
-  const handleRegenerate = async () => {
-    if (!transaction._id) {
-      ToastError("Transaction ID tidak ditemukan");
+      setIsRegenerating(true);
+      try {
+        const res = await regenerateTransaction(transaction._id);
+        if (res.status === "success") {
+          ToastSuccess("Ticket berhasil di-regenerate!");
+          onSuccessAction(); // refresh data list
+          onClose(); // tutup modal
+        } else {
+          ToastError(res.message);
+        }
+      } catch (err: any) {
+        ToastError(err.message || "Gagal meregenerasi tiket.");
+      } finally {
+        setIsRegenerating(false);
+      }
+    };
+
+    const handleUpdatePaymentProof = async () => {
+    if (!transaction?._id) {
+      ToastError('Transaction ID tidak ditemukan.');
       return;
     }
 
-    setIsRegenerating(true);
-    try {
-      const res = await regenerateTransaction(transaction._id);
-      if (res.status === "success") {
-        ToastSuccess("Ticket berhasil di-regenerate!");
-        onSuccessAction(); // refresh data list
-        onClose(); // tutup modal
-      } else {
-        ToastError(res.message);
-      }
-    } catch (err: any) {
-      ToastError(err.message || "Gagal meregenerasi tiket.");
-    } finally {
-      setIsRegenerating(false);
+    if (!uploadFile) {
+      ToastError('Pilih file terlebih dahulu.');
+      return;
     }
-  };
+      setLoading(true);
+      try {
+        const res = await updatePaymentProof(transaction._id, uploadFile);
+        if (res.status === 'success') {
+          ToastSuccess('Payment proof berhasil diperbarui.');
+          onSuccessAction();
+          onClose();
+        } else {
+          ToastError(res.message);
+        }
+      } catch (err: any) {
+        ToastError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
 
     return (
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center z-50 p-4">
@@ -173,12 +202,41 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
                         </button>
                     </div>
                 )}
-                {(authUser?.authUser?.role === 'superadmin' ||
-                authUser?.authUser?.role === 'admin') && (
-                  <button onClick={handleRegenerate} disabled={isRegenerating}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-400">
-                    {isRegenerating ? "Regenerating..." : "Regenerate Ticket"}
-                  </button>
+                {['admin', 'superadmin'].includes(authUser?.authUser?.role || '') && (
+                  <div className="mt-4 border-t pt-4 flex flex-col md:flex-row items-center gap-3 justify-between">
+                    <div className="flex-1">
+                      <label className="text-sm font-medium block mb-1">
+                        Upload Payment Proof Baru
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) setUploadFile(file);
+                        }}
+                        className="border rounded-md p-2 text-sm w-full"
+                      />
+                    </div>
+
+                    <div className="flex gap-3 mt-5">
+                      <button
+                        onClick={handleUpdatePaymentProof}
+                        disabled={loading || !uploadFile}
+                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                      >
+                        {loading ? 'Uploading...' : 'Update Payment Proof'}
+                      </button>
+
+                      <button
+                        onClick={handleRegenerate}
+                        disabled={isRegenerating}
+                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-400"
+                      >
+                        {isRegenerating ? "Regenerating..." : "Regenerate Ticket"}
+                      </button>
+                    </div>
+                  </div>
                 )}
             </div>
         </div>

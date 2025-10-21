@@ -772,3 +772,44 @@ export const regenerateTransactionHandler: RequestHandler = async (req, res, nex
     session.endSession();
   }
 };
+
+export const updatePaymentProofHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const transactionId = req.params.id;
+    const admin = req.user;
+
+    appAssert(admin, BAD_REQUEST, "Unauthorized access");
+    appAssert(req.file, BAD_REQUEST, "No file uploaded");
+
+    // Cari transaksi
+    const transaction = await TransactionModel.findById(transactionId);
+    appAssert(transaction, NOT_FOUND, "Transaction not found");
+
+    // Hapus file lama kalau ada
+    if (transaction.paymentProof) {
+      const oldFilePath = path.join(
+        process.cwd(),
+        "uploads",
+        "paymentProof",
+        path.basename(transaction.paymentProof)
+      );
+
+      if (fs.existsSync(oldFilePath)) {
+        fs.unlinkSync(oldFilePath);
+      }
+    }
+
+    const baseUrl = getBaseUrl(req);
+    const newFilePath = `${baseUrl}/uploads/paymentProof/${req.file.filename}`;
+
+    transaction.paymentProof = newFilePath;
+    await transaction.save();
+
+    res.status(OK).json({
+      message: "Payment proof updated successfully",
+      paymentProof: newFilePath,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

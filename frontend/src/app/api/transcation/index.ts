@@ -286,3 +286,30 @@ export async function regenerateTransaction(
     return { status: 'error', message: error.message, data: null };
   }
 }
+
+export async function updatePaymentProof(
+  transactionId: string,
+  file: File
+): Promise<{ status: string; message: string; data: ITransaction | null }> {
+  try {
+    const formData = new FormData();
+    formData.append('paymentProof', file);
+
+    const res = await fetchWithToken(`/transaction/${transactionId}/payment-proof`, {
+      method: 'PATCH',
+      body: formData,
+    });
+
+    const responseData = await res.json();
+    if (!res.ok)
+      throw new Error(responseData.message || 'Gagal mengupdate payment proof.');
+
+    return {
+      status: 'success',
+      message: responseData.message,
+      data: responseData.data ?? null,
+    };
+  } catch (error: any) {
+    return { status: 'error', message: error.message, data: null };
+  }
+}
