@@ -35,7 +35,7 @@ export default async function homepage() {
       <div className="relative">
         <HeroSection />
         <TicketSection event={eventData} />
-        <GalerySection />
+        {/* <GalerySection /> */}
         <SponsorSection />
       </div>
     </div>

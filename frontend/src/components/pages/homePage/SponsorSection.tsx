@@ -101,7 +101,7 @@ const medpartData: Sponsor[] = [
 
 export default function SponsorSection() {
   return (
-    <section className="relative pd-full">
+    <section className="relative pd-full mt-50">
       <div className="flex flex-col">
         <div className="flex flex-col gap-8">
           <Label text="SPONSOR" />
