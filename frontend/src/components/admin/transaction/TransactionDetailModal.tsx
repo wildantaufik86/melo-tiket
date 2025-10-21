@@ -1,6 +1,6 @@
 'use client'
 
-import { revertTransaction, updateTransactionStatus, verifyTransaction } from "@/app/api/transcation";
+import { regenerateTransaction, revertTransaction, updateTransactionStatus, verifyTransaction } from "@/app/api/transcation";
 import { useAuth } from "@/context/authUserContext";
 import { ToastError, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 import { ITransaction } from "@/types/Transaction";
@@ -21,6 +21,7 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
     const [isProcessing, setIsProcessing] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [selectedStatus, setSelectedStatus] = useState<'pending' | 'paid'>(transaction.status as 'pending' | 'paid');
+    const [isRegenerating, setIsRegenerating] = useState(false);
 
     const authUser = useAuth();
 
@@ -50,23 +51,47 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
       setIsProcessing(false);
     };
 
-       const handleStatusUpdate = async () => {
-        setIsUpdating(true);
-        try {
-            const result = await updateTransactionStatus(transaction._id!, { status: selectedStatus });
-            if (result.status === 'success') {
-                ToastSuccess(`Transaction status updated to ${selectedStatus}`);
-                onSuccessAction();
-                onClose();
-            } else {
-                ToastError(`Error: ${result.message}`);
-            }
-        } catch (err: any) {
-            ToastError(`Error: ${err.message}`);
-        } finally {
-            setIsUpdating(false);
-        }
+    const handleStatusUpdate = async () => {
+      setIsUpdating(true);
+      try {
+          const result = await updateTransactionStatus(transaction._id!, { status: selectedStatus });
+          if (result.status === 'success') {
+              ToastSuccess(`Transaction status updated to ${selectedStatus}`);
+              onSuccessAction();
+              onClose();
+          } else {
+              ToastError(`Error: ${result.message}`);
+          }
+      } catch (err: any) {
+          ToastError(`Error: ${err.message}`);
+      } finally {
+          setIsUpdating(false);
+      }
     };
+
+
+  const handleRegenerate = async () => {
+    if (!transaction._id) {
+      ToastError("Transaction ID tidak ditemukan");
+      return;
+    }
+
+    setIsRegenerating(true);
+    try {
+      const res = await regenerateTransaction(transaction._id);
+      if (res.status === "success") {
+        ToastSuccess("Ticket berhasil di-regenerate!");
+        onSuccessAction(); // refresh data list
+        onClose(); // tutup modal
+      } else {
+        ToastError(res.message);
+      }
+    } catch (err: any) {
+      ToastError(err.message || "Gagal meregenerasi tiket.");
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
 
     return (
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center z-50 p-4">
@@ -147,6 +172,13 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
                             {isUpdating ? 'Updating...' : 'Update Status'}
                         </button>
                     </div>
+                )}
+                {(authUser?.authUser?.role === 'superadmin' ||
+                authUser?.authUser?.role === 'admin') && (
+                  <button onClick={handleRegenerate} disabled={isRegenerating}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-400">
+                    {isRegenerating ? "Regenerating..." : "Regenerate Ticket"}
+                  </button>
                 )}
             </div>
         </div>

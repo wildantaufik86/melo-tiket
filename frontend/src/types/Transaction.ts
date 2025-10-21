@@ -29,6 +29,7 @@ export interface ITransaction extends Document {
   verifiedAt?: string;
   deletedAt?: string;
   createdAt?: string;
+  updatedAt?: Date;
 }
 
 export interface IPaginationInfo {

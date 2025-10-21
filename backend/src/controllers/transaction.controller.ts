@@ -14,6 +14,10 @@ import appAssert from '../utils/appAssert';
 import AppError from '../utils/appError';
 import { processAndGenerateTicket } from '../services/ticket.service';
 import nodeCron from 'node-cron';
+import { IPurchasedTicket } from '../types/Transaction';
+import fs from "fs";
+import path from "path";
+
 
 const getBaseUrl = (req: Request): string =>
   `${req.protocol}://${req.get('host')}`;
@@ -667,5 +671,104 @@ export const updateTransactionStatusHandler: RequestHandler = async (req: any, r
     });
   } catch (err) {
     next(err);
+  }
+};
+
+export const regenerateTransactionHandler: RequestHandler = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const initiator = req.user;
+    appAssert(initiator, FORBIDDEN, "Authentication failed, user not found.");
+
+    // Hanya admin/superadmin yang boleh regenerate tiket
+    if (initiator.role !== "superadmin" && initiator.role !== "admin") {
+      throw new AppError(FORBIDDEN, "Only admin or superadmin can regenerate tickets.");
+    }
+
+    const { transactionId } = req.params;
+    appAssert(transactionId, BAD_REQUEST, "Transaction ID is required.");
+
+    const transaction = await TransactionModel.findById(transactionId).session(session);
+    appAssert(transaction, NOT_FOUND, "Transaction not found.");
+
+    const ticketIds = transaction.tickets.map((t) => t.ticketId);
+    const ticketsFromDb = await TicketModel.find({ _id: { $in: ticketIds } })
+      .populate({ path: "eventId", select: "eventName date" })
+      .session(session);
+
+    if (ticketsFromDb.length < ticketIds.length) {
+      console.warn(`⚠️ Some ticket types not found in TicketModel for ${transactionId}.`);
+    }
+
+    const regeneratedTickets: IPurchasedTicket[] = [];
+
+    for (const oldTicket of transaction.tickets) {
+      const ticketDoc = ticketsFromDb.find(
+        (t) => t._id.toString() === oldTicket.ticketId.toString()
+      );
+      if (!ticketDoc) {
+        console.warn(`⚠️ Ticket ${oldTicket.ticketId} not found. Skipped.`);
+        continue;
+      }
+
+      // --- Cek apakah file tiket lama masih ada ---
+      const ticketPath = path.join(
+        process.cwd(),
+        "uploads/tickets",
+        path.basename(oldTicket.ticketImage || "")
+      );
+
+      const fileExists = oldTicket.ticketImage && fs.existsSync(ticketPath);
+
+      if (!fileExists) {
+        console.log(`🛠 Regenerating missing ticket image for ${oldTicket.ticketId}...`);
+        const newTicketData = await processAndGenerateTicket(ticketDoc);
+
+        regeneratedTickets.push({
+          _id: new mongoose.Types.ObjectId(),
+          ticketId: ticketDoc._id,
+          qrCode: newTicketData.qrCode,
+          ticketImage: newTicketData.ticketImage,
+          isScanned: false,
+          quantity: oldTicket.quantity ?? 1,
+          price: oldTicket.price ?? ticketDoc.price,
+        });
+      } else {
+        // Kalau file masih ada, pakai data lama
+        regeneratedTickets.push(oldTicket);
+      }
+    }
+
+    appAssert(
+      regeneratedTickets.length > 0,
+      NOT_FOUND,
+      "No valid tickets found to regenerate."
+    );
+
+    transaction.tickets = regeneratedTickets;
+    transaction.updatedAt = new Date();
+
+    await transaction.save({ session });
+
+    await UserModel.findByIdAndUpdate(
+      transaction.userId,
+      { $addToSet: { historyTransaction: transaction._id } },
+      { session }
+    );
+
+    await session.commitTransaction();
+
+    res.status(OK).json({
+      message: "Tickets regenerated successfully (missing files recreated).",
+      transactionId: transaction._id,
+      regeneratedTickets: regeneratedTickets.length,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    next(error);
+  } finally {
+    session.endSession();
   }
 };

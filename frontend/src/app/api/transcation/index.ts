@@ -264,3 +264,25 @@ export async function updateTransactionStatus(
     return { status: 'error', message: error.message, data: null };
   }
 }
+
+export async function regenerateTransaction(
+  transactionId: string
+): Promise<{ status: string; message: string; data: ITransaction | null }> {
+  try {
+    const res = await fetchWithToken(`/transaction/${transactionId}/regenerate`, {
+      method: 'POST', // sesuai backend endpoint
+    });
+
+    const responseData = await res.json();
+    if (!res.ok)
+      throw new Error(responseData.message || 'Gagal meregenerasi tiket.');
+
+    return {
+      status: 'success',
+      message: responseData.message,
+      data: responseData.data ?? null,
+    };
+  } catch (error: any) {
+    return { status: 'error', message: error.message, data: null };
+  }
+}

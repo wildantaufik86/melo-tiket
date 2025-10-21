@@ -23,4 +23,5 @@ export interface ITransaction extends Document {
   verifiedBy?: mongoose.Types.ObjectId | string;
   verifiedAt?: Date;
   deletedAt?: Date;
+  updatedAt?: Date;
 }
