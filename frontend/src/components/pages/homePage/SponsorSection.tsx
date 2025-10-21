@@ -106,9 +106,97 @@ export default function SponsorSection() {
         <div className="flex flex-col gap-8">
           <Label text="SPONSOR" />
           <div className="grid grid-cols-1 gap-4 place-items-center mt-8">
-            <div className="flex justify-center items-center w-full max-w-[200px] lg:max-w-[300px]">
+            <div className="flex justify-center items-center w-full">
               <Image
-                src={'/images/bca-syariah.png'}
+                src={'/images/sponsorship-logo/sponsorship-bca-syariah.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+            </div>
+            <div className="w-full grid grid-cols-3 gap-5 place-items-center">
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-sadz.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-yup.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-bge.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+            </div>
+            <div className="w-full grid grid-cols-2 gap-1 place-items-center px-10">
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-cleo.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-im3.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+            </div>
+            <div className="w-full grid grid-cols-2 gap-1 place-items-center">
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-veory.webp'}
+                alt="bca-syariah-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+              <Image
+                src={'/images/sponsorship-logo/partnership-lumoa.webp'}
                 alt="bca-syariah-logo"
                 width={300}
                 height={400}
