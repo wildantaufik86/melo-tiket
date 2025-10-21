@@ -113,7 +113,7 @@ export default function SponsorSection() {
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out max-w-3xl"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
@@ -127,7 +127,7 @@ export default function SponsorSection() {
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
@@ -139,7 +139,8 @@ export default function SponsorSection() {
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
                 quality={75}
@@ -150,7 +151,8 @@ export default function SponsorSection() {
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
                 quality={75}
@@ -163,7 +165,7 @@ export default function SponsorSection() {
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
@@ -175,7 +177,7 @@ export default function SponsorSection() {
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
