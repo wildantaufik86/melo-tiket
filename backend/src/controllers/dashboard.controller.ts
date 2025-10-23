@@ -42,7 +42,13 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
     const totalRevenue = revenueAgg.length > 0 ? revenueAgg[0].totalRevenue : 0;
 
     const expectedRevenueAgg = await TransactionModel.aggregate([
-      { $match: { deletedAt: null, isComplimentary: { $ne: true } } },
+      { $match:
+        {
+        status: { $in: ["paid", "pending"] },
+        deletedAt: null,
+        isComplimentary: { $ne: true }
+        }
+      },
       { $group: { _id: null, expectedTotalRevenue: { $sum: "$totalPrice" } } },
     ]);
     const expectedTotalRevenue = expectedRevenueAgg.length > 0 ? expectedRevenueAgg[0].expectedTotalRevenue : 0;
