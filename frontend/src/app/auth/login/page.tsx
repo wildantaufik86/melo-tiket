@@ -49,12 +49,10 @@ export default function LoginPage() {
           return;
         }
 
-        // 4. Tampilkan pesan sukses
         ToastSuccess('Login successful!');
 
-        // 5. Redirect berdasarkan role
         const { role } = result.data.user;
-        if (role === 'admin' || role === 'superadmin') {
+        if ( role === 'operator' || role === 'admin' || role === 'superadmin') {
           router.replace('/admin');
         } else {
           router.replace('/');
