@@ -73,7 +73,7 @@ export default function AdminSidebar() {
           </button> */}
 
           {/* Sidebar Header with Logo and Title */}
-          <div className="flex items-center justify-between space-x-4 bg-gray-50 border rounded-lg border-black/10 mb-3">
+          {/* <div className="flex items-center justify-between space-x-4 bg-gray-50 border rounded-lg border-black/10 mb-3">
             <Link href={'/admin'} className="">
               <div className="p-2 space-x-1 h-full rounded-lg">
                 <img
@@ -83,7 +83,7 @@ export default function AdminSidebar() {
                 />
               </div>
             </Link>
-          </div>
+          </div> */}
 
           {/* Profile Section */}
           <div className="flex items-center px-4 space-x-4 bg-gray-50 border rounded-lg border-black/10">
