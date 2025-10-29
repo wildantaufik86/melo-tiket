@@ -174,11 +174,48 @@ export const getDashboardSummaryHandler: RequestHandler = async (req, res, next)
       }
     ]);
 
+    const transactionPerCategoryTotal = await TransactionModel.aggregate([
+      { $match:
+        {
+        status: { $in: ["paid", "pending"] },
+        deletedAt: null,
+        isComplimentary: { $ne: true }
+        }
+      },
+      { $unwind: "$tickets" },
+      {
+        $lookup: {
+          from: "tickets",
+          localField: "tickets.ticketId",
+          foreignField: "_id",
+          as: "ticketInfo"
+        }
+      },
+      { $unwind: { path: "$ticketInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "ticketInfo.category",
+          foreignField: "_id",
+          as: "categoryInfo"
+        }
+      },
+      { $unwind: { path: "$categoryInfo", preserveNullAndEmptyArrays: true } },
+      {
+        $group: {
+          _id: "$ticketInfo.category",
+          categoryName: { $first: "$categoryInfo.name" },
+          totalAmount: { $sum: "$ticketInfo.price" },
+          totalTransactions: { $sum: 1 }
+        }
+      }
+    ]);
+
     const totalStock = stockPerCategory.reduce((sum, category) => sum + category.totalStock, 0);
     const totalSold = soldPerCategory.reduce((sum, category) => sum + category.totalSold, 0);
     const totalSoldRevenue = soldPerCategory.reduce((sum, category) => sum + category.totalRevenue, 0);
     const totalTransactionAmount = transactionPerCategory.reduce((sum, category) => sum + category.totalAmount, 0);
-    const totalCategoryTransactions = transactionPerCategory.reduce((sum, category) => sum + category.totalTransactions, 0);
+    const totalCategoryTransactions = transactionPerCategoryTotal.reduce((sum, category) => sum + category.totalTransactions, 0);
 
     res.status(OK).json({
       message: "Dashboard summary retrieved successfully",
