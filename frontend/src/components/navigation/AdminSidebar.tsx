@@ -1,28 +1,19 @@
 'use client';
 
+import Link from 'next/link';
+import { useState } from 'react';
 import { logout } from '@/app/actions/auth';
 import { useAuth } from '@/context/authUserContext';
-import {
-  CallBellIcon,
-  ChalkboardTeacher,
-  Folders,
-  Gauge,
-  House,
-  HouseIcon,
-  TicketIcon,
-  UserIcon,
-  VideoConferenceIcon,
-} from '@phosphor-icons/react/dist/ssr';
-import { ChevronDown, ChevronUp, LogOut, Menu, X } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { ChevronDown, ChevronUp, LogOut, Menu} from 'lucide-react';
+import { GaugeIcon, QrCodeIcon, TicketIcon, UserIcon } from '@phosphor-icons/react/dist/ssr';
 
 export default function AdminSidebar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [productsManagementOpen, setProductManagementOpen] = useState(false);
   const [eventsManagementOpen, setEventManagementOpen] = useState(false);
   const [transactionOpen, setTransactionOpen] = useState(false);
+  const [qrOpen, setQrOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const authUser = useAuth();
@@ -115,7 +106,7 @@ export default function AdminSidebar() {
                     hover:bg-[#EFF6FF] hover:text-black/75`}
                 >
                   <div className="flex items-center">
-                    <Gauge
+                    <GaugeIcon
                       size={24}
                       className="text-black/75 mr-2"
                       weight="light"
@@ -269,6 +260,62 @@ export default function AdminSidebar() {
                   </div>
                 </Link>
               </li>
+            )}
+
+            {authUser?.authUser?.role === 'superadmin' && (
+              <>
+              <li onClick={() => setQrOpen(!qrOpen)} className="text-sm font-semibold py-2 px-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75 cursor-pointer flex items-center justify-between">
+                <div className="flex items-center">
+                  <QrCodeIcon
+                    size={24}
+                    className="text-black/75 mr-2"
+                    weight="light"
+                  />
+                  <span>QR Managements</span>
+                </div>
+                <span className="duration-200">
+                  {qrOpen ? <ChevronUp /> : <ChevronDown />}
+                </span>
+              </li>
+              <div className={`flex flex-col gap-2 px-4 overflow-hidden transition-[max-height] duration-300 ease-in-out ${qrOpen ? 'max-h-96' : 'max-h-0'}`}>
+                <Link href={'/admin/qr-management/create'} className={`${
+                    pathname.startsWith('/admin/qr-management/create')
+                      ? 'bg-gray-100'
+                      : 'bg-white'} block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}>
+                  Create QR
+                </Link>
+                <Link
+                  href={''}
+                  className={`${
+                    pathname.startsWith('/admin/transaction/new')
+                      ? 'bg-gray-100'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Verify E-Ticket
+                </Link>
+                <Link
+                  href={'/admin/qr-management/verify-bracelet'}
+                  className={`${
+                    pathname.startsWith('/admin/qr-management/verify-bracelet')
+                      ? 'bg-gray-100'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Verify Bracelet
+                </Link>
+                <Link
+                  href={''}
+                  className={`${
+                    pathname.startsWith('/admin/transaction/new')
+                      ? 'bg-gray-100'
+                      : 'bg-white'
+                  } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}
+                >
+                  Log Scanned
+                </Link>
+              </div>
+              </>
             )}
 
             {/* <li>

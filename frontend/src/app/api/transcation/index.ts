@@ -32,6 +32,12 @@ export interface IExportedTransaction {
   'Tanggal Pembelian': string;
 }
 
+export interface IVerifyWristbandResponse {
+  uniqueId: string;
+  scannedAt: string;
+  operatorName: string;
+}
+
 export async function fetchWithToken(
   url: string,
   options?: RequestInit
@@ -311,5 +317,54 @@ export async function updatePaymentProof(
     };
   } catch (error: any) {
     return { status: 'error', message: error.message, data: null };
+  }
+}
+
+export async function generateQrCodes(quantity: number): Promise<Response> {
+  try {
+    const res = await fetchWithToken('/transaction/qr/generate', {
+      method: 'POST',
+      body: JSON.stringify({ quantity }),
+    });
+
+    if (!res.ok) {
+      const responseData = await res.json();
+      throw new Error(responseData.message || 'Gagal generate QR code.');
+    }
+
+    return res;
+  } catch (error: any) {
+    throw new Error(error.message || 'Terjadi kesalahan tidak diketahui.');
+  }
+}
+
+export async function verifyWristbandQr(qrContent: string): Promise<{
+  status: 'success' | 'error';
+  message: string;
+  data: IVerifyWristbandResponse | null;
+}> {
+  try {
+    const res = await fetchWithToken('/transaction/qr/verify-wristband', {
+      method: 'POST',
+      body: JSON.stringify({ qrContent }),
+    });
+
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      throw new Error(responseData.message || 'Gagal memverifikasi QR code.');
+    }
+
+    return {
+      status: 'success',
+      message: responseData.message,
+      data: responseData.data,
+    };
+  } catch (error: any) {
+    return {
+      status: 'error',
+      message: error.message || 'Terjadi kesalahan tidak diketahui.',
+      data: null,
+    };
   }
 }
