@@ -73,6 +73,7 @@ const authenticate: RequestHandler = async (req, res, next) => {
     req.user = {
       _id: userFromDb._id as mongoose.Types.ObjectId,
       role: userFromDb.role!,
+      name: userFromDb.name!,
       email: userFromDb.email
     };
 

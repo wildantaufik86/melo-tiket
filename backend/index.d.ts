@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 interface UserPayload {
   _id: mongoose.Types.ObjectId | string;
   email: string;
+  name: string;
   role: 'user' | 'operator' | 'admin' | 'superadmin';
 }
 

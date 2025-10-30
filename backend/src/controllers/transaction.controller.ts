@@ -7,6 +7,7 @@ import {
   BAD_REQUEST,
   CREATED,
   FORBIDDEN,
+  INTERNAL_SERVER_ERROR,
   NOT_FOUND,
   OK,
 } from '../constants/http';
@@ -17,7 +18,10 @@ import nodeCron from 'node-cron';
 import { IPurchasedTicket } from '../types/Transaction';
 import fs from "fs";
 import path from "path";
-
+import * as qrcode from 'qrcode';
+import JSZip from 'jszip';
+import crypto from 'crypto';
+import BraceletModel from '../models/BraceletModel';
 
 const getBaseUrl = (req: Request): string =>
   `${req.protocol}://${req.get('host')}`;
@@ -809,6 +813,178 @@ export const updatePaymentProofHandler: RequestHandler = async (req, res, next) 
       message: "Payment proof updated successfully",
       paymentProof: newFilePath,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const generateQrCodeHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { quantity } = req.body;
+    const numQuantity = parseInt(quantity, 10);
+
+    // 1. Validasi Input
+    appAssert(
+      !isNaN(numQuantity) && numQuantity > 0,
+      BAD_REQUEST,
+      'Quantity must be a positive number.'
+    );
+
+    // Set batas wajar untuk mencegah server abuse
+    appAssert(
+      numQuantity <= 1000, // Anda bisa sesuaikan batas ini
+      BAD_REQUEST,
+      'Cannot generate more than 1000 QR codes at a time.'
+    );
+
+    const qrSecret = process.env.QR_SECRET;
+    appAssert(
+      qrSecret,
+      INTERNAL_SERVER_ERROR,
+      'QR_SECRET is not configured on the server.'
+    );
+
+    // 2. Inisialisasi ZIP di memori
+    const zip = new JSZip();
+
+    // 3. Loop dan Generate QR
+    for (let i = 0; i < numQuantity; i++) {
+      // 3a. Buat Identifier Unik & Tak Teriru (HMAC)
+      // Tambahkan 'i' untuk memastikan keunikan jika loop berjalan sangat cepat
+      const payload = `${Date.now()}${i}`;
+
+      const signature = crypto
+        .createHmac('sha256', qrSecret)
+        .update(payload)
+        .digest('hex');
+
+      const uniqueId = `${payload}.${signature}`;
+      const qrContent = `melofestvol2-11/29/2025-${uniqueId}`;
+
+      // 3b. Generate QR Code sebagai Buffer (di memori)
+      const qrBuffer = await qrcode.toBuffer(qrContent, {
+        errorCorrectionLevel: 'M', // 'M' adalah level koreksi error medium
+        margin: 2,
+        width: 300,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF',
+        },
+      });
+
+      // 3c. Masukkan buffer QR ke dalam ZIP (di memori)
+      zip.file(`qrcode-${uniqueId}.png`, qrBuffer, { binary: true });
+    }
+
+    // 4. Generate file ZIP sebagai Buffer (di memori)
+    const zipBuffer = await zip.generateAsync({
+      type: 'nodebuffer',
+      compression: 'DEFLATE',
+      compressionOptions: {
+        level: 9, // Kompresi maksimum
+      },
+    });
+
+    // 5. Kirim ZIP ke Klien
+    const fileName = `melofestvol2-qrcodes-${Date.now()}.zip`;
+
+    // Set header agar browser tahu ini adalah file download
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+
+    // Kirim buffer
+    res.status(200).send(zipBuffer);
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyWristbandQrHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { qrContent } = req.body;
+    const operator = req.user;
+
+    appAssert(qrContent, BAD_REQUEST, 'QR content is required.');
+    appAssert(operator, FORBIDDEN, 'Operator not authenticated.');
+
+    const qrSecret = process.env.QR_SECRET;
+    appAssert(
+      qrSecret,
+      INTERNAL_SERVER_ERROR,
+      'QR_SECRET is not configured on the server.'
+    );
+
+    // 1. Parse QR Content
+    const prefix = 'melofestvol2-11/29/2025-';
+    appAssert(
+      qrContent.startsWith(prefix),
+      BAD_REQUEST,
+      'Invalid QR code format. Not a valid wristband.'
+    );
+
+    const uniqueId = qrContent.substring(prefix.length);
+    const idParts = uniqueId.split('.');
+    appAssert(
+      idParts.length === 2,
+      BAD_REQUEST,
+      'Invalid QR signature format.'
+    );
+
+    const [payload, signatureFromQR] = idParts;
+
+    // 2. Verifikasi Keaslian (HMAC Check)
+    const expectedSignature = crypto
+      .createHmac('sha256', qrSecret)
+      .update(payload)
+      .digest('hex');
+
+    const isAuthentic = crypto.timingSafeEqual(
+      Buffer.from(signatureFromQR, 'hex'),
+      Buffer.from(expectedSignature, 'hex')
+    );
+
+    appAssert(
+      isAuthentic,
+      BAD_REQUEST,
+      'Invalid QR. Cek keaslian gagal ❌. Indikasi QR palsu ⚠️.'
+    );
+
+    // 3. Verifikasi Penggunaan (Database Check)
+    // QR terbukti ASLI. Sekarang cek apakah sudah pernah dipakai.
+    try {
+      const newScan = new BraceletModel({
+        uniqueId: uniqueId,
+        operatorId: operator._id,
+        eventName: 'melofestvol2',
+      });
+      await newScan.save();
+
+      res.status(OK).json({
+        status: 'success',
+        message: 'QR Code Valid. Akses Masuk Event diberikan.',
+        data: {
+          uniqueId: uniqueId,
+          scannedAt: newScan.scannedAt,
+          operatorName: operator.name,
+        },
+      });
+
+    } catch (error: any) {
+      if (error.code === 11000) {
+        const existingScan = await BraceletModel.findOne({ uniqueId: uniqueId })
+          .populate('operatorId', 'name');
+
+        const operatorName = (existingScan?.operatorId as any)?.name || 'Unknown';
+
+        throw new AppError(
+          BAD_REQUEST,
+          `Gelang SUDAH DIGUNAKAN pada ${existingScan?.scannedAt.toLocaleString('id-ID')} oleh ${operatorName}.`
+        );
+      }
+      throw error;
+    }
+
   } catch (error) {
     next(error);
   }
