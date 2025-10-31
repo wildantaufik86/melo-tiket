@@ -101,6 +101,7 @@ export default function AdminUserDisplay() {
                 'Nama': user.name,
                 'Email': user.email,
                 'No. KTP': user.idNumber,
+                'No. Hp': user.profile?.phoneNumber || '',
                 'Role': user.role,
                 'Tanggal Bergabung': new Date(user.createdAt!).toLocaleDateString('id-ID'),
             }));
