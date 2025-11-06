@@ -123,11 +123,11 @@ export default function SponsorSection() {
             <div className="w-full grid grid-cols-3 gap-5 place-items-center">
               <Image
                 src={'/images/sponsorship-logo/sponsorship-sadz.webp'}
-                alt="bca-syariah-logo"
+                alt="sadz-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] xl:max-w-[250px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
@@ -135,11 +135,11 @@ export default function SponsorSection() {
               />
               <Image
                 src={'/images/sponsorship-logo/sponsorship-yup.webp'}
-                alt="bca-syariah-logo"
+                alt="yup-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] xl:max-w-[250px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
@@ -147,25 +147,25 @@ export default function SponsorSection() {
               />
               <Image
                 src={'/images/sponsorship-logo/sponsorship-bge.webp'}
-                alt="bca-syariah-logo"
+                alt="bge-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] xl:max-w-[250px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
                 quality={75}
               />
             </div>
-            <div className="w-full grid grid-cols-2 gap-1 place-items-center px-10">
+            <div className="w-full grid grid-cols-3 gap-1 place-items-center px-5">
               <Image
                 src={'/images/sponsorship-logo/sponsorship-cleo.webp'}
-                alt="bca-syariah-logo"
+                alt="sponsorship-cleo-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] xl:max-w-[250px]"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
@@ -173,21 +173,33 @@ export default function SponsorSection() {
               />
               <Image
                 src={'/images/sponsorship-logo/sponsorship-im3.webp'}
-                alt="bca-syariah-logo"
+                alt="sponsorship-im3-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
-                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] lg:max-w-[300px]"
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out md:max-w-[200px] xl:max-w-[250px]"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-veory.webp'}
+                alt="sponsorship-veory-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
                 quality={75}
               />
             </div>
-            <div className="w-full grid grid-cols-2 gap-1 place-items-center">
+            <div className="w-full grid grid-cols-3 gap-1 place-items-center px-10">
               <Image
-                src={'/images/sponsorship-logo/sponsorship-veory.webp'}
-                alt="bca-syariah-logo"
+                src={'/images/sponsorship-logo/sponsorship-rental-mobil.webp'}
+                alt="rental-mobil-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
@@ -198,12 +210,43 @@ export default function SponsorSection() {
                 quality={75}
               />
               <Image
-                src={'/images/sponsorship-logo/partnership-lumoa.webp'}
-                alt="bca-syariah-logo"
+                src={'/images/sponsorship-logo/sponsorship-capella-honda.webp'}
+                alt="capella-honda-logo"
                 width={300}
                 height={400}
                 style={{ width: '100%', height: 'auto' }}
                 className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+              <Image
+                src={'/images/sponsorship-logo/sponsorship-tehbotol.webp'}
+                alt="tehbotol-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out"
+                sizes="(max-width: 768px) 50vw, 200px"
+                loading="lazy"
+                priority={false}
+                quality={75}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-8">
+          <Label text="PARTNERSHIP" />
+          <div className="grid grid-cols-1 gap-4 place-items-center mt-8">
+            <div className="flex justify-center items-center w-full">
+              <Image
+                src={'/images/sponsorship-logo/partnership-lumoa.webp'}
+                alt="lumoa-logo"
+                width={300}
+                height={400}
+                style={{ width: '100%', height: 'auto' }}
+                className="object-contain p-2 hover:scale-110 duration-500 ease-in-out max-w-3xl"
                 sizes="(max-width: 768px) 50vw, 200px"
                 loading="lazy"
                 priority={false}
