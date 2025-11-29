@@ -18,7 +18,7 @@ export interface IVerifyTransactionPayload {
 }
 
 export interface IUpdateTransactionStatusPayload {
-  status: 'pending' | 'paid';
+  status: 'refund' | 'pending' | 'paid';
 }
 
 export interface IExportedTransaction {
@@ -36,6 +36,17 @@ export interface IVerifyWristbandResponse {
   uniqueId: string;
   scannedAt: string;
   operatorName: string;
+}
+
+export interface IVerifyETicketResponse {
+  ticketId: string;
+  scannedAt: string;
+  operatorName: string;
+  user: {
+    fullname: string;
+    idNumber: string | number;
+    gender: 'male' | 'female' | string;
+  };
 }
 
 export async function fetchWithToken(
@@ -338,11 +349,7 @@ export async function generateQrCodes(quantity: number): Promise<Response> {
   }
 }
 
-export async function verifyWristbandQr(qrContent: string): Promise<{
-  status: 'success' | 'error';
-  message: string;
-  data: IVerifyWristbandResponse | null;
-}> {
+export async function verifyWristbandQr(qrContent: string): Promise<{ status: 'success' | 'error'; message: string; data: IVerifyWristbandResponse | null; }> {
   try {
     const res = await fetchWithToken('/transaction/qr/verify-wristband', {
       method: 'POST',
@@ -365,6 +372,83 @@ export async function verifyWristbandQr(qrContent: string): Promise<{
       status: 'error',
       message: error.message || 'Terjadi kesalahan tidak diketahui.',
       data: null,
+    };
+  }
+}
+
+export async function revertWristbandScan(uniqueId: string): Promise<{ status: 'success' | 'error'; message: string; }> {
+  try {
+    const res = await fetchWithToken('/transaction/qr/reverse-wristband', {
+      method: 'POST',
+      body: JSON.stringify({ uniqueId }),
+    });
+
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      throw new Error(responseData.message || 'Gagal membatalkan scan gelang.');
+    }
+
+    return {
+      status: 'success',
+      message: responseData.message,
+    };
+  } catch (error: any) {
+    return {
+      status: 'error',
+      message: error.message,
+    };
+  }
+}
+
+export async function verifyETicket(qrContent: string): Promise<{ status: 'success' | 'error'; message: string; data: IVerifyETicketResponse | null; }> {
+  try {
+    const res = await fetchWithToken('/transaction/qr/verify-eticket', {
+      method: 'POST',
+      body: JSON.stringify({ qrContent }),
+    });
+
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      throw new Error(responseData.message || 'Gagal memverifikasi E-Tiket.');
+    }
+
+    return {
+      status: 'success',
+      message: responseData.message,
+      data: responseData.data,
+    };
+  } catch (error: any) {
+    return {
+      status: 'error',
+      message: error.message || 'Terjadi kesalahan tidak diketahui.',
+      data: null,
+    };
+  }
+}
+
+export async function revertETicketScan(ticketId: string): Promise<{ status: 'success' | 'error'; message: string;}> {
+  try {
+    const res = await fetchWithToken('/transaction/qr/reverse-eticket', {
+      method: 'POST',
+      body: JSON.stringify({ ticketId }),
+    });
+
+    const responseData = await res.json();
+
+    if (!res.ok) {
+      throw new Error(responseData.message || 'Gagal membatalkan scan tiket.');
+    }
+
+    return {
+      status: 'success',
+      message: responseData.message,
+    };
+  } catch (error: any) {
+    return {
+      status: 'error',
+      message: error.message,
     };
   }
 }

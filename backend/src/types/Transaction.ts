@@ -8,6 +8,8 @@ export interface IPurchasedTicket {
   isScanned: boolean;
   quantity?: number;
   price?: number;
+  scannedBy?: mongoose.Types.ObjectId | string;
+  scannedAt?: Date;
 }
 
 export interface ITransaction extends Document {
@@ -15,7 +17,7 @@ export interface ITransaction extends Document {
   tickets: IPurchasedTicket[];
   totalTicket: number;
   totalPrice: number;
-  status: "expired" | "reject" | "pending" | "paid";
+  status: "refund" | "expired" | "reject" | "pending" | "paid";
   transactionMethod: "Online" | "Onsite";
   isComplimentary?: boolean,
   expiredAt: Date;

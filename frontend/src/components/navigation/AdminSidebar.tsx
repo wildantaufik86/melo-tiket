@@ -285,9 +285,9 @@ export default function AdminSidebar() {
                   Create QR
                 </Link>
                 <Link
-                  href={''}
+                  href={'/admin/qr-management/verify-eticket'}
                   className={`${
-                    pathname.startsWith('/admin/transaction/new')
+                    pathname.startsWith('/admin/qr-management/verify-eticket')
                       ? 'bg-gray-100'
                       : 'bg-white'
                   } block text-sm font-semibold py-2 px-4 ml-4 rounded text-primary hover:bg-[#EFF6FF] hover:text-black/75`}

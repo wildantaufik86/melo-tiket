@@ -1,6 +1,7 @@
 'use client'
 
 import { ITransaction } from "@/types/Transaction";
+import { getStatusClass } from "@/utils/statusHelper";
 import { EyeIcon } from "@phosphor-icons/react";
 
 interface TransactionListProps {
@@ -15,6 +16,7 @@ const getStatusBadge = (status: ITransaction['status']) => {
         pending: 'bg-yellow-100 text-yellow-800',
         paid: 'bg-green-100 text-green-800',
         reject: 'bg-red-100 text-red-800',
+        refund: 'bg-gray-200 text-red-800',
         expired: 'bg-gray-100 text-gray-800',
     };
     return styles[status] || styles.expired;
@@ -47,7 +49,7 @@ export default function TransactionList({ transactions, onViewDetails }: Transac
                             <td className="py-3 px-4">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(trx.totalPrice)}</td>
                             <td className="py-3 px-4">{formatDate(trx.createdAt)}</td>
                             <td className="py-3 px-4 text-center">
-                                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusBadge(trx.status)}`}>
+                                <span className={`${getStatusClass(trx.status)} text-sm`}>
                                     {trx.status}
                                 </span>
                             </td>

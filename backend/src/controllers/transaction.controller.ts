@@ -586,7 +586,6 @@ export const exportAllTransactionsHandler: RequestHandler = async (req, res, nex
   }
 };
 
-
 export const revertTransactionStatusHandler: RequestHandler = async (req: any, res, next) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -642,6 +641,55 @@ export const revertTransactionStatusHandler: RequestHandler = async (req: any, r
   }
 };
 
+export const refundTransactionStatusHandler: RequestHandler = async (req: any, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { transactionId } = req.params;
+    const superAdminId = req.user?._id; // dari JWT
+
+    const transaction = await TransactionModel.findById(transactionId).session(session);
+    appAssert(transaction, 404, "Transaksi tidak ditemukan");
+
+    if (!["paid", "pending"].includes(transaction.status)) {
+      throw new Error(`Transaksi dengan status ${transaction.status} tidak bisa di-revert`);
+    }
+
+    for (const item of transaction.tickets) {
+      const ticket = await TicketModel.findById(item.ticketId).session(session);
+      if (!ticket) throw new Error(`Tiket tidak ditemukan`);
+      if (ticket.stock < 1) {
+        throw new Error(`Stok tiket habis, tidak bisa refund`);
+      }
+    }
+
+    for (const item of transaction.tickets) {
+      await TicketModel.findByIdAndUpdate(
+        item.ticketId,
+        { $inc: { stock: -1 } },
+        { session }
+      );
+    }
+
+    transaction.status = "refund";
+
+    await transaction.save({ session });
+
+    await session.commitTransaction();
+    res.status(200).json({
+      success: true,
+      message: "Transaksi berhasil di proses ke status REFUND",
+      data: transaction,
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    next(err);
+  } finally {
+    session.endSession();
+  }
+};
+
 export const updateTransactionStatusHandler: RequestHandler = async (req: any, res, next) => {
   try {
     const { transactionId } = req.params;
@@ -649,7 +697,7 @@ export const updateTransactionStatusHandler: RequestHandler = async (req: any, r
     const superAdminId = req.user?._id;
 
     // validasi status
-    if (!["paid", "pending"].includes(status)) {
+    if (!["refund", "paid", "pending"].includes(status)) {
       throw new AppError(400, "Status hanya boleh 'paid' atau 'pending'");
     }
 
@@ -984,6 +1032,178 @@ export const verifyWristbandQrHandler: RequestHandler = async (req, res, next) =
       }
       throw error;
     }
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const revertWristbandScanHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { uniqueId } = req.body;
+    const adminUser = req.user;
+
+    appAssert(uniqueId, BAD_REQUEST, 'uniqueId gelang diperlukan.');
+
+    appAssert(
+      adminUser && adminUser.role === 'superadmin',
+      FORBIDDEN,
+      'AKSES DITOLAK. Hanya Superadmin yang dapat membatalkan scan gelang.'
+    );
+
+    const deletedScan = await BraceletModel.findOneAndDelete({
+      uniqueId: uniqueId
+    });
+
+    appAssert(
+      deletedScan,
+      NOT_FOUND,
+      `Scan untuk gelang dengan ID ${uniqueId} tidak ditemukan. Gelang ini mungkin memang belum pernah discan.`
+    );
+
+    res.status(OK).json({
+      status: 'success',
+      message: `Status scan untuk gelang ${uniqueId} berhasil dibatalkan (dihapus). Gelang ini sekarang bisa discan ulang.`,
+      data: {
+        deletedScanId: deletedScan._id,
+        uniqueId: deletedScan.uniqueId,
+        scannedAt: deletedScan.scannedAt,
+      },
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyETicketHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { qrContent } = req.body;
+    const operator = req.user;
+
+    appAssert(qrContent, BAD_REQUEST, 'Konten QR (ID Tiket) diperlukan.');
+    appAssert(operator, FORBIDDEN, 'Operator tidak terautentikasi.');
+
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(qrContent);
+    appAssert(
+      isValidObjectId,
+      BAD_REQUEST,
+      'Format QR Code tidak valid. Bukan ID Tiket yang sah.'
+    );
+
+    const ticketId = qrContent;
+
+    const transaction = await TransactionModel.findOne({
+      'tickets._id': ticketId,
+    }).populate('tickets.scannedBy', 'name')
+    .populate(
+      'userId',
+      'idNumber profile.fullname profile.gender'
+    );
+
+    appAssert(
+      transaction,
+      NOT_FOUND,
+      'Tiket tidak valid atau tidak ditemukan di database.'
+    );
+
+    appAssert(
+      transaction.status === 'paid',
+      BAD_REQUEST,
+      'Status transaksi tiket ini belum lunas (pending/expired/reject).'
+    );
+
+    const ticket = transaction.tickets.find(
+      (t) => t._id.toString() === ticketId
+    );
+
+    appAssert(
+      ticket,
+      INTERNAL_SERVER_ERROR,
+      'Gagal menemukan data sub-tiket. Hubungi admin.'
+    );
+
+    if (ticket.isScanned) {
+      const operatorName =
+        (ticket.scannedBy as any)?.name || 'Operator Tidak Dikenal';
+      const scannedTime = ticket.scannedAt
+        ? ticket.scannedAt.toLocaleString('id-ID', {
+            timeZone: 'Asia/Jakarta',
+          })
+        : 'waktu tidak tercatat';
+
+      throw new AppError(
+        BAD_REQUEST,
+        `PERINGATAN: Tiket SUDAH DIGUNAKAN pada ${scannedTime} oleh ${operatorName}.`
+      );
+    }
+
+    ticket.isScanned = true;
+    ticket.scannedBy = operator._id;
+    ticket.scannedAt = new Date();
+
+    await transaction.save();
+
+    const userData = transaction.userId as any;
+
+    res.status(OK).json({
+      status: 'success',
+      message: 'Tiket Valid. Akses Masuk Diberikan. ✅',
+      data: {
+        ticketId: ticket._id,
+        scannedAt: ticket.scannedAt,
+        operatorName: operator.name,
+        user: {
+          fullname: userData.profile?.fullname || 'N/A',
+          idNumber: userData.idNumber || 'N/A',
+          gender: userData.profile?.gender || 'N/A',
+        }
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const revertTicketScanHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { ticketId } = req.body;
+    const adminUser = req.user;
+
+    appAssert(ticketId, BAD_REQUEST, 'Ticket ID (payload) diperlukan.');
+
+    appAssert(
+      adminUser && adminUser.role === 'superadmin',
+      FORBIDDEN,
+      'AKSES DITOLAK. Hanya Superadmin yang dapat membatalkan status scan tiket.'
+    );
+
+    const result = await TransactionModel.updateOne(
+      { 'tickets._id': ticketId },
+      {
+        $set: { 'tickets.$.isScanned': false },
+        $unset: {
+          'tickets.$.scannedBy': '',
+          'tickets.$.scannedAt': '',
+        },
+      }
+    );
+
+    if (result.modifiedCount === 0) {
+      const existingTicket = await TransactionModel.findOne(
+        { 'tickets._id': ticketId },
+        { 'tickets.$': 1 }
+      );
+      if (!existingTicket) {
+        throw new AppError(NOT_FOUND, `Tiket dengan ID ${ticketId} tidak ditemukan.`);
+      }
+      throw new AppError(BAD_REQUEST, 'Gagal update. Status tiket ini memang sudah "false" (belum discan).');
+    }
+
+    res.status(OK).json({
+      status: 'success',
+      message: `Status scan untuk tiket ${ticketId} berhasil dibatalkan (di-reset ke false).`,
+    });
 
   } catch (error) {
     next(error);

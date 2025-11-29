@@ -8,6 +8,8 @@ const PurchasedTicketSchema = new Schema<IPurchasedTicket>({
   isScanned: { type: Boolean, default: false },
   quantity: { type: Number, default: 1 },
   price: { type: Number, default: 0 },
+  scannedBy: { type: Schema.Types.ObjectId, ref: "User" },
+  scannedAt: { type: Date },
 })
 
 const TransactionSchema = new Schema<ITransaction>(
@@ -18,7 +20,7 @@ const TransactionSchema = new Schema<ITransaction>(
     totalPrice: { type: Number, required: true, min: 0 },
     status: {
       type: String,
-      enum: ["expired", "reject", "pending", "paid"],
+      enum: ["expired", "refund", "reject", "pending", "paid"],
       default: "pending",
     },
     transactionMethod: {

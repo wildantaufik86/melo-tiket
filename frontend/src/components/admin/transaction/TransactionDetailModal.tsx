@@ -4,6 +4,7 @@ import { regenerateTransaction, revertTransaction, updatePaymentProof, updateTra
 import { useAuth } from "@/context/authUserContext";
 import { ToastError, ToastSuccess } from "@/lib/validations/toast/ToastNofication";
 import { ITransaction } from "@/types/Transaction";
+import { getStatusClass } from "@/utils/statusHelper";
 import { useState } from "react";
 
 interface ModalProps {
@@ -20,7 +21,7 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
     const [isVerifying, setIsVerifying] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
-    const [selectedStatus, setSelectedStatus] = useState<'pending' | 'paid'>(transaction.status as 'pending' | 'paid');
+    const [selectedStatus, setSelectedStatus] = useState<'refund' | 'pending' | 'paid'>(transaction.status as 'refund' | 'pending' | 'paid');
     const [isRegenerating, setIsRegenerating] = useState(false);
     const [loading, setLoading] = useState(false);
     const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -126,53 +127,110 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
         <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex justify-center items-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div className="flex justify-between items-center mb-4 border-b pb-2">
-                    <h2 className="text-lg font-bold">Transaction Details - {transaction._id ?? ''}</h2>
+                    <h2 className="text-lg font-bold">Detail Transaksi</h2>
                     <button onClick={onClose} className="text-2xl font-bold">&times;</button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
-                    <div>
-                        <p><strong>User:</strong> {isUserObject(transaction.userId) ? transaction.userId.name : 'N/A'}</p>
-                        <p><strong>Email:</strong> {isUserObject(transaction.userId) ? transaction.userId.email : 'N/A'}</p>
-                        <p><strong>Ticket:</strong> {transaction.tickets.length}</p>
-                        <p><strong>Total:</strong> {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(transaction.totalPrice)}</p>
+                <div className="flex justify-between items-start bg-gray-200 p-4 rounded-md mb-6 text-gray-800">
+                  <div className="text-start text-[10px] md:text-sm space-y-1 md:space-y-2 font-semibold">
+                    <p>ID</p>
+                    <p>Tanggal</p>
+                    <p>Nama Pengguna</p>
+                    <p>Email</p>
+                    <p>Jumlah Tiket</p>
+                    <p>Metode Pembayaran</p>
+                    <p>Status</p>
+                    <p>Jumlah Transaksi</p>
+                  </div>
+                  <div className="text-end text-[10px] md:text-sm space-y-1 md:space-y-2">
+                    <p>{transaction._id ?? ''}</p>
+                    <p>{new Date(transaction.createdAt!).toLocaleString('id-ID')}</p>
+                    <p>{isUserObject(transaction.userId) ? transaction.userId.name : 'N/A'}</p>
+                    <p>{isUserObject(transaction.userId) ? transaction.userId.email : 'N/A'}</p>
+                    <p>{transaction.tickets.length}</p>
+                    <p>{transaction.transactionMethod}</p>
+                    <div className="flex justify-end">
+                      <p className={`${getStatusClass(transaction.status)}`}>{transaction.status}</p>
                     </div>
-                    <div>
-                        <p><strong>Status:</strong> <span className="font-semibold capitalize">{transaction.status}</span></p>
-                        <p><strong>Method:</strong> {transaction.transactionMethod}</p>
-                        <p><strong>Date:</strong> {new Date(transaction.createdAt!).toLocaleString('id-ID')}</p>
-                    </div>
+                    <p className="font-bold">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(transaction.totalPrice)}</p>
+                  </div>
                 </div>
 
                 {transaction.paymentProof && (
                     <div className="mb-4">
-                        <h3 className="font-semibold mb-2">Payment Proof</h3>
+                        <h3 className="font-semibold text-sm md:text-md mb-2">Bukti Pembayaran</h3>
                         <a href={`${transaction.paymentProof}`} target="_blank" rel="noopener noreferrer">
-                            <img src={`${transaction.paymentProof}`} alt="Payment Proof" className="max-w-xs border rounded-md"/>
+                            <img src={`${transaction.paymentProof}`} alt="Payment Proof" className="w-full border rounded-md"/>
                         </a>
                     </div>
                 )}
 
-                {/* Aksi hanya untuk transaksi yang 'pending' */}
-                {transaction.status === 'pending' && (
-                    <div className="flex justify-end gap-4 pt-4 border-t">
-                        <button
-                            onClick={() => handleVerify('reject')}
-                            disabled={isVerifying}
-                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-400">
-                            {isVerifying ? 'Processing...' : 'Reject'}
-                        </button>
-                        <button
-                            onClick={() => handleVerify('paid')}
-                            disabled={isVerifying}
-                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400">
-                            {isVerifying ? 'Processing...' : 'Approve Payment'}
-                        </button>
+                {authUser?.authUser?.role === 'superadmin' && (
+                  transaction.status === 'paid') && (
+                    <div className="border-t">
+                      <h3 className="font-semibold text-sm md:text-md mt-4">Status Transaksi</h3>
+                      <div className="flex flex-col justify-between md:flex-row md:gap-20 items-center gap-4 pt-2 text-sm md:text-md">
+                          <select
+                              value={selectedStatus}
+                              onChange={(e) => setSelectedStatus(e.target.value as 'pending' | 'paid')}
+                              className="border w-full rounded-md px-3 py-2"
+                              disabled={isUpdating}
+                          >
+                              <option value="pending">Pending</option>
+                              <option value="paid">Paid</option>
+                          </select>
+                          <button
+                              onClick={handleStatusUpdate}
+                              disabled={isUpdating || selectedStatus === transaction.status}
+                              className="px-2 py-2 w-full bg-blue-600 font-bold text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
+                          >
+                              {isUpdating ? 'Memproses...' : 'Perbaharui'}
+                          </button>
+                      </div>
                     </div>
+                )}
+                {['admin', 'superadmin'].includes(authUser?.authUser?.role || '') && (
+                    <>
+                    <div className="mt-4 border-t pt-4">
+                        <h3 className="text-sm font-medium block mb-2">Unggah Bukti Pembayaran Baru</h3>
+                        <div className="flex flex-col md:flex-row items-center gap-3 justify-between text-sm md:text-md">
+                          <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) setUploadFile(file);
+                              }}
+                              className="border rounded-md p-2 text-sm w-full"
+                          />
+                          <button
+                              onClick={handleUpdatePaymentProof}
+                              disabled={loading || !uploadFile}
+                              className="px-2 py-2 bg-green-600 font-bold text-white w-full md:max-w-fit rounded-md hover:bg-green-700 disabled:bg-gray-400"
+                          >
+                              {loading ? 'Uploading...' : 'Simpan'}
+                          </button>
+                        </div>
+                    </div>
+                    {transaction.status === 'paid' && (
+                    <div className="w-full py-2 flex justify-between text-sm md:text-md mt-10">
+                        <button
+                            onClick={handleRegenerate}
+                            disabled={isRegenerating}
+                            className="px-4 py-2 bg-indigo-600 text-white rounded-md font-bold hover:bg-indigo-700 disabled:bg-indigo-400"
+                        >
+                            {isRegenerating ? "Regenerating..." : "Cetak Ulang Tiket"}
+                        </button>
+                        {authUser?.authUser?.role === 'superadmin' && (
+                        <button className="bg-rose-500 text-white px-3 py-2 rounded-lg font-bold">Refund Tiket</button>
+                        )}
+                    </div>
+                    )}
+                    </>
                 )}
                 {authUser?.authUser?.role === 'superadmin' &&
                  (transaction.status === 'reject' || transaction.status === 'expired') && (
-                    <div className="flex justify-end pt-4 border-t">
+                    <div className="flex justify-end pt-4 mt-4 text-sm md:text-md border-t">
                         <button
                             onClick={handleRevert}
                             disabled={isProcessing}
@@ -181,62 +239,15 @@ export default function TransactionDetailModal({ transaction, onClose, onSuccess
                         </button>
                     </div>
                 )}
-                {authUser?.authUser?.role === 'superadmin' && (
-                  transaction.status === 'paid') && (
-                    <div className="flex flex-col justify-end md:flex-row items-center gap-4 pt-4 border-t">
-                        <select
-                            value={selectedStatus}
-                            onChange={(e) => setSelectedStatus(e.target.value as 'pending' | 'paid')}
-                            className="border rounded-md px-3 py-2"
-                            disabled={isUpdating}
-                        >
-                            <option value="pending">Pending</option>
-                            <option value="paid">Paid</option>
-                        </select>
-                        <button
-                            onClick={handleStatusUpdate}
-                            disabled={isUpdating || selectedStatus === transaction.status}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400"
-                        >
-                            {isUpdating ? 'Updating...' : 'Update Status'}
+                {transaction.status === 'pending' && (
+                    <div className="flex justify-between mt-4 text-sm md:text-md gap-4 pt-4 border-t">
+                        <button onClick={() => handleVerify('reject')} disabled={isVerifying} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:bg-red-400">
+                          {isVerifying ? 'Processing...' : 'Tolak'}
+                        </button>
+                        <button onClick={() => handleVerify('paid')} disabled={isVerifying} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400">
+                          {isVerifying ? 'Processing...' : 'Konfirmasi Pembayaran'}
                         </button>
                     </div>
-                )}
-                {['admin', 'superadmin'].includes(authUser?.authUser?.role || '') && (
-                  <div className="mt-4 border-t pt-4 flex flex-col md:flex-row items-center gap-3 justify-between">
-                    <div className="flex-1">
-                      <label className="text-sm font-medium block mb-1">
-                        Upload Payment Proof Baru
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) setUploadFile(file);
-                        }}
-                        className="border rounded-md p-2 text-sm w-full"
-                      />
-                    </div>
-
-                    <div className="flex gap-3 mt-5">
-                      <button
-                        onClick={handleUpdatePaymentProof}
-                        disabled={loading || !uploadFile}
-                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
-                      >
-                        {loading ? 'Uploading...' : 'Update Payment Proof'}
-                      </button>
-
-                      <button
-                        onClick={handleRegenerate}
-                        disabled={isRegenerating}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-indigo-400"
-                      >
-                        {isRegenerating ? "Regenerating..." : "Regenerate Ticket"}
-                      </button>
-                    </div>
-                  </div>
                 )}
             </div>
         </div>

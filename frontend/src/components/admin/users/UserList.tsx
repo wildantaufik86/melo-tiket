@@ -2,6 +2,7 @@
 
 import { useAuth } from '@/context/authUserContext';
 import { IUser } from '@/types/User';
+import { getStatusClass } from '@/utils/statusHelper';
 import { PencilIcon, TrashIcon } from '@phosphor-icons/react';
 
 interface UserListProps {
@@ -32,7 +33,7 @@ export default function UserList({ users, onEdit, onDelete }: UserListProps) {
               <td className="py-3 px-4">{user.email}</td>
               <td className="py-3 px-4">{user.idNumber}</td>
               <td className="py-3 px-4 text-center">
-                <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 capitalize">
+                <span className={`${getStatusClass(user.role)} text-sm`}>
                   {user.role}
                 </span>
               </td>

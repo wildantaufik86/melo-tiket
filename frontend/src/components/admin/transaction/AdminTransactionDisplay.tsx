@@ -93,12 +93,12 @@ export default function AdminTransactionDisplay() {
     };
 
     return (
-        <section>
+        <section className='mt-27 lg:mt-0'>
             <BreadCrumb items={breadcrumbItems} />
             <div className="w-full bg-white rounded-lg shadow-xl p-6 sm:p-8 border border-gray-200">
-              <div className="flex justify-between items-center mb-6 gap-4">
+              <div className="flex md:justify-between flex-col  md:flex-row items-center mb-6 gap-4">
                 <h1 className="text-xl font-extrabold text-gray-900">Transaction Management</h1>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <input
                     type="text"
                     placeholder="Search by user or transaction ID..."
@@ -109,15 +109,15 @@ export default function AdminTransactionDisplay() {
                     }}
                     className="border rounded-lg px-3 py-2 text-sm"
                   />
+                  <TransactionFilter currentFilter={statusFilter} onFilterChange={handleFilterChange} />
                   {authUser?.authUser?.role === 'superadmin' && (
                   <button
                     onClick={handleExportToExcel}
                     disabled={isExporting}
                     className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                      {isExporting ? 'Mengekspor...' : 'Export to Excel'}
+                      {isExporting ? 'Mengekspor...' : 'Export'}
                   </button>
                   )}
-                  <TransactionFilter currentFilter={statusFilter} onFilterChange={handleFilterChange} />
                 </div>
               </div>
 

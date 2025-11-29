@@ -8,6 +8,8 @@ export interface IPurchasedTicket {
   isScanned: boolean;
   quantity?: number;
   price?: number;
+  scannedBy?: string;
+  scannedAt?: Date;
 }
 
 export interface IRevertTransactionPayload {
@@ -21,7 +23,7 @@ export interface ITransaction extends Document {
   isComplimentary: boolean;
   totalTicket: number;
   totalPrice: number;
-  status: 'expired' | 'reject' | 'pending' | 'paid';
+  status: 'refund' | 'expired' | 'reject' | 'pending' | 'paid';
   transactionMethod: 'Online' | 'Onsite';
   expiredAt: string;
   paymentProof?: string;
